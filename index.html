@@ -541,11 +541,11 @@ tr:nth-child(even) { background: #f8f9ff; }
 <div class="section">
   <h2>历史报告存档</h2>
   <table>
-    <tr><th>日期</th><th>文件</th><th>说明</th></tr>
-    <tr><td>2026-07-23</td><td><a href="reports/20260723.html">reports/20260723.html</a></td><td>当日盘中快照（最新）</td></tr>
-    <tr><td>2026-07-22</td><td><a href="reports/20260722.html">reports/20260722.html</a></td><td>收盘完整版 · 极端情绪日</td></tr>
+    <tr><th>日期</th><th>HTML版（带样式）</th><th>Markdown版（AI可读）</th><th>说明</th></tr>
+    <tr><td>2026-07-23</td><td><a href="reports/20260723.html">20260723.html</a></td><td><a href="reports/20260723.md">20260723.md</a></td><td>当日盘中快照（最新）</td></tr>
+    <tr><td>2026-07-22</td><td><a href="reports/20260722.html">20260722.html</a></td><td><a href="reports/20260722.md">20260722.md</a></td><td>收盘完整版 · 极端情绪日</td></tr>
   </table>
-  <div class="note">每日收盘后自动归档至 reports/YYYYMMDD.html，index.html 同步更新为当日最新报告。</div>
+  <div class="note">每日收盘后自动归档至 reports/YYYYMMDD.html + .md，index.html 同步更新为当日最新报告。Markdown版本可通过 raw.githubusercontent.com 读取，供ChatGPT等AI工具使用。</div>
 </div>
 
 <!-- Footer -->

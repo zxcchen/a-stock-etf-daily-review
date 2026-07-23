@@ -5,15 +5,26 @@
 ## 仓库结构
 
 ```
-index.html                # 首页（展示当日最新复盘数据，每日更新）
+index.html                # 首页（展示当日最新复盘数据，每日更新，带样式）
 reports/                  # 历史报告归档
-├── 20260722.html         # 7/22 收盘完整版
-├── 20260723.html         # 7/23 盘中快照
-└── YYYYMMDD.html         # 每日按日期命名
+├── 20260722.html         # HTML版（带样式渲染）
+├── 20260722.md           # Markdown版（纯文本，AI可读）
+├── 20260723.html
+├── 20260723.md
+└── YYYYMMDD.html/.md     # 每日按日期命名，同时生成HTML和MD
 ```
 
-> **命名规则**：`reports/YYYYMMDD.html`（如 `20260723.html`）  
-> **index.html**：每日更新，内嵌当日完整看盘数据 + 顶部导航链接到历史报告
+> **命名规则**：`reports/YYYYMMDD.html` + `reports/YYYYMMDD.md`（如 `20260723.html` / `20260723.md`）  
+> **index.html**：每日更新，内嵌当日完整看盘数据 + 顶部导航链接到历史报告  
+> **Markdown版本**：供ChatGPT等AI工具读取，通过 raw.githubusercontent.com 访问
+
+## 链接格式
+
+| 用途 | 链接格式 | 示例 |
+|------|---------|------|
+| 带样式预览 | `https://zxcchen.github.io/a-stock-etf-daily-review/` | 首页 |
+| HTML报告 | `https://zxcchen.github.io/a-stock-etf-daily-review/reports/YYYYMMDD.html` | 7/23报告 |
+| **Markdown（AI可读）** | `https://raw.githubusercontent.com/zxcchen/a-stock-etf-daily-review/main/reports/YYYYMMDD.md` | 7/23 MD |
 
 ## 模板版本：V3.0（20章）
 
