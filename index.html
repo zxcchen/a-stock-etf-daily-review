@@ -55,6 +55,9 @@ tr:nth-child(even) { background: #f8f9ff; }
 .nav-link { color: rgba(255,255,255,0.6); text-decoration: none; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; transition: all 0.2s; }
 .nav-link:hover { color: #fff; background: rgba(255,255,255,0.1); }
 .nav-link.active { color: #fff; background: rgba(255,255,255,0.15); }
+.nav-tools { display: flex; gap: 14px; align-items: center; }
+.nav-tools a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 12px; font-weight: 600; transition: all 0.2s; }
+.nav-tools a:hover { color: #fff; }
 .nav-github a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 12px; transition: color 0.2s; }
 .nav-github a:hover { color: #fff; }
 </style>
@@ -72,7 +75,9 @@ tr:nth-child(even) { background: #f8f9ff; }
       <a href="reports/20260723.html" class="nav-link active">07/23</a>
       <a href="reports/20260722.html" class="nav-link">07/22</a>
     </div>
-    <div class="nav-github">
+    <div class="nav-tools">
+      <a href="latest.md" target="_blank" title="AI可读固定入口">📄 Latest.md</a>
+      <a href="trade_signal.md" target="_blank" title="策略信号文档">📈 信号策略</a>
       <a href="https://github.com/zxcchen/a-stock-etf-daily-review" target="_blank">GitHub</a>
     </div>
   </div>
@@ -537,6 +542,17 @@ tr:nth-child(even) { background: #f8f9ff; }
   </table>
 </div>
 
+<!-- AI工具固定入口 -->
+<div class="section">
+  <h2>AI工具读取入口</h2>
+  <table>
+    <tr><th>用途</th><th>文件</th><th>链接</th><th>说明</th></tr>
+    <tr><td>最新报告（固定入口）</td><td>latest.md</td><td><a href="latest.md">latest.md</a></td><td>每日自动同步最新复盘，ChatGPT可直接读取</td></tr>
+    <tr><td>交易策略文档</td><td>trade_signal.md</td><td><a href="trade_signal.md">trade_signal.md</a></td><td>信号定义、等级、仓位、验证计划</td></tr>
+  </table>
+  <div class="note">提示：将 <code>https://zxcchen.github.io/a-stock-etf-daily-review/latest.md</code> 发给ChatGPT，即可自动读取当日最新数据；将 <code>trade_signal.md</code> 一并发送，可让AI按统一框架分析。</div>
+</div>
+
 <!-- 历史报告存档 -->
 <div class="section">
   <h2>历史报告存档</h2>
@@ -545,7 +561,7 @@ tr:nth-child(even) { background: #f8f9ff; }
     <tr><td>2026-07-23</td><td><a href="reports/20260723.html">20260723.html</a></td><td><a href="reports/20260723.md">20260723.md</a></td><td>当日盘中快照（最新）</td></tr>
     <tr><td>2026-07-22</td><td><a href="reports/20260722.html">20260722.html</a></td><td><a href="reports/20260722.md">20260722.md</a></td><td>收盘完整版 · 极端情绪日</td></tr>
   </table>
-  <div class="note">每日收盘后自动归档至 reports/YYYYMMDD.html + .md，index.html 同步更新为当日最新报告。Markdown版本可通过 raw.githubusercontent.com 读取，供ChatGPT等AI工具使用。</div>
+  <div class="note">每日收盘后自动归档至 reports/YYYYMMDD.html + .md，index.html 同步更新为当日最新报告。历史Markdown版本可通过 raw.githubusercontent.com 读取。</div>
 </div>
 
 <!-- Footer -->

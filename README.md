@@ -6,6 +6,8 @@
 
 ```
 index.html                # 首页（展示当日最新复盘数据，每日更新，带样式）
+latest.md                 # 固定入口：每日自动同步最新复盘报告（AI可读）
+trade_signal.md           # 交易策略文档：信号定义、等级、仓位、验证计划
 reports/                  # 历史报告归档
 ├── 20260722.html         # HTML版（带样式渲染）
 ├── 20260722.md           # Markdown版（纯文本，AI可读）
@@ -16,7 +18,9 @@ reports/                  # 历史报告归档
 
 > **命名规则**：`reports/YYYYMMDD.html` + `reports/YYYYMMDD.md`（如 `20260723.html` / `20260723.md`）  
 > **index.html**：每日更新，内嵌当日完整看盘数据 + 顶部导航链接到历史报告  
-> **Markdown版本**：供ChatGPT等AI工具读取，通过 raw.githubusercontent.com 访问
+> **latest.md**：固定入口文件，每日自动复制最新报告内容，方便ChatGPT等AI工具读取  
+> **trade_signal.md**：策略框架文档，记录信号定义、阈值、等级、仓位建议、验证计划  
+> **Markdown版本**：供ChatGPT等AI工具读取，通过 GitHub Pages 或 raw.githubusercontent.com 访问
 
 ## 链接格式
 
@@ -24,7 +28,9 @@ reports/                  # 历史报告归档
 |------|---------|------|
 | 带样式预览 | `https://zxcchen.github.io/a-stock-etf-daily-review/` | 首页 |
 | HTML报告 | `https://zxcchen.github.io/a-stock-etf-daily-review/reports/YYYYMMDD.html` | 7/23报告 |
-| **Markdown（AI可读）** | `https://raw.githubusercontent.com/zxcchen/a-stock-etf-daily-review/main/reports/YYYYMMDD.md` | 7/23 MD |
+| **Latest.md（AI固定入口）** | `https://zxcchen.github.io/a-stock-etf-daily-review/latest.md` | 最新报告 |
+| **Trade Signal.md（策略文档）** | `https://zxcchen.github.io/a-stock-etf-daily-review/trade_signal.md` | 策略信号 |
+| 历史Markdown | `https://raw.githubusercontent.com/zxcchen/a-stock-etf-daily-review/main/reports/YYYYMMDD.md` | 7/23 MD |
 
 ## 模板版本：V3.0（20章）
 
