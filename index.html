@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A股每日复盘V3.0 — ETF异动择时模型研究</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(135deg, #0f0c29 0%, #1a1a2e 50%, #16213e 100%);
+  min-height: 100vh;
+  color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+.container {
+  max-width: 800px;
+  width: 100%;
+}
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.header h1 {
+  font-size: 28px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.header .subtitle {
+  font-size: 15px;
+  color: #8b8ba7;
+}
+.header .badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 3px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.report-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: #e0e0e0;
+}
+.report-card:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(102, 126, 234, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+}
+.report-card .left { flex: 1; }
+.report-card .date {
+  font-size: 13px;
+  color: #8b8ba7;
+  margin-bottom: 4px;
+}
+.report-card .title {
+  font-size: 17px;
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.report-card .desc {
+  font-size: 13px;
+  color: #8b8ba7;
+}
+.report-card .arrow {
+  font-size: 20px;
+  color: #667eea;
+  margin-left: 16px;
+}
+.report-card .tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+.tag-v3 { background: rgba(102, 126, 234, 0.2); color: #a5b4fc; }
+.tag-v2 { background: rgba(39, 174, 96, 0.2); color: #6ee7b7; }
+.tag-live { background: rgba(231, 76, 60, 0.2); color: #fca5a5; }
+.footer {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 12px;
+  color: #555;
+  line-height: 1.8;
+}
+.footer a { color: #667eea; text-decoration: none; }
+.model-info {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 32px;
+}
+.model-info h3 {
+  font-size: 14px;
+  color: #a5b4fc;
+  margin-bottom: 12px;
+}
+.model-info p {
+  font-size: 13px;
+  color: #8b8ba7;
+  line-height: 1.8;
+}
+.model-info .signal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.signal-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #8b8ba7;
+}
+.signal-item strong { color: #e0e0e0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>A股每日复盘 <span class="badge">V3.0</span></h1>
+    <div class="subtitle">ETF异动择时模型研究 &middot; 每日自动生成收盘复盘报告</div>
+  </div>
+
+  <div class="model-info">
+    <h3>核心假设</h3>
+    <p>极端情绪 + 宽基ETF异动 + 高成交额 → 中长期重要拐点</p>
+    <div class="signal-grid">
+      <div class="signal-item"><strong>A:</strong> 下跌家数 &gt; 3500</div>
+      <div class="signal-item"><strong>B:</strong> ETF放量 ≥ 1.5x</div>
+      <div class="signal-item"><strong>C:</strong> 成交额 &gt; 2万亿</div>
+      <div class="signal-item"><strong>D:</strong> 跌停 &gt; 50</div>
+    </div>
+  </div>
+
+  <a class="report-card" href="reports/A%E8%82%A1%E6%AF%8F%E6%97%A5%E5%A4%8D%E7%9B%98_V3.0_20260723.html">
+    <div class="left">
+      <div class="date">2026-07-23</div>
+      <div class="title">7月23日 V3.0复盘<span class="tag tag-live">盘中快照</span></div>
+      <div class="desc">10:02盘中数据 · 情绪反转上涨3532家 · 科创50逆势跌1.96% · 立新能源6连板</div>
+    </div>
+    <div class="arrow">→</div>
+  </a>
+
+  <a class="report-card" href="reports/A%E8%82%A1%E6%AF%8F%E6%97%A5%E5%A4%8D%E7%9B%98_V3.0_20260722.html">
+    <div class="left">
+      <div class="date">2026-07-22</div>
+      <div class="title">7月22日 V3.0复盘<span class="tag tag-v3">V3.0完整版</span></div>
+      <div class="desc">收盘数据 · 创业板暴跌3.23% · 下跌3876家 · ETF缩量退潮 · 信号0星</div>
+    </div>
+    <div class="arrow">→</div>
+  </a>
+
+  <a class="report-card" href="reports/A%E8%82%A1%E6%AF%8F%E6%97%A5%E5%A4%8D%E7%9B%98_20260722_V2.0.html">
+    <div class="left">
+      <div class="date">2026-07-22</div>
+      <div class="title">7月22日 V2.0复盘<span class="tag tag-v2">首版</span></div>
+      <div class="desc">收盘数据 · 13章+V2.0扩展字段 · 极端情绪指数75分</div>
+    </div>
+    <div class="arrow">→</div>
+  </a>
+
+  <div class="footer">
+    <p>数据来源：腾讯自选股（westock-data接口） + Web搜索补充</p>
+    <p>每个交易日 15:30 自动生成 &middot; <a href="https://github.com/zxcchen/a-stock-etf-daily-review">查看源码仓库</a></p>
+    <p>本报告仅提供客观数据统计，不构成投资建议。投资有风险，决策需谨慎。</p>
+  </div>
+</div>
+</body>
+</html>
