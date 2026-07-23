@@ -1,7 +1,8 @@
 # ETF异动择时模型 — 交易信号与策略文档
 
-> **固定入口：** `https://zxcchen.github.io/a-stock-etf-daily-review/trade_signal.md`  
-> **用途：** 供ChatGPT/AI工具读取，结合每日 `latest.md` 复盘数据进行二次判断，形成可跟踪的交易信号系统。  
+> **固定入口：** `https://zxcchen.github.io/a-stock-etf-daily-review/trade_signal.txt`  
+> **备选入口：** `https://raw.githubusercontent.com/zxcchen/a-stock-etf-daily-review/main/trade_signal.md`  
+> **用途：** 供ChatGPT/AI工具读取，结合每日 `latest.txt` 复盘数据进行二次判断，形成可跟踪的交易信号系统。  
 > **更新频率：** 每日收盘后自动更新信号追踪表，策略框架长期有效。
 
 ---

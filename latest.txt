@@ -1,6 +1,7 @@
-<!-- 固定入口：latest.md — 此文件每日自动同步为最新复盘报告 -->
+<!-- 固定入口：latest.txt — 此文件每日自动同步为最新复盘报告 -->
 <!-- 当前最新报告：reports/20260723.md -->
-<!-- ChatGPT/AI读取入口：https://zxcchen.github.io/a-stock-etf-daily-review/latest.md -->
+<!-- ChatGPT/AI读取入口：https://zxcchen.github.io/a-stock-etf-daily-review/latest.txt -->
+<!-- 备选入口：https://raw.githubusercontent.com/zxcchen/a-stock-etf-daily-review/main/latest.md -->
 
 # A股每日复盘 V3.0 — ETF异动择时模型
 
