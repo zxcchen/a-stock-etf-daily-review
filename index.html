@@ -3,189 +3,559 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A股每日复盘V3.0 — ETF异动择时模型研究</title>
+<title>A股每日复盘 — ETF异动择时模型研究 | 最新：2026年7月23日</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: linear-gradient(135deg, #0f0c29 0%, #1a1a2e 50%, #16213e 100%);
-  min-height: 100vh;
-  color: #e0e0e0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-}
-.container {
-  max-width: 800px;
-  width: 100%;
-}
-.header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-.header h1 {
-  font-size: 28px;
-  color: #fff;
-  margin-bottom: 8px;
-}
-.header .subtitle {
-  font-size: 15px;
-  color: #8b8ba7;
-}
-.header .badge {
-  display: inline-block;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  padding: 3px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  margin-left: 6px;
-  vertical-align: middle;
-}
-.report-card {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 24px 28px;
-  margin-bottom: 16px;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  text-decoration: none;
-  color: #e0e0e0;
-}
-.report-card:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(102, 126, 234, 0.5);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
-}
-.report-card .left { flex: 1; }
-.report-card .date {
-  font-size: 13px;
-  color: #8b8ba7;
-  margin-bottom: 4px;
-}
-.report-card .title {
-  font-size: 17px;
-  color: #fff;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-.report-card .desc {
-  font-size: 13px;
-  color: #8b8ba7;
-}
-.report-card .arrow {
-  font-size: 20px;
-  color: #667eea;
-  margin-left: 16px;
-}
-.report-card .tag {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  margin-left: 8px;
-}
-.tag-v3 { background: rgba(102, 126, 234, 0.2); color: #a5b4fc; }
-.tag-v2 { background: rgba(39, 174, 96, 0.2); color: #6ee7b7; }
-.tag-live { background: rgba(231, 76, 60, 0.2); color: #fca5a5; }
-.footer {
-  text-align: center;
-  margin-top: 40px;
-  font-size: 12px;
-  color: #555;
-  line-height: 1.8;
-}
-.footer a { color: #667eea; text-decoration: none; }
-.model-info {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin-bottom: 32px;
-}
-.model-info h3 {
-  font-size: 14px;
-  color: #a5b4fc;
-  margin-bottom: 12px;
-}
-.model-info p {
-  font-size: 13px;
-  color: #8b8ba7;
-  line-height: 1.8;
-}
-.model-info .signal-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 8px;
-  margin-top: 12px;
-}
-.signal-item {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 12px;
-  color: #8b8ba7;
-}
-.signal-item strong { color: #e0e0e0; }
+body { font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.header { background: linear-gradient(135deg, #1a237e, #283593); color: #fff; padding: 30px; border-radius: 12px; margin-bottom: 20px; }
+.header h1 { font-size: 28px; margin-bottom: 8px; }
+.header .subtitle { font-size: 14px; opacity: 0.9; }
+.header .warning { background: #ff6f00; padding: 8px 16px; border-radius: 6px; display: inline-block; margin-top: 10px; font-size: 13px; font-weight: bold; }
+.section { background: #fff; border-radius: 10px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.section h2 { font-size: 18px; color: #1a237e; border-left: 4px solid #1a237e; padding-left: 12px; margin-bottom: 16px; }
+.section h3 { font-size: 15px; color: #333; margin: 12px 0 8px; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+th { background: #e8eaf6; color: #1a237e; padding: 8px 10px; text-align: center; font-weight: 600; border: 1px solid #c5cae9; }
+td { padding: 7px 10px; text-align: center; border: 1px solid #e0e0e0; }
+tr:nth-child(even) { background: #f8f9ff; }
+.red { color: #d32f2f; font-weight: bold; }
+.green { color: #2e7d32; font-weight: bold; }
+.tag { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 12px; margin: 2px; }
+.tag-red { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+.tag-green { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.tag-blue { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+.tag-orange { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+.tag-gray { background: #f5f5f5; color: #616161; border: 1px solid #e0e0e0; }
+.signal-box { padding: 16px; border-radius: 8px; margin: 10px 0; text-align: center; }
+.signal-none { background: #e8f5e9; border: 2px solid #a5d6a7; }
+.signal-low { background: #fff3e0; border: 2px solid #ffcc80; }
+.signal-mid { background: #ffebee; border: 2px solid #ef9a9a; }
+.signal-high { background: #ffebee; border: 2px solid #c62828; }
+.signal-box .stars { font-size: 24px; margin: 4px 0; }
+.signal-box .label { font-size: 16px; font-weight: bold; }
+.summary-table { width: 100%; }
+.summary-table td:first-child { font-weight: 600; text-align: left; width: 30%; }
+.note { font-size: 12px; color: #888; margin-top: 8px; }
+.highlight-box { background: #fffde7; border: 1px solid #fff59d; border-radius: 8px; padding: 12px; margin: 10px 0; font-size: 13px; }
+.checkbox-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin: 10px 0; }
+.checkbox-item { padding: 6px 12px; border-radius: 4px; font-size: 13px; }
+.checked-no { background: #f5f5f5; color: #757575; }
+.checked-yes { background: #ffebee; color: #c62828; font-weight: bold; }
+.footer { text-align: center; padding: 20px; color: #999; font-size: 12px; }
+.intraday-banner { background: #fff3e0; border: 2px solid #ff9800; border-radius: 8px; padding: 12px; margin: 10px 0; text-align: center; font-weight: bold; color: #e65100; }
+
+/* Navigation Bar */
+.nav-bar { position: sticky; top: 0; z-index: 100; background: rgba(26, 35, 126, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.15); padding: 0; }
+.nav-inner { max-width: 1200px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+.nav-brand { display: flex; align-items: center; gap: 8px; }
+.nav-logo { color: #fff; font-size: 16px; font-weight: 700; }
+.nav-badge { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.nav-links { display: flex; gap: 6px; }
+.nav-link { color: rgba(255,255,255,0.6); text-decoration: none; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+.nav-link:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.nav-link.active { color: #fff; background: rgba(255,255,255,0.15); }
+.nav-github a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 12px; transition: color 0.2s; }
+.nav-github a:hover { color: #fff; }
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="header">
-    <h1>A股每日复盘 <span class="badge">V3.0</span></h1>
-    <div class="subtitle">ETF异动择时模型研究 &middot; 每日自动生成收盘复盘报告</div>
-  </div>
-
-  <div class="model-info">
-    <h3>核心假设</h3>
-    <p>极端情绪 + 宽基ETF异动 + 高成交额 → 中长期重要拐点</p>
-    <div class="signal-grid">
-      <div class="signal-item"><strong>A:</strong> 下跌家数 &gt; 3500</div>
-      <div class="signal-item"><strong>B:</strong> ETF放量 ≥ 1.5x</div>
-      <div class="signal-item"><strong>C:</strong> 成交额 &gt; 2万亿</div>
-      <div class="signal-item"><strong>D:</strong> 跌停 &gt; 50</div>
+<!-- Navigation Bar -->
+<div class="nav-bar">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <span class="nav-logo">ETF异动择时模型</span>
+      <span class="nav-badge">V3.0</span>
+    </div>
+    <div class="nav-links">
+      <a href="reports/20260723.html" class="nav-link active">07/23</a>
+      <a href="reports/20260722.html" class="nav-link">07/22</a>
+    </div>
+    <div class="nav-github">
+      <a href="https://github.com/zxcchen/a-stock-etf-daily-review" target="_blank">GitHub</a>
     </div>
   </div>
+</div>
 
-  <a class="report-card" href="reports/A%E8%82%A1%E6%AF%8F%E6%97%A5%E5%A4%8D%E7%9B%98_V3.0_20260723.html">
-    <div class="left">
-      <div class="date">2026-07-23</div>
-      <div class="title">7月23日 V3.0复盘<span class="tag tag-live">盘中快照</span></div>
-      <div class="desc">10:02盘中数据 · 情绪反转上涨3532家 · 科创50逆势跌1.96% · 立新能源6连板</div>
-    </div>
-    <div class="arrow">→</div>
-  </a>
 
-  <a class="report-card" href="reports/A%E8%82%A1%E6%AF%8F%E6%97%A5%E5%A4%8D%E7%9B%98_V3.0_20260722.html">
-    <div class="left">
-      <div class="date">2026-07-22</div>
-      <div class="title">7月22日 V3.0复盘<span class="tag tag-v3">V3.0完整版</span></div>
-      <div class="desc">收盘数据 · 创业板暴跌3.23% · 下跌3876家 · ETF缩量退潮 · 信号0星</div>
-    </div>
-    <div class="arrow">→</div>
-  </a>
+<!-- Header -->
+<div class="header">
+  <h1>A股每日复盘 V3.0 — ETF异动择时模型</h1>
+  <div class="subtitle">2026年7月23日（周四）| 数据时间：10:55 盘中快照 | 生成时间：2026-07-23 10:56</div>
+  <div class="warning">⚠ 本报告为盘中实时快照（截至10:55），非收盘数据。完整收盘报告将在15:30由定时任务自动生成。</div>
+</div>
 
-  <a class="report-card" href="reports/A%E8%82%A1%E6%AF%8F%E6%97%A5%E5%A4%8D%E7%9B%98_20260722_V2.0.html">
-    <div class="left">
-      <div class="date">2026-07-22</div>
-      <div class="title">7月22日 V2.0复盘<span class="tag tag-v2">首版</span></div>
-      <div class="desc">收盘数据 · 13章+V2.0扩展字段 · 极端情绪指数75分</div>
-    </div>
-    <div class="arrow">→</div>
-  </a>
+<!-- Intraday Warning -->
+<div class="intraday-banner">
+  当前为A股盘中交易时段（9:30-15:00），以下数据均为实时盘中数据，成交额等指标将随交易继续增长。<br>
+  昨日（7/22）收盘数据作为对照参考一并列出。
+</div>
 
-  <div class="footer">
-    <p>数据来源：腾讯自选股（westock-data接口） + Web搜索补充</p>
-    <p>每个交易日 15:30 自动生成 &middot; <a href="https://github.com/zxcchen/a-stock-etf-daily-review">查看源码仓库</a></p>
-    <p>本报告仅提供客观数据统计，不构成投资建议。投资有风险，决策需谨慎。</p>
+<!-- 一、指数数据 -->
+<div class="section">
+  <h2>一、指数数据（盘中实时）</h2>
+  <table>
+    <tr><th>指数</th><th>最新点位</th><th>涨跌幅</th><th>成交额</th><th>振幅</th><th>量比</th></tr>
+    <tr><td>上证指数</td><td>3870.56</td><td class="red">+0.09%</td><td>3290.9亿</td><td>0.46%</td><td>2.03</td></tr>
+    <tr><td>深证成指</td><td>14116.66</td><td class="red">+0.39%</td><td>3913.3亿</td><td>1.22%</td><td>2.04</td></tr>
+    <tr><td>创业板指</td><td>3587.34</td><td class="red">+0.58%</td><td>1750.6亿</td><td>1.65%</td><td>1.96</td></tr>
+    <tr><td>沪深300</td><td>4720.42</td><td class="red">+0.07%</td><td>2326.1亿</td><td>0.58%</td><td>1.76</td></tr>
+    <tr><td>科创50</td><td>1823.55</td><td class="green">-1.96%</td><td>447.9亿</td><td>2.97%</td><td>1.50</td></tr>
+  </table>
+  <div class="highlight-box">
+    <b>对比昨日收盘（7/22）：</b>上证3867.03(+0.07%) → 今日盘中3870.56(+0.09%)，微幅续涨；<br>
+    创业板3566.73(-3.23%) → 今日盘中3587.34(+0.58%)，昨日暴跌后小幅反弹；<br>
+    <b>科创50连续走弱</b>：1860.08 → 1823.55(-1.96%)，半导体存储方向持续承压。
   </div>
+</div>
+
+<!-- 二、市场情绪数据 -->
+<div class="section">
+  <h2>二、市场情绪数据</h2>
+  <h3>今日盘中实时</h3>
+  <table>
+    <tr><th>指标</th><th>今日盘中</th><th>昨日收盘(7/22)</th><th>变化</th></tr>
+    <tr><td>两市成交额</td><td>7224.33亿（部分）</td><td>26533.45亿</td><td>盘中进行中</td></tr>
+    <tr><td>上涨家数</td><td class="red">3532</td><td class="green">1530</td><td>+2002</td></tr>
+    <tr><td>下跌家数</td><td class="green">1826</td><td class="red">3875</td><td>-2049</td></tr>
+    <tr><td>平盘家数</td><td>172</td><td>125</td><td>+47</td></tr>
+    <tr><td>涨停家数</td><td class="red">53</td><td class="red">46</td><td>+7</td></tr>
+    <tr><td>跌停家数</td><td class="green">2</td><td class="green">1</td><td>+1</td></tr>
+    <tr><td>上涨占比</td><td class="red">63%</td><td>27.67%</td><td>+35.33pct</td></tr>
+  </table>
+  <div class="highlight-box">
+    <b>情绪反转：</b>昨日3875家下跌（极端偏弱），今日盘中已翻转为3532家上涨（63%），市场情绪显著修复。<br>
+    但科创50仍跌近2%，半导体方向资金分歧明显，属于结构性分化行情。
+  </div>
+  
+  <h3>连板梯队（7/22收盘 → 7/23盘中）</h3>
+  <table>
+    <tr><th>连板高度</th><th>7/22收盘</th><th>7/23盘中</th><th>方向</th></tr>
+    <tr><td>6连板</td><td>—</td><td class="red">立新能源</td><td>电力</td></tr>
+    <tr><td>5连板</td><td class="red">立新能源</td><td>—（晋级6板）</td><td>电力</td></tr>
+    <tr><td>4连板</td><td class="red">华银电力</td><td class="red">华银电力/美利云</td><td>电力/算力</td></tr>
+    <tr><td>3连板</td><td class="red">美利云</td><td class="red">证通电子</td><td>算力</td></tr>
+    <tr><td>2连板</td><td>9只</td><td>多只</td><td>—</td></tr>
+    <tr><td>首板</td><td>34只</td><td>进行中</td><td>—</td></tr>
+  </table>
+  <div class="note">连板最高高度：6板（立新能源，电力方向）| 昨日连板晋级率约60% | 炸板数据待收盘统计</div>
+</div>
+
+<!-- 三、ETF成交数据 -->
+<div class="section">
+  <h2>三、ETF成交数据（重点）</h2>
+  <h3>三大宽基ETF + 半导体ETF行情（盘中实时）</h3>
+  <table>
+    <tr><th>ETF</th><th>最新价</th><th>涨跌幅</th><th>盘中成交额</th><th>换手率</th><th>量比</th></tr>
+    <tr><td>沪深300ETF(510300)</td><td>4.773</td><td class="red">+0.17%</td><td>11.04亿</td><td>0.96%</td><td>0.25</td></tr>
+    <tr><td>创业板ETF(159915)</td><td>3.586</td><td class="red">+0.00%</td><td>34.95亿</td><td>5.83%</td><td>0.71</td></tr>
+    <tr><td>科创50ETF(588000)</td><td>1.886</td><td class="green">-3.53%</td><td>56.20亿</td><td>6.60%</td><td>0.97</td></tr>
+    <tr><td>半导体ETF(512480)</td><td>1.104</td><td class="green">-4.17%</td><td>12.33亿</td><td>6.00%</td><td>1.44</td></tr>
+  </table>
+  <div class="note">注：盘中成交额为截至10:55的部分数据，收盘后将大幅增长。512480半导体ETF作为科技板块风向标纳入观察。</div>
+
+  <h3>沪深300ETF(510300) 近5日OHLC表</h3>
+  <table>
+    <tr><th>日期</th><th>开盘价</th><th>收盘价</th><th>最高价</th><th>最低价</th><th>涨跌幅</th><th>成交额</th></tr>
+    <tr><td>7/22</td><td>4.750</td><td>4.765</td><td>4.823</td><td>4.750</td><td class="green">-0.52%</td><td>60.59亿</td></tr>
+    <tr><td>7/21</td><td>4.680</td><td>4.790</td><td>4.790</td><td>4.620</td><td class="red">+3.01%</td><td>128.95亿</td></tr>
+    <tr><td>7/20</td><td>4.630</td><td>4.650</td><td>4.690</td><td>4.580</td><td class="red">+1.31%</td><td>185.62亿</td></tr>
+    <tr><td>7/17</td><td>4.720</td><td>4.590</td><td>4.730</td><td>4.550</td><td class="green">-3.37%</td><td>146.49亿</td></tr>
+    <tr><td>7/16</td><td>4.780</td><td>4.750</td><td class="red">4.830</td><td>4.720</td><td class="green">-1.86%</td><td>79.09亿</td></tr>
+    <tr style="font-weight:bold;background:#e8eaf6;"><td>5日统计</td><td>—</td><td>—</td><td class="red">最高4.830</td><td class="green">最低4.550</td><td>—</td><td>均值120.15亿</td></tr>
+  </table>
+
+  <h3>创业板ETF(159915) 近5日OHLC表</h3>
+  <table>
+    <tr><th>日期</th><th>开盘价</th><th>收盘价</th><th>最高价</th><th>最低价</th><th>涨跌幅</th><th>成交额</th></tr>
+    <tr><td>7/22</td><td>3.650</td><td>3.586</td><td>3.716</td><td>3.575</td><td class="green">-3.34%</td><td>94.80亿</td></tr>
+    <tr><td>7/21</td><td>3.490</td><td>3.710</td><td>3.710</td><td>3.390</td><td class="red">+6.61%</td><td>152.66亿</td></tr>
+    <tr><td>7/20</td><td>3.510</td><td>3.480</td><td>3.570</td><td>3.360</td><td class="red">+0.58%</td><td>194.57亿</td></tr>
+    <tr><td>7/17</td><td>3.680</td><td>3.460</td><td>3.680</td><td>3.410</td><td class="green">-6.99%</td><td>154.27亿</td></tr>
+    <tr><td>7/16</td><td>3.770</td><td>3.720</td><td class="red">3.820</td><td>3.680</td><td class="green">-2.87%</td><td>77.70亿</td></tr>
+    <tr style="font-weight:bold;background:#e8eaf6;"><td>5日统计</td><td>—</td><td>—</td><td class="red">最高3.820</td><td class="green">最低3.360</td><td>—</td><td>均值134.80亿</td></tr>
+  </table>
+
+  <h3>科创50ETF(588000) 近5日OHLC表</h3>
+  <table>
+    <tr><th>日期</th><th>开盘价</th><th>收盘价</th><th>最高价</th><th>最低价</th><th>涨跌幅</th><th>成交额</th></tr>
+    <tr><td>7/22</td><td>1.963</td><td>1.955</td><td>2.038</td><td>1.935</td><td class="green">-3.22%</td><td>137.36亿</td></tr>
+    <tr><td>7/21</td><td>1.830</td><td>2.020</td><td>2.020</td><td>1.760</td><td class="red">+10.99%</td><td>173.22亿</td></tr>
+    <tr><td>7/20</td><td>1.850</td><td>1.820</td><td>1.870</td><td>1.740</td><td class="red">+0.55%</td><td>234.53亿</td></tr>
+    <tr><td>7/17</td><td>1.920</td><td>1.810</td><td>1.950</td><td>1.790</td><td class="green">-7.18%</td><td>142.87亿</td></tr>
+    <tr><td>7/16</td><td>1.980</td><td>1.950</td><td class="red">2.050</td><td>1.930</td><td class="green">-3.94%</td><td>90.33亿</td></tr>
+    <tr style="font-weight:bold;background:#e8eaf6;"><td>5日统计</td><td>—</td><td>—</td><td class="red">最高2.050</td><td class="green">最低1.740</td><td>—</td><td>均值155.66亿</td></tr>
+  </table>
+
+  <h3>半导体ETF(512480) 近5日OHLC表</h3>
+  <table>
+    <tr><th>日期</th><th>开盘价</th><th>收盘价</th><th>最高价</th><th>最低价</th><th>涨跌幅</th><th>成交额</th></tr>
+    <tr><td>7/22</td><td>1.143</td><td>1.152</td><td>1.210</td><td>1.138</td><td class="red">+1.06%</td><td>26.88亿</td></tr>
+    <tr><td>7/21</td><td>1.060</td><td>1.140</td><td>1.140</td><td>1.000</td><td class="red">+9.62%</td><td>28.39亿</td></tr>
+    <tr><td>7/20</td><td>1.100</td><td>1.040</td><td>1.110</td><td>1.010</td><td class="green">-2.80%</td><td>21.12亿</td></tr>
+    <tr><td>7/17</td><td>1.140</td><td>1.070</td><td>1.160</td><td>1.060</td><td class="green">-6.14%</td><td>22.12亿</td></tr>
+    <tr><td>7/16</td><td>1.190</td><td>1.160</td><td class="red">1.240</td><td>1.150</td><td class="green">-2.52%</td><td>18.09亿</td></tr>
+    <tr style="font-weight:bold;background:#e8eaf6;"><td>5日统计</td><td>—</td><td>—</td><td class="red">最高1.240</td><td class="green">最低1.000</td><td>—</td><td>均值23.32亿</td></tr>
+  </table>
+
+  <div class="highlight-box">
+    <b>四只ETF近5日OHLC对比要点：</b><br>
+    • <b>510300</b>：5日最高4.830(7/16) / 最低4.550(7/17)，振幅6.1%。7/20放量185.62亿后持续缩量至60.59亿<br>
+    • <b>159915</b>：5日最高3.820(7/16) / 最低3.360(7/20)，振幅13.5%。7/20探底3.36后7/21反弹至3.71，7/22回落至3.586<br>
+    • <b>588000</b>：5日最高2.050(7/16) / 最低1.740(7/20)，振幅15.9%。7/21暴涨+10.99%至2.02后7/22回落-3.22%<br>
+    • <b>512480</b>：5日最高1.240(7/16) / 最低1.000(7/21)，振幅24%，波动最剧烈。7/21探底1.000后反弹但今日续跌-4.17%
+  </div>
+</div>
+
+<!-- 四、V3.0 ETF放量倍数量化 -->
+<div class="section">
+  <h2>四、【V3.0新增】ETF放量倍数量化表</h2>
+  <table>
+    <tr><th>ETF</th><th>今日盘中</th><th>昨日(7/22)</th><th>近5日均值</th><th>昨日放量倍数</th><th>趋势</th></tr>
+    <tr><td>510300</td><td>11.04亿(部分)</td><td>60.59亿</td><td>120.15亿</td><td class="green">0.50x</td><td>连续缩量</td></tr>
+    <tr><td>159915</td><td>34.95亿(部分)</td><td>94.80亿</td><td>134.80亿</td><td class="green">0.70x</td><td>缩量</td></tr>
+    <tr><td>588000</td><td>56.20亿(部分)</td><td>137.36亿</td><td>155.66亿</td><td class="green">0.88x</td><td>缩量</td></tr>
+  </table>
+  <div class="highlight-box">
+    <b>5日均值计算明细（7/22~7/16）：</b><br>
+    510300：60.59 + 128.95 + 185.62 + 146.49 + 79.09 = 600.74亿 → 均值120.15亿<br>
+    159915：94.80 + 152.66 + 194.57 + 154.27 + 77.70 = 674.00亿 → 均值134.80亿<br>
+    588000：137.36 + 173.22 + 234.53 + 142.87 + 90.33 = 778.31亿 → 均值155.66亿<br><br>
+    <b>关键发现：</b>7/20是近期ETF放量峰值日（510300达185.62亿、159915达194.57亿、588000达234.53亿，三大ETF均破百亿），7/21维持放量，7/22全面缩量至5日均值的50-88%。今日盘中成交额为部分值，需收盘后确认是否出现新的放量信号。
+  </div>
+</div>
+
+<!-- 五、ETF净申赎 -->
+<div class="section">
+  <h2>五、【V3.0新增】ETF净申赎数据</h2>
+  <h3>三大宽基ETF净申赎</h3>
+  <table>
+    <tr><th>ETF</th><th>近期净申赎</th><th>资金流向</th><th>来源</th></tr>
+    <tr><td>沪深300ETF(510300)</td><td>盘中主力净流入约0.81亿</td><td>小幅净流入</td><td>同花顺iFinD</td></tr>
+    <tr><td>创业板ETF(159915)</td><td>月内净流入超210亿元</td><td class="red">持续大额净流入</td><td>每日经济新闻/Wind</td></tr>
+    <tr><td>科创50ETF(588000)</td><td>近5日净流入190.19亿（4日净流入），近1周规模增长195.32亿</td><td class="red">持续大额净流入</td><td>Wind/有连云</td></tr>
+  </table>
+  <h3>全市场ETF净申赎</h3>
+  <table>
+    <tr><th>指标</th><th>数据</th><th>来源</th></tr>
+    <tr><td>全市场股票ETF净申赎</td><td>待收盘后更新</td><td>—</td></tr>
+    <tr><td>昨日(7/22)全市场ETF</td><td>净赎回54.54亿</td><td>昨日报告</td></tr>
+    <tr><td>通信ETF(515880)</td><td>近30日净流入172.46亿</td><td>每日经济新闻</td></tr>
+  </table>
+  <div class="highlight-box">
+    <b>净申赎要点：</b><br>
+    • 159915月内净流入超210亿，创业板深化改革落地成效显著，资金持续借道ETF布局成长板块<br>
+    • 588000近5日4日净流入，合计"吸金"190.19亿，日均净流入38.04亿，规模增长195.32亿<br>
+    • 510300盘中主力小幅净流入0.81亿，整体维持平稳<br>
+    • 注意：159915和588000持续大额净流入，但价格仍在调整，说明申购资金以"抄底"为主，尚未形成价格推动
+  </div>
+  <div class="note">ETF净申赎数据通常在收盘后2-3小时公布，今日完整数据将在15:30定时报告中更新。</div>
+</div>
+
+<!-- 六、行业ETF异动 -->
+<div class="section">
+  <h2>六、行业ETF异动</h2>
+  <h3>行业ETF行情（盘中实时）</h3>
+  <table>
+    <tr><th>ETF</th><th>最新价</th><th>涨跌幅</th><th>盘中成交额</th><th>量比</th><th>异动判断</th></tr>
+    <tr><td>通信ETF(515880)</td><td>0.686</td><td class="red">+2.24%</td><td>13.40亿</td><td>1.62</td><td>量比偏高</td></tr>
+    <tr><td>有色金属ETF(512400)</td><td>1.789</td><td class="red">+1.19%</td><td>3.29亿</td><td>2.64</td><td>量比偏高</td></tr>
+    <tr><td>电力ETF(159611)</td><td>1.093</td><td class="red">+0.28%</td><td>3.57亿</td><td>2.21</td><td>—</td></tr>
+    <tr><td>煤炭ETF(515220)</td><td>1.226</td><td class="red">+0.16%</td><td>3.42亿</td><td>2.06</td><td>—</td></tr>
+    <tr><td>半导体ETF(512480)</td><td>1.104</td><td class="green">-4.17%</td><td>12.33亿</td><td>1.44</td><td>持续调整</td></tr>
+    <tr><td>医药ETF(512010)</td><td>0.373</td><td class="green">-1.06%</td><td>1.15亿</td><td>1.23</td><td>—</td></tr>
+  </table>
+  <div class="highlight-box">
+    <b>行业ETF异动观察：</b>通信ETF量比1.62且涨2.24%，有色金属ETF量比2.64，资金明显流入通信和有色方向。<br>
+    半导体ETF持续下跌-4.17%，存储芯片方向资金仍在撤离。电力/煤炭维持强势但涨幅收窄。
+  </div>
+</div>
+
+<!-- 七、资金流向 -->
+<div class="section">
+  <h2>七、资金流向</h2>
+  <h3>行业板块资金流入TOP5（盘中实时）</h3>
+  <table>
+    <tr><th>排名</th><th>板块</th><th>涨跌幅</th><th>主力净流入</th><th>5日净流入</th><th>涨跌比</th></tr>
+    <tr><td>1</td><td>元件</td><td class="red">+2.80%</td><td>+21.70亿</td><td>-14.77亿</td><td>59/60</td></tr>
+    <tr><td>2</td><td>消费电子</td><td class="red">+1.91%</td><td>+14.02亿</td><td>-4.71亿</td><td>66/91</td></tr>
+    <tr><td>3</td><td>电网设备</td><td class="red">+2.25%</td><td>+10.52亿</td><td>-0.50亿</td><td>119/126</td></tr>
+  </table>
+  <h3>概念板块涨幅TOP6（盘中实时）</h3>
+  <table>
+    <tr><th>排名</th><th>概念</th><th>涨跌幅</th><th>领涨股</th></tr>
+    <tr><td>1</td><td>昨日连板</td><td class="red">+6.64%</td><td>证通电子(+10.04%)</td></tr>
+    <tr><td>2</td><td>昨日涨停</td><td class="red">+4.64%</td><td>五洲医疗(+20.00%)</td></tr>
+    <tr><td>3</td><td>MLCC</td><td class="red">+4.61%</td><td>昀冢科技(+20.00%)</td></tr>
+    <tr><td>4</td><td>被动元件概念</td><td class="red">+3.92%</td><td>昀冢科技(+20.00%)</td></tr>
+    <tr><td>5</td><td>可燃冰</td><td class="red">+3.62%</td><td>德石股份(+19.19%)</td></tr>
+    <tr><td>6</td><td>昨日首板</td><td class="red">+3.59%</td><td>五洲医疗(+20.00%)</td></tr>
+  </table>
+  <h3>行业板块涨幅TOP6（盘中实时）</h3>
+  <table>
+    <tr><th>排名</th><th>行业</th><th>涨跌幅</th><th>换手率</th><th>领涨股</th></tr>
+    <tr><td>1</td><td>汽车服务</td><td class="red">+3.64%</td><td>0.57%</td><td>阿尔特(+8.30%)</td></tr>
+    <tr><td>2</td><td>能源金属</td><td class="red">+3.39%</td><td>2.04%</td><td>博迁新材(+10.00%)</td></tr>
+    <tr><td>3</td><td>油服工程</td><td class="red">+3.28%</td><td>0.77%</td><td>潜能恒信(+10.22%)</td></tr>
+    <tr><td>4</td><td>玻璃玻纤</td><td class="red">+3.23%</td><td>1.23%</td><td>宏和科技(+5.88%)</td></tr>
+    <tr><td>5</td><td>元件</td><td class="red">+2.80%</td><td>2.26%</td><td>贤丰控股(+10.06%)</td></tr>
+    <tr><td>6</td><td>照明设备</td><td class="red">+2.72%</td><td>0.45%</td><td>民爆光电(+5.89%)</td></tr>
+  </table>
+</div>
+
+<!-- 八、今日最强主线 -->
+<div class="section">
+  <h2>八、今日最强主线</h2>
+  <h3>涨幅前三板块</h3>
+  <table>
+    <tr><th>排名</th><th>板块</th><th>涨幅</th><th>逻辑</th></tr>
+    <tr><td>①</td><td>汽车服务</td><td class="red">+3.64%</td><td>超跌反弹</td></tr>
+    <tr><td>②</td><td>能源金属</td><td class="red">+3.39%</td><td>有色金属供需改善，中信建投看多</td></tr>
+    <tr><td>③</td><td>油服工程</td><td class="red">+3.28%</td><td>中东局势紧张+油价上涨</td></tr>
+  </table>
+  <h3>跌幅前三方向</h3>
+  <table>
+    <tr><th>排名</th><th>方向</th><th>跌幅</th><th>逻辑</th></tr>
+    <tr><td>①</td><td>科创50</td><td class="green">-1.96%</td><td>半导体存储持续调整，德明利8天6跌停</td></tr>
+    <tr><td>②</td><td>半导体ETF</td><td class="green">-4.17%</td><td>光模块/存储退潮，资金撤离</td></tr>
+    <tr><td>③</td><td>医药ETF</td><td class="green">-1.06%</td><td>防御性偏弱，资金切换至顺周期</td></tr>
+  </table>
+</div>
+
+<!-- 九、市场风格 -->
+<div class="section">
+  <h2>九、市场风格</h2>
+  <div>
+    <span class="tag tag-red">☑ 大盘股</span>
+    <span class="tag tag-gray">☐ 小盘股</span>
+    <span class="tag tag-gray">☐ 科技成长</span>
+    <span class="tag tag-red">☑ 红利价值</span>
+    <span class="tag tag-gray">☐ 消费</span>
+    <span class="tag tag-red">☑ 周期</span>
+    <span class="tag tag-red">☑ 金融</span>
+    <span class="tag tag-gray">☐ 高股息</span>
+    <span class="tag tag-gray">☐ AI</span>
+    <span class="tag tag-gray">☐ 半导体</span>
+    <span class="tag tag-gray">☐ 机器人</span>
+    <span class="tag tag-gray">☐ 创新药</span>
+    <span class="tag tag-gray">☐ 军工</span>
+    <span class="tag tag-gray">☐ 新能源</span>
+    <span class="tag tag-red">☑ 电力</span>
+    <span class="tag tag-red">☑ 有色金属</span>
+    <span class="tag tag-red">☑ 算力</span>
+  </div>
+  <div class="highlight-box">
+    <b>资金主要攻击方向：</b>电力（立新能源6连板领衔）+ 算力租赁（美利云4连板）+ 有色金属（能源金属+3.39%）+ 油气（中东局势）。<br>
+    资金从半导体存储/光模块撤离，高低切换至电力、有色、通信设备。大盘价值风格主导（沪深300 > 中证1000 +8%），价值指数 > 成长指数 +5%。
+  </div>
+</div>
+
+<!-- 十、融资融券 -->
+<div class="section">
+  <h2>十、【V3.0新增】融资融券数据</h2>
+  <table>
+    <tr><th>指标</th><th>数据</th><th>日期</th></tr>
+    <tr><td>融资余额</td><td>约27182.82亿</td><td>7/22</td></tr>
+    <tr><td>融资买入额</td><td>约+528亿</td><td>7/22</td></tr>
+    <tr><td>今日数据</td><td>待收盘后更新</td><td>—</td></tr>
+  </table>
+  <div class="note">融资融券数据有1日延迟，今日数据将在收盘后次日公布。昨日融资余额维持高位，杠杆资金未出现大规模去杠杆。</div>
+</div>
+
+<!-- 十一、重要新闻 -->
+<div class="section">
+  <h2>十一、重要新闻</h2>
+  <table>
+    <tr><th>#</th><th>标题</th><th>来源</th></tr>
+    <tr><td>①</td><td>证监会再重磅发声；7万亿产业大利好（国务院批复）</td><td>腾讯自选股</td></tr>
+    <tr><td>②</td><td>财政部部长蓝佛安：以更大力度落实财政金融协同促内需一揽子政策</td><td>人民日报</td></tr>
+    <tr><td>③</td><td>谷歌Q2云业务超预期飙升82%，上调全年资本开支指引</td><td>华尔街见闻</td></tr>
+    <tr><td>④</td><td>63亿特高压招标落地！电力板块走强，立新能源6连板</td><td>腾讯自选股</td></tr>
+    <tr><td>⑤</td><td>美威胁袭伊基础设施，伊朗军方：不允许本地区出口一滴石油</td><td>央视新闻</td></tr>
+  </table>
+  <div class="highlight-box">
+    <b>其他关注：</b>特斯拉Q2营收+26%但盈利-18%远逊预期 | 谷歌盘后跌超4% | OpenAI豪掷300亿建数据中心 | 高端PCB价格涨超300%订单排到2027 | 日韩股市大涨KOSPI+4% | 证监会本周座谈会释放三大信号
+  </div>
+</div>
+
+<!-- 十二、政策消息 -->
+<div class="section">
+  <h2>十二、政策消息</h2>
+  <table>
+    <tr><th>类别</th><th>内容</th></tr>
+    <tr><td>降准</td><td>无</td></tr>
+    <tr><td>降息</td><td>无（LPR 1年期3.00%/5年期3.50%维持不变，7/20更新）</td></tr>
+    <tr><td>财政政策</td><td>财政部部长蓝佛安：更大力度落实财政金融协同促内需</td></tr>
+    <tr><td>产业政策</td><td>国务院批复超7万亿元大产业；发改委发布《可再生能源发展"十五五"规划》；国家电网63亿特高压招标落地</td></tr>
+    <tr><td>监管政策</td><td>证监会再度发声，本周系列座谈会释放三大核心信号；坚决维护资本市场平稳健康运行</td></tr>
+    <tr><td>国际重大事件</td><td>美伊互放狠话，中东局势升温；特朗普预计9月联邦政府停摆；日元跌破163创1986年来新低</td></tr>
+  </table>
+</div>
+
+<!-- 十三、ETF异动历史匹配 -->
+<div class="section">
+  <h2>十三、ETF异动历史匹配</h2>
+  <div class="highlight-box">
+    <b>今日ETF异动判断：否</b><br>
+    今日为盘中时段，ETF成交额为部分值。从昨日（7/22）收盘数据看，三大ETF全部缩量（放量倍数0.50x/0.70x/0.88x），未发生宽基ETF异动。<br><br>
+    <b>近期ETF放量峰值日：7月20日</b>（510300: 185.62亿, 159915: 194.57亿, 588000: 234.53亿，三大ETF均破百亿）<br>
+    <b>7/20异动信号追踪：</b>次日(7/21)创业板+3.40%反弹 → 第2日(7/22)创业板-3.23%暴跌 → 第3日(7/23盘中)创业板+0.58%企稳<br>
+    <b>结论：</b>7/20的ETF放量信号对应的是短期反弹而非中长期拐点，后续需继续追踪5日/20日表现。
+  </div>
+</div>
+
+<!-- 十四、风险指标 -->
+<div class="section">
+  <h2>十四、风险指标</h2>
+  <h3>今日盘中（10:55）</h3>
+  <div class="checkbox-list">
+    <div class="checkbox-item checked-no">☐ 千股跌停</div>
+    <div class="checkbox-item checked-no">☐ 超3000家下跌</div>
+    <div class="checkbox-item checked-no">☐ 超4000家下跌</div>
+    <div class="checkbox-item checked-no">☐ 超4500家下跌</div>
+    <div class="checkbox-item checked-no">☐ 超200家跌停</div>
+    <div class="checkbox-item checked-no">☐ 超300家跌停</div>
+    <div class="checkbox-item checked-no">☐ 两市成交额突破2万亿（盘中7224亿）</div>
+    <div class="checkbox-item checked-no">☐ 三大ETF成交额均突破100亿（盘中部分）</div>
+    <div class="checkbox-item checked-no">☐ ETF尾盘异动</div>
+    <div class="checkbox-item checked-no">☐ 国家队疑似入场</div>
+  </div>
+  <div class="highlight-box">
+    <b>对比昨日（7/22）：</b>超3000家下跌☑（3875家）+ 超4000家下跌☑（3875家接近但未超4000）+ 两市成交额破2万亿☑（26533亿）→ 今日情绪明显修复（仅1826家下跌），无极端风险指标触发。
+  </div>
+</div>
+
+<!-- 十五、信号阈值检测 -->
+<div class="section">
+  <h2>十五、【V3.0新增】信号阈值检测表</h2>
+  <table>
+    <tr><th>条件</th><th>阈值</th><th>今日盘中</th><th>昨日(7/22)</th><th>触发</th></tr>
+    <tr><td>A: 下跌家数</td><td>>3500</td><td>1826</td><td>3875</td><td>7/22触发✓ / 7/23未触发✗</td></tr>
+    <tr><td>B: ETF放量≥1.5x(2只)</td><td>≥1.5</td><td>盘中部分</td><td>0.50/0.70/0.88</td><td>✗</td></tr>
+    <tr><td>C: 两市成交额</td><td>>2万亿</td><td>7224亿(部分)</td><td>26533亿</td><td>7/22触发✓ / 7/23待确认</td></tr>
+    <tr><td>D: 跌停家数</td><td>>50</td><td>2</td><td>1</td><td>✗</td></tr>
+  </table>
+</div>
+
+<!-- 十六、信号等级评级 -->
+<div class="section">
+  <h2>十六、【V3.0新增】信号等级评级</h2>
+  <div class="signal-box signal-none">
+    <div class="stars">☆☆☆☆☆</div>
+    <div class="label">0星 — 无信号</div>
+  </div>
+  <table>
+    <tr><th>评级</th><th>条件</th><th>今日</th></tr>
+    <tr><td>0星</td><td>无ETF放量（放量倍数<1.0x）</td><td class="red">当前</td></tr>
+    <tr><td>1星</td><td>1只ETF放量≥1.5x</td><td>—</td></tr>
+    <tr><td>2星</td><td>2只ETF放量≥1.5x + 成交额>2万亿</td><td>—</td></tr>
+    <tr><td>3星</td><td>2只ETF放量≥1.5x + 下跌>3500 + 成交额>2万亿</td><td>—</td></tr>
+    <tr><td>4星</td><td>3星 + 跌停>50</td><td>—</td></tr>
+    <tr><td>5星</td><td>4星 + 极端情绪共振（极端拐点）</td><td>—</td></tr>
+  </table>
+  <div class="highlight-box">
+    <b>评级依据：</b>昨日三大ETF全部缩量（最高仅0.88x），今日盘中ETF成交额为部分值暂无法判断。极端情绪方面，今日下跌仅1826家（远低于3500阈值），市场情绪修复中，不满足信号触发条件。
+  </div>
+</div>
+
+<!-- 十七、极端情绪指数 -->
+<div class="section">
+  <h2>十七、【V3.0新增】极端情绪指数</h2>
+  <table>
+    <tr><th>指标</th><th>今日盘中(7/23)</th><th>昨日(7/22)</th><th>极端判断</th></tr>
+    <tr><td>上涨家数</td><td class="red">3532</td><td>1530</td><td>7/23偏强 / 7/22偏弱</td></tr>
+    <tr><td>下跌家数</td><td class="green">1826</td><td class="red">3875</td><td>7/23正常 / 7/22极端</td></tr>
+    <tr><td>跌停家数</td><td>2</td><td>1</td><td>均正常</td></tr>
+    <tr><td>ETF异动</td><td>否</td><td>否</td><td>均无</td></tr>
+    <tr><td>两市成交额</td><td>7224亿(部分)</td><td>26533亿</td><td>7/22放量 / 7/23待确认</td></tr>
+  </table>
+  <div class="highlight-box">
+    <b>极端情绪评分：</b><br>
+    7/23盘中：25分（情绪偏强，无极端信号）<br>
+    7/22收盘：75分（情绪极端偏弱，下跌3875家+成交26533亿，但ETF未放量）<br><br>
+    <b>核心发现：</b>7/22是情绪极端日但ETF未放量（缩量），按模型不触发拐点信号。7/23情绪快速修复（3532家上涨），符合"极端情绪后反弹"的历史规律，但由于缺乏ETF放量配合，属于普通反弹而非模型定义的"重要拐点"。
+  </div>
+</div>
+
+<!-- 十八、跨市场参考 -->
+<div class="section">
+  <h2>十八、【V3.0新增】跨市场参考数据</h2>
+  <table>
+    <tr><th>指标</th><th>最新值</th><th>变化</th><th>信号意义</th></tr>
+    <tr><td>美元指数</td><td>101.12-101.14</td><td>-0.03%</td><td>小幅走弱</td></tr>
+    <tr><td>美国10年国债收益率</td><td>4.6626%</td><td>+3.45BP</td><td>两月高位，加息预期重燃</td></tr>
+    <tr><td>中国10年国债收益率</td><td>1.728%</td><td>-0.52BP</td><td>维持低位</td></tr>
+    <tr><td>人民币(在岸)</td><td>6.7740</td><td>-72pips</td><td>小幅贬值</td></tr>
+    <tr><td>人民币(离岸)</td><td>6.7749</td><td>-60pips</td><td>—</td></tr>
+    <tr><td>人民币(中间价)</td><td>6.7933</td><td>-16pips</td><td>—</td></tr>
+    <tr><td>COMEX黄金</td><td>4135.0美元/盎司</td><td class="red">+1.44%</td><td>历史新高！避险情绪升温</td></tr>
+    <tr><td>现货黄金</td><td>4130.07美元/盎司</td><td class="red">+1.31%</td><td>同步新高</td></tr>
+    <tr><td>WTI原油</td><td>86.48-86.83美元</td><td class="red">+2.54~2.95%</td><td>中东局势推升</td></tr>
+    <tr><td>布伦特原油</td><td>94.07-95.31美元</td><td class="red">+3.36~4.72%</td><td>逼近95美元</td></tr>
+    <tr><td>道指</td><td>52218.58</td><td class="green">-0.01%</td><td>基本持平</td></tr>
+    <tr><td>纳指</td><td>25690.90</td><td class="green">-0.57%</td><td>科技股回调</td></tr>
+    <tr><td>标普500</td><td>7498.96</td><td class="green">-0.14%</td><td>—</td></tr>
+    <tr><td>日经225</td><td>66115.60</td><td class="green">-0.18%</td><td>日元贬值压力</td></tr>
+    <tr><td>韩国KOSPI</td><td>—</td><td class="red">+4%</td><td>存储巨头飙涨</td></tr>
+    <tr><td>港股恒指</td><td>—</td><td class="red">+0.3%高开</td><td>半导体走强</td></tr>
+  </table>
+  <div class="highlight-box">
+    <b>跨市场要点：</b><br>
+    1. <b>黄金创历史新高4135美元</b>，避险情绪极度升温，利好黄金/有色板块<br>
+    2. <b>中东局势紧张升级</b>（美伊互放狠话），油价暴涨布伦特逼近95美元，利好油气板块<br>
+    3. <b>美债收益率升至两月高位4.66%</b>，对A股估值形成压制，但中美利差扩大可能加速资金回流<br>
+    4. <b>日元跌破163创1986年来新低</b>，亚洲货币承压<br>
+    5. <b>KOSPI+4%</b>，存储巨头飙涨（三星/SK海力士），但A股存储方向仍在调整（德明利跌停）
+  </div>
+</div>
+
+<!-- 十九、后续标记字段 -->
+<div class="section">
+  <h2>十九、【V3.0新增】后续标记字段（前瞻性回测设计）</h2>
+  <table>
+    <tr><th>标记日</th><th>信号类型</th><th>次日涨跌幅</th><th>5日累计</th><th>20日累计</th><th>状态</th></tr>
+    <tr><td>7/20</td><td>ETF放量峰值日（三大ETF均破百亿）</td><td class="red">+1.79%(7/21)</td><td>待填入</td><td>待填入</td><td>追踪中</td></tr>
+    <tr><td>7/22</td><td>极端情绪日（3875家下跌）无ETF放量</td><td class="red">+0.58%(7/23盘中)</td><td>待填入</td><td>待填入</td><td>追踪中</td></tr>
+    <tr><td>7/23</td><td>—</td><td>—</td><td>—</td><td>—</td><td>未触发信号</td></tr>
+  </table>
+  <div class="note">每日复盘时自动补填前一日的"次日涨跌幅"字段。积累30天后可统计信号触发日 → 后续N日涨幅分布，验证模型有效性。</div>
+</div>
+
+<!-- 二十、总结 -->
+<div class="section">
+  <h2>二十、总结（仅客观）</h2>
+  <table class="summary-table">
+    <tr><td>指标</td><td>今日数据</td></tr>
+    <tr><td>市场情绪</td><td class="red">修复中（上涨3532家/63%，较昨日27.67%大幅改善）</td></tr>
+    <tr><td>资金强弱</td><td>元件+消费电子+电网设备资金流入TOP3，半导体/光模块资金流出</td></tr>
+    <tr><td>ETF状态</td><td>三大ETF昨日全部缩量（0.50x/0.70x/0.88x），512480半导体ETF跌-4.17%，今日盘中部分</td></tr>
+    <tr><td>市场风格</td><td>大盘价值主导，电力+有色+算力主线，红利防御</td></tr>
+    <tr><td>是否极端行情</td><td><span class="tag tag-green">否</span>（今日情绪正常，昨日7/22为极端日）</td></tr>
+    <tr><td>是否出现ETF异动</td><td><span class="tag tag-gray">否</span>（三大ETF未放量）</td></tr>
+    <tr><td>是否值得重点跟踪</td><td>★★☆☆☆（2/5星 — 情绪修复日，无ETF信号，常规跟踪）</td></tr>
+  </table>
+</div>
+
+<!-- 历史报告存档 -->
+<div class="section">
+  <h2>历史报告存档</h2>
+  <table>
+    <tr><th>日期</th><th>文件</th><th>说明</th></tr>
+    <tr><td>2026-07-23</td><td><a href="reports/20260723.html">reports/20260723.html</a></td><td>当日盘中快照（最新）</td></tr>
+    <tr><td>2026-07-22</td><td><a href="reports/20260722.html">reports/20260722.html</a></td><td>收盘完整版 · 极端情绪日</td></tr>
+  </table>
+  <div class="note">每日收盘后自动归档至 reports/YYYYMMDD.html，index.html 同步更新为当日最新报告。</div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <p>数据来源：腾讯自选股行情接口（westock-data）+ Web搜索补充（每日经济新闻/Wind/有连云）</p>
+  <p>报告类型：V3.0 | 当前展示：2026-07-23 盘中快照 | 每个交易日15:30自动更新收盘报告</p>
+  <p>仓库结构：index.html（当日最新）+ reports/YYYYMMDD.html（历史归档）</p>
+  <p>本报告仅提供客观数据统计，不构成任何投资建议。投资有风险，决策需谨慎。</p>
+</div>
+
 </div>
 </body>
 </html>
