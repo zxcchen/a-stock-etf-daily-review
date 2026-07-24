@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A股每日复盘 — ETF异动择时模型</title>
+<style>
+  :root {
+    --bg: #0a0e27; --card-bg: #111640; --border: #1e2350;
+    --text: #c8d0e0; --text-muted: #6b7394; --accent: #4a9eff;
+    --red: #ef4444; --green: #22c55e; --gold: #f59e0b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; padding: 20px; max-width: 1000px; margin: 0 auto; line-height: 1.6; }
+  h1 { text-align: center; font-size: 1.6em; color: #e8ecff; margin: 20px 0; }
+  h2 { font-size: 1.2em; color: var(--accent); margin: 25px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin: 12px 0; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .stat { background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; text-align: center; }
+  .stat .label { color: var(--text-muted); font-size: 0.8em; }
+  .stat .value { font-size: 1.2em; font-weight: 700; margin-top: 4px; }
+  .red { color: var(--red); }
+  .green { color: var(--green); }
+  .gold { color: var(--gold); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85em; margin: 8px 0; }
+  th { background: #0d1233; color: var(--accent); padding: 8px; text-align: left; border-bottom: 2px solid var(--border); }
+  td { padding: 7px 8px; border-bottom: 1px solid var(--border); }
+  .signal-box { background: linear-gradient(135deg, #1a1040, #0d1233); border: 1px solid #4a2d80; border-radius: 8px; padding: 16px; margin: 12px 0; text-align: center; }
+  .signal-stars { font-size: 1.8em; color: var(--gold); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; font-weight: 600; }
+  .badge-yes { background: rgba(239,68,68,0.2); color: var(--red); }
+  .badge-no { background: rgba(34,197,94,0.15); color: var(--green); }
+  .nav-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+  .nav-links a { color: var(--accent); text-decoration: none; padding: 6px 14px; background: rgba(74,158,255,0.08); border-radius: 14px; font-size: 0.85em; }
+  .nav-links a:hover { background: rgba(74,158,255,0.2); }
+  .footer { text-align: center; color: var(--text-muted); font-size: 0.8em; margin-top: 30px; padding: 15px; border-top: 1px solid var(--border); }
+  @media (max-width: 600px) { .grid, .grid-3 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>📊 A股每日复盘 — ETF异动择时模型</h1>
+<p style="text-align:center;color:var(--text-muted);margin-bottom:20px;">最新数据：2026年7月24日（星期五）收盘 | 模板 V3.0</p>
+
+<!-- 今日信号 -->
+<div class="signal-box">
+  <p style="color:#c4b5fd;font-size:0.9em;">信号评级</p>
+  <div class="signal-stars">☆☆☆☆☆ 0星</div>
+  <p style="color:#9db4d0;font-size:0.85em;margin-top:5px;">无ETF放量 — 不触发拐点信号 | 常规跟踪</p>
+</div>
+
+<!-- 今日关键指标 -->
+<div class="card">
+  <h2 style="margin-top:0;">📈 今日关键指标</h2>
+  <div class="grid-3">
+    <div class="stat"><div class="label">上证指数</div><div class="value green">3,814.20 <small style="font-size:0.7em">-1.61%</small></div></div>
+    <div class="stat"><div class="label">深证成指</div><div class="value green">13,774.68 <small style="font-size:0.7em">-2.47%</small></div></div>
+    <div class="stat"><div class="label">创业板指</div><div class="value green">3,480.87 <small style="font-size:0.7em">-2.65%</small></div></div>
+    <div class="stat"><div class="label">两市成交额</div><div class="value">19,312亿</div></div>
+    <div class="stat"><div class="label">涨 / 跌</div><div class="value"><span class="red">555</span> / <span class="green">4,940</span></div></div>
+    <div class="stat"><div class="label">涨停 / 跌停</div><div class="value"><span class="red">42</span> / <span class="green">25</span></div></div>
+  </div>
+</div>
+
+<!-- ETF 数据 -->
+<div class="card">
+  <h2 style="margin-top:0;">📊 四大ETF行情</h2>
+  <table>
+    <tr><th>ETF</th><th>名称</th><th>收盘价</th><th>涨跌幅</th><th>成交额（亿）</th><th>放量倍数</th></tr>
+    <tr><td>510300</td><td>沪深300ETF</td><td>4.701</td><td class="green">-1.80%</td><td>48.44</td><td class="gold">0.44x</td></tr>
+    <tr><td>159915</td><td>创业板ETF</td><td>3.508</td><td class="green">-2.47%</td><td>64.43</td><td class="gold">0.49x</td></tr>
+    <tr><td>588000</td><td>科创50ETF</td><td>1.885</td><td class="green">-0.16%</td><td>89.82</td><td class="gold">0.57x</td></tr>
+    <tr><td>512480</td><td>半导体ETF</td><td>1.113</td><td class="red">+0.63%</td><td>18.07</td><td class="gold">0.76x</td></tr>
+  </table>
+</div>
+
+<!-- 信号阈值 -->
+<div class="card">
+  <h2 style="margin-top:0;">⚡ 信号阈值检测</h2>
+  <table>
+    <tr><th>条件</th><th>代号</th><th>阈值</th><th>今日数值</th><th>触发</th></tr>
+    <tr><td>下跌家数</td><td>A</td><td>&gt; 3500家</td><td>4,940家</td><td><span class="badge badge-yes">✓</span></td></tr>
+    <tr><td>ETF放量倍数</td><td>B</td><td>≥ 2只 ≥ 1.5x</td><td>全部 &lt; 1.0x</td><td><span class="badge badge-no">✗</span></td></tr>
+    <tr><td>两市成交额</td><td>C</td><td>&gt; 2万亿</td><td>19,312亿</td><td><span class="badge badge-no">✗</span></td></tr>
+    <tr><td>跌停家数</td><td>D</td><td>&gt; 50家</td><td>25家</td><td><span class="badge badge-no">✗</span></td></tr>
+  </table>
+</div>
+
+<!-- 今日主线 -->
+<div class="card">
+  <h2 style="margin-top:0;">🎯 今日主线</h2>
+  <p><span class="red"><b>涨幅方向：</b></span>军工/兵装重组（多股涨停）→ 半导体（通富微电涨停）→ 工业气体（中船特气+19%）→ 银行（防御性上涨）</p>
+  <p style="margin-top:6px;"><span class="green"><b>跌幅方向：</b></span>贵金属/有色（招金黄金-7%）→ 电力（多股跌停）→ 算力租赁 → AI应用</p>
+  <p style="margin-top:6px;color:var(--text-muted);"><b>风格：</b>个股普跌（90%下跌），仅科技局部活跃+军工强势，周期和电力集体回调</p>
+</div>
+
+<!-- 跨市场 -->
+<div class="card">
+  <h2 style="margin-top:0;">🌍 跨市场参考</h2>
+  <table>
+    <tr><th>指标</th><th>数值</th><th>涨跌</th></tr>
+    <tr><td>美元指数</td><td>101.45</td><td class="red">+0.33%</td></tr>
+    <tr><td>美10年国债收益率</td><td>4.691%</td><td class="red">+3.86bp</td></tr>
+    <tr><td>WTI原油</td><td>92.36美元/桶</td><td class="red">+6.37%</td></tr>
+    <tr><td>COMEX黄金</td><td>4,052.30美元/盎司</td><td class="green">-2.40%</td></tr>
+    <tr><td>韩国KOSPI</td><td>6,690.62</td><td class="green">-5.72%</td></tr>
+    <tr><td>纳斯达克(7/23)</td><td>25,137.69</td><td class="green">-2.15%</td></tr>
+  </table>
+</div>
+
+<!-- 历史报告导航 -->
+<div class="card">
+  <h2 style="margin-top:0;">📁 历史报告</h2>
+  <div class="nav-links">
+    <a href="reports/20260724.html" target="_blank">📄 2026-07-24 完整报告（HTML）</a>
+    <a href="reports/20260724.md" target="_blank">📝 2026-07-24 完整报告（MD）</a>
+    <a href="reports/20260723.md" target="_blank">📝 2026-07-23 报告（MD）</a>
+    <a href="reports/20260722.md" target="_blank">📝 2026-07-22 报告（MD）</a>
+    <a href="latest.md" target="_blank">📌 最新报告（latest.md）</a>
+  </div>
+</div>
+
+<div class="footer">
+  <p>报告由A股每日复盘自动化生成 | 模板版本 V3.0 | 数据源：腾讯自选股 + 东方财富</p>
+  <p style="margin-top:8px;"><b>免责声明：</b>本报告仅为基于公开市场数据的客观统计，不构成任何投资建议。股市有风险，投资需谨慎。</p>
+</div>
+
+</body>
+</html>
