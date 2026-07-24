@@ -1,78 +1,78 @@
-# A股每日复盘V3.0 — ETF异动择时模型研究
+# A股每日复盘 V3.0 — ETF异动择时模型
 
-每日自动生成A股收盘复盘报告，围绕"极端情绪 + 宽基ETF异动 + 高成交额 → 中长期重要拐点"核心假设展开研究。
+> 自动化 A 股收盘数据观测与复盘分析系统。每日 15:00 自动生成两份报告。
+
+## 双模版体系
+
+| 报告 | 说明 | 位置 |
+|------|------|------|
+| **模版1：今日看板** | 20章数据仪表盘，含指数/ETF/情绪/资金/信号等 | `reports/YYYYMMDD.md` |
+| **模版2：复盘分析** | 基于模型的策略分析，含仓位建议/趋势判断 | `analysis/YYYYMMDD.md` |
+
+## 触发方式
+
+- **定时**：每个交易日 15:00 自动生成
+- **手动**：在 WorkBuddy 中说「今日看板」手动触发
+- 生成后自动推送到本仓库
 
 ## 仓库结构
 
 ```
-index.html                # 首页（展示当日最新复盘数据，每日更新，带样式）
-latest.txt                # 固定入口：每日自动同步最新复盘报告（AI可读，GitHub Pages服务）
-latest.md                 # 同上，raw.githubusercontent.com入口
-trade_signal.txt          # 交易策略文档：信号定义、等级、仓位、验证计划（GitHub Pages服务）
-trade_signal.md           # 同上，raw.githubusercontent.com入口
-reports/                  # 历史报告归档
-├── 20260722.html         # HTML版（带样式渲染）
-├── 20260722.md           # Markdown版（纯文本，AI可读）
-├── 20260723.html
+index.html                # 首页（展示当日最新复盘数据）
+latest.md                 # 固定入口：最新今日看板
+latest_analysis.md        # 固定入口：最新复盘分析
+trade_signal.md           # 交易策略文档
+templates/                # 模版格式说明
+├── daily-dashboard.md    # 模版1格式
+└── review-analysis.md    # 模版2格式
+reports/                  # 历史今日看板归档
+├── 20260722.md
 ├── 20260723.md
-└── YYYYMMDD.html/.md     # 每日按日期命名，同时生成HTML和MD
+├── 20260724.md
+└── YYYYMMDD.md
+analysis/                 # 历史复盘分析归档
+└── YYYYMMDD.md
 ```
 
-> **命名规则**：`reports/YYYYMMDD.html` + `reports/YYYYMMDD.md`（如 `20260723.html` / `20260723.md`）  
-> **index.html**：每日更新，内嵌当日完整看盘数据 + 顶部导航链接到历史报告  
-> **latest.txt**：固定入口文件，每日自动复制最新报告内容，方便ChatGPT等AI工具读取  
-> **trade_signal.txt**：策略框架文档，记录信号定义、阈值、等级、仓位建议、验证计划  
-> **注意**：GitHub Pages不支持 `.md` 文件直接访问，AI读取请用 `.txt` 版本或 `raw.githubusercontent.com`
+## 数据来源
 
-## 链接格式
+- 通达信 MCP（行情/K线/资金流向）
+- 腾讯自选股（市场数据）
+- 公开市场数据
 
-| 用途 | 链接格式 | 示例 |
-|------|---------|------|
-| 带样式预览 | `https://zxcchen.github.io/a-stock-etf-daily-review/` | 首页 |
-| HTML报告 | `https://zxcchen.github.io/a-stock-etf-daily-review/reports/YYYYMMDD.html` | 7/23报告 |
-| **最新数据（AI固定入口）** | `https://zxcchen.github.io/a-stock-etf-daily-review/latest.txt` | 最新报告 |
-| **策略文档（AI固定入口）** | `https://zxcchen.github.io/a-stock-etf-daily-review/trade_signal.txt` | 策略信号 |
-| 历史Markdown（Raw） | `https://raw.githubusercontent.com/zxcchen/a-stock-etf-daily-review/main/reports/YYYYMMDD.md` | 7/23 MD |
+## 分析模型
 
-## 模板版本：V3.0（20章）
-
-### 核心字段
-1. **极端情绪指数**（5项）：上涨家数/下跌家数/跌停家数/ETF异动/两市成交额
-2. **ETF放量倍数量化**：今日成交额 / 近5日均值，量化判定缩量/放量
-3. **ETF净申赎数据**：510300/159915/588000三大ETF各自净申赎
-4. **信号阈值检测**：4项条件自动检测，0-5星等级评级
-5. **后续标记字段**：次日/5日/20日涨跌幅追踪，前瞻性回测设计
-6. **跨市场参考**：美元指数/美债/人民币汇率/黄金/港股
-7. **四只ETF近5日OHLC表**：510300/159915/588000/512480
-
-### 信号阈值定义
-- A: 下跌家数 > 3500
-- B: ETF放量倍数 >= 1.5x（至少2只）
-- C: 两市成交额 > 2万亿
-- D: 跌停家数 > 50
+### 信号阈值定义（ABCD 条件）
+- **A**: 下跌家数 > 3500
+- **B**: ETF 放量倍数 ≥ 1.5x（至少 2 只）
+- **C**: 两市成交额 > 2 万亿
+- **D**: 跌停家数 > 50
 
 ### 信号等级
-- 0星：无ETF放量
-- 1星：关注
-- 2星：警惕
-- 3星：重视
-- 4星：重点跟踪
-- 5星：极端拐点信号
+- 0 星：无 ETF 放量
+- 1 星：关注
+- 2 星：警惕
+- 3 星：重视
+- 4 星：重点跟踪
+- 5 星：极端拐点信号
 
-### 观察ETF标的
+### 观察 ETF 标的
 | ETF | 代码 | 说明 |
 |-----|------|------|
 | 沪深300ETF | 510300 | 大盘价值风向标 |
 | 创业板ETF | 159915 | 成长科技风向标 |
 | 科创50ETF | 588000 | 硬科技风向标 |
-| 半导体ETF | 512480 | 科技板块风向标（含近5日OHLC表） |
+| 半导体ETF | 512480 | 科技板块风向标 |
 
-## 数据来源
-- 腾讯自选股（westock-data接口）
-- Web搜索补充（每日经济新闻/Wind/同花顺等）
+## 链接格式
 
-## 定时自动化
-每个交易日15:30（A股收盘后30分钟）自动生成当日完整复盘报告。
+| 用途 | 链接 |
+|------|------|
+| 带样式预览 | `https://zxcchen.github.io/a-stock-etf-daily-review/` |
+| 最新看板（AI入口） | `https://zxcchen.github.io/a-stock-etf-daily-review/latest.txt` |
+| 最新复盘（AI入口） | `https://raw.githubusercontent.com/zxcchen/a-stock-etf-daily-review/main/latest_analysis.md` |
+| 历史报告 | `https://raw.githubusercontent.com/zxcchen/a-stock-etf-daily-review/main/reports/YYYYMMDD.md` |
 
 ## 免责声明
+
 本报告仅提供客观数据统计，不构成任何投资建议。投资有风险，决策需谨慎。
