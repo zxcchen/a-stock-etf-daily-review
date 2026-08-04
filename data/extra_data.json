@@ -1,49 +1,4 @@
 {
-  "industries": [],
-  "industry_etfs": {
-    "512400": {
-      "name": "有色金属ETF南方",
-      "price": 1.798,
-      "change_pct": 1.12,
-      "amount_wan": 49863.0,
-      "turnover_pct": 2.16
-    },
-    "515220": {
-      "name": "煤炭ETF国泰",
-      "price": 1.166,
-      "change_pct": -0.85,
-      "amount_wan": 53182.0,
-      "turnover_pct": 3.95
-    },
-    "159611": {
-      "name": "电力ETF广发",
-      "price": 1.077,
-      "change_pct": -0.83,
-      "amount_wan": 33009.0,
-      "turnover_pct": 3.01
-    },
-    "515880": {
-      "name": "通信ETF国泰",
-      "price": 0.627,
-      "change_pct": 7.73,
-      "amount_wan": 328629.0,
-      "turnover_pct": 8.19
-    },
-    "512010": {
-      "name": "医药ETF易方达",
-      "price": 0.385,
-      "change_pct": 2.94,
-      "amount_wan": 66345.0,
-      "turnover_pct": 3.76
-    },
-    "512880": {
-      "name": "证券ETF国泰",
-      "price": 1.103,
-      "change_pct": -0.18,
-      "amount_wan": 81180.0,
-      "turnover_pct": 1.29
-    }
-  },
   "breadth": {
     "total": 0,
     "up": 0,
@@ -51,5 +6,50 @@
     "flat": 0,
     "limit_up": 0,
     "limit_down": 0
+  },
+  "industries": [],
+  "industry_etfs": {
+    "512400": {
+      "name": "有色金属ETF南方",
+      "price": 1.809,
+      "change_pct": 1.74,
+      "amount_wan": 82716.0,
+      "turnover_pct": 3.57
+    },
+    "515220": {
+      "name": "煤炭ETF国泰",
+      "price": 1.172,
+      "change_pct": -0.34,
+      "amount_wan": 95101.0,
+      "turnover_pct": 7.03
+    },
+    "159611": {
+      "name": "电力ETF广发",
+      "price": 1.076,
+      "change_pct": -0.92,
+      "amount_wan": 51005.0,
+      "turnover_pct": 4.66
+    },
+    "515880": {
+      "name": "通信ETF国泰",
+      "price": 0.637,
+      "change_pct": 9.45,
+      "amount_wan": 580324.0,
+      "turnover_pct": 14.28
+    },
+    "512010": {
+      "name": "医药ETF易方达",
+      "price": 0.383,
+      "change_pct": 2.41,
+      "amount_wan": 83943.0,
+      "turnover_pct": 4.76
+    },
+    "512880": {
+      "name": "证券ETF国泰",
+      "price": 1.104,
+      "change_pct": -0.09,
+      "amount_wan": 167161.0,
+      "turnover_pct": 2.66
+    }
   }
 }

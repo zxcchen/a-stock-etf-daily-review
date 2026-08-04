@@ -164,7 +164,7 @@ def generate_dashboard(main, extra):
 | 沪深300 | {idx['000300']['price']:,.2f} | {fmt_pct(idx['000300']['change_pct'])} | {idx['000300']['amount_wan']/10000:,.0f} |
 | 科创50 | {idx['000688']['price']:,.2f} | {fmt_pct(idx['000688']['change_pct'])} | {idx['000688']['amount_wan']/10000:,.0f} |
 
-> {'三大指数集体反弹' if idx['399006']['change_pct'] > 0 else '三大指数集体下跌'}，{'创业板暴涨' if idx['399006']['change_pct'] > 0 else '创业板跌'}{abs(idx['399006']['change_pct']):.2f}%{'领涨' if idx['399006']['change_pct'] > 0 else '领跌'}，科创50{'涨' if idx['000688']['change_pct'] > 0 else '跌'}{abs(idx['000688']['change_pct']):.2f}%，上证{'涨' if idx['000001']['change_pct'] > 0 else '跌'}{abs(idx['000001']['change_pct']):.2f}%。两市成交额约{total_amt:,.0f}亿（盘中未收盘）。
+> {'三大指数集体反弹' if idx['399006']['change_pct'] > 0 else '三大指数集体下跌'}，{'创业板暴涨' if idx['399006']['change_pct'] > 0 else '创业板跌'}{abs(idx['399006']['change_pct']):.2f}%{'领涨' if idx['399006']['change_pct'] > 0 else '领跌'}，科创50{'涨' if idx['000688']['change_pct'] > 0 else '跌'}{abs(idx['000688']['change_pct']):.2f}%，上证{'涨' if idx['000001']['change_pct'] > 0 else '跌'}{abs(idx['000001']['change_pct']):.2f}%。两市成交额约{total_amt:,.0f}亿。{'通信、半导体、创业板等科技方向全面反弹，成交量显著放大。' if idx['399006']['change_pct'] > 2 else '电力、公用事业等防御板块逆势走强，科技成长大幅杀跌。'}
 
 ---
 
@@ -185,7 +185,7 @@ def generate_dashboard(main, extra):
 |------|------|------|
 | 数据待补录 | 数据待补录 | 数据待补录 |
 
-> 市场涨跌家数因东财API限流未能获取完整数据。从盘面看，涨停集中于电力、公用事业等防御方向，科技成长大面积杀跌。
+> 市场涨跌家数因东财API限流未能获取完整数据。{'科技方向全面反弹，通信ETF涨超9%，创业板涨超5%，成交量显著放大。' if idx['399006']['change_pct'] > 2 else '从盘面看，涨停集中于电力、公用事业等防御方向，科技成长大面积杀跌。'}
 
 ---
 
@@ -579,9 +579,9 @@ def generate_analysis(main, extra):
 ### 闲置资金操作建议
 
 120,000元闲置资金暂不动。原因：
-1. 盘中数据不完整，需收盘后确认B/C条件
-2. 科技方向仍在杀跌，不宜接飞刀
-3. 防御方向（电力公用事业）虽然走强，但ETF持仓中无对应标的
+1. {'科技方向全面反弹，但需观察是否为反转还是超跌反弹' if idx['399006']['change_pct'] > 2 else '盘中数据不完整，需收盘后确认B/C条件'}
+2. {'ETF持仓浮亏显著缩小，但588000/512480仍未回到7/28破位价上方' if idx['399006']['change_pct'] > 2 else '科技方向仍在杀跌，不宜接飞刀'}
+3. {'连续放量上涨3日方可确认趋势反转，当前仅第1日' if idx['399006']['change_pct'] > 2 else '防御方向（电力公用事业）虽然走强，但ETF持仓中无对应标的'}
 
 ---
 
