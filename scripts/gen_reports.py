@@ -150,7 +150,7 @@ def generate_dashboard(main, extra):
 
     report = f"""# A股每日复盘 V3.0 — ETF异动择时模型
 
-**日期：2026年8月3日（星期一）| 盘中快照（{fetch_time[-8:]}）| 数据源：mootdx + 腾讯财经 + 东财 + 同花顺**
+**日期：{datetime.now().strftime('%Y年%m月%d日')}| 盘中快照（{fetch_time[-8:]}）| 数据源：mootdx + 腾讯财经 + 东财 + 同花顺**
 
 ---
 
@@ -164,7 +164,7 @@ def generate_dashboard(main, extra):
 | 沪深300 | {idx['000300']['price']:,.2f} | {fmt_pct(idx['000300']['change_pct'])} | {idx['000300']['amount_wan']/10000:,.0f} |
 | 科创50 | {idx['000688']['price']:,.2f} | {fmt_pct(idx['000688']['change_pct'])} | {idx['000688']['amount_wan']/10000:,.0f} |
 
-> 三大指数集体下跌，科创50暴跌{abs(idx['000688']['change_pct']):.2f}%领跌，创业板跌{abs(idx['399006']['change_pct']):.2f}%，上证跌{abs(idx['000001']['change_pct']):.2f}%。7/31全球科技反弹一日游，今日科技方向全面回调。两市成交额约{total_amt:,.0f}亿（盘中未收盘），缩量明显。电力、公用事业等防御板块逆势走强，半导体、科技成长大幅杀跌。
+> {'三大指数集体反弹' if idx['399006']['change_pct'] > 0 else '三大指数集体下跌'}，{'创业板暴涨' if idx['399006']['change_pct'] > 0 else '创业板跌'}{abs(idx['399006']['change_pct']):.2f}%{'领涨' if idx['399006']['change_pct'] > 0 else '领跌'}，科创50{'涨' if idx['000688']['change_pct'] > 0 else '跌'}{abs(idx['000688']['change_pct']):.2f}%，上证{'涨' if idx['000001']['change_pct'] > 0 else '跌'}{abs(idx['000001']['change_pct']):.2f}%。两市成交额约{total_amt:,.0f}亿（盘中未收盘）。
 
 ---
 
@@ -486,7 +486,7 @@ def generate_analysis(main, extra):
             }
     b_count = sum(1 for v in vol_data.values() if v["ratio"] >= 1.5)
 
-    report = f"""# 复盘分析 — 2026年8月3日（周一）盘中
+    report = f"""# 复盘分析 — {datetime.now().strftime('%Y年%m月%d日')} 盘中
 
 > 数据时间：{fetch_time} | 盘中快照，未收盘
 
@@ -628,7 +628,7 @@ def generate_stock_tracking(main, extra):
         "603290": "半导体/IGBT", "000063": "通信设备/5G", "002803": "跨境电商",
     }
 
-    report = f"""# 个股追踪报告 — 2026年8月3日（周一）
+    report = f"""# 个股追踪报告 — {datetime.now().strftime('%Y年%m月%d日')}
 
 > 数据时间：{fetch_time} | 盘中快照
 > 数据源：mootdx K线 + 手动计算技术指标
@@ -908,10 +908,11 @@ def generate_stock_tracking(main, extra):
 
 def main():
     main_data, extra_data = load_data()
+    date_str = datetime.now().strftime("%Y%m%d")
 
     # 今日看板
     dashboard = generate_dashboard(main_data, extra_data)
-    dashboard_path = os.path.join(BASE, "reports", "20260803.md")
+    dashboard_path = os.path.join(BASE, "reports", f"{date_str}.md")
     with open(dashboard_path, "w", encoding="utf-8") as f:
         f.write(dashboard)
     # latest.md
@@ -921,7 +922,7 @@ def main():
 
     # 复盘分析
     analysis = generate_analysis(main_data, extra_data)
-    analysis_path = os.path.join(BASE, "analysis", "20260803.md")
+    analysis_path = os.path.join(BASE, "analysis", f"{date_str}.md")
     os.makedirs(os.path.dirname(analysis_path), exist_ok=True)
     with open(analysis_path, "w", encoding="utf-8") as f:
         f.write(analysis)
@@ -931,7 +932,7 @@ def main():
 
     # 个股追踪
     tracking = generate_stock_tracking(main_data, extra_data)
-    tracking_path = os.path.join(BASE, "stock-tracking", "20260803.md")
+    tracking_path = os.path.join(BASE, "stock-tracking", f"{date_str}.md")
     with open(tracking_path, "w", encoding="utf-8") as f:
         f.write(tracking)
     with open(os.path.join(BASE, "stock-tracking", "latest_stock_tracking.md"), "w", encoding="utf-8") as f:
