@@ -11,45 +11,45 @@
   "industry_etfs": {
     "512400": {
       "name": "有色金属ETF南方",
-      "price": 1.863,
-      "change_pct": 2.99,
-      "amount_wan": 45016.0,
-      "turnover_pct": 1.88
+      "price": 1.891,
+      "change_pct": 4.53,
+      "amount_wan": 97171.0,
+      "turnover_pct": 4.01
     },
     "515220": {
       "name": "煤炭ETF国泰",
-      "price": 1.167,
-      "change_pct": -0.43,
-      "amount_wan": 15298.0,
-      "turnover_pct": 1.18
+      "price": 1.17,
+      "change_pct": -0.17,
+      "amount_wan": 37054.0,
+      "turnover_pct": 2.84
     },
     "159611": {
       "name": "电力ETF广发",
-      "price": 1.062,
-      "change_pct": -1.3,
-      "amount_wan": 22154.0,
-      "turnover_pct": 2.04
+      "price": 1.065,
+      "change_pct": -1.02,
+      "amount_wan": 41706.0,
+      "turnover_pct": 3.83
     },
     "515880": {
       "name": "通信ETF国泰",
-      "price": 0.626,
-      "change_pct": -1.73,
-      "amount_wan": 293458.0,
-      "turnover_pct": 7.53
+      "price": 0.637,
+      "change_pct": 0.0,
+      "amount_wan": 566012.0,
+      "turnover_pct": 14.43
     },
     "512010": {
       "name": "医药ETF易方达",
-      "price": 0.384,
-      "change_pct": 0.26,
-      "amount_wan": 24283.0,
-      "turnover_pct": 1.39
+      "price": 0.387,
+      "change_pct": 1.04,
+      "amount_wan": 43545.0,
+      "turnover_pct": 2.5
     },
     "512880": {
       "name": "证券ETF国泰",
-      "price": 1.106,
-      "change_pct": 0.18,
-      "amount_wan": 49422.0,
-      "turnover_pct": 0.78
+      "price": 1.112,
+      "change_pct": 0.72,
+      "amount_wan": 140408.0,
+      "turnover_pct": 2.21
     }
   }
 }
