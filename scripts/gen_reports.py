@@ -164,7 +164,7 @@ def generate_dashboard(main, extra):
 | 沪深300 | {idx['000300']['price']:,.2f} | {fmt_pct(idx['000300']['change_pct'])} | {idx['000300']['amount_wan']/10000:,.0f} |
 | 科创50 | {idx['000688']['price']:,.2f} | {fmt_pct(idx['000688']['change_pct'])} | {idx['000688']['amount_wan']/10000:,.0f} |
 
-> {'三大指数集体反弹' if idx['399006']['change_pct'] > 0 else '三大指数集体下跌'}，{'创业板暴涨' if idx['399006']['change_pct'] > 0 else '创业板跌'}{abs(idx['399006']['change_pct']):.2f}%{'领涨' if idx['399006']['change_pct'] > 0 else '领跌'}，科创50{'涨' if idx['000688']['change_pct'] > 0 else '跌'}{abs(idx['000688']['change_pct']):.2f}%，上证{'涨' if idx['000001']['change_pct'] > 0 else '跌'}{abs(idx['000001']['change_pct']):.2f}%。两市成交额约{total_amt:,.0f}亿。{'通信、半导体、创业板等科技方向全面反弹，成交量显著放大。' if idx['399006']['change_pct'] > 2 else '电力、公用事业等防御板块逆势走强，科技成长大幅杀跌。'}
+> {'科技方向持续反弹' if idx['000688']['change_pct'] > 1 else ('三大指数集体反弹' if idx['399006']['change_pct'] > 0 else '三大指数集体下跌')}，{'创业板暴涨' if idx['399006']['change_pct'] > 3 else ('创业板涨' if idx['399006']['change_pct'] > 0 else '创业板跌')}{abs(idx['399006']['change_pct']):.2f}%{'领涨' if idx['399006']['change_pct'] > 0 else '领跌'}，科创50{'涨' if idx['000688']['change_pct'] > 0 else '跌'}{abs(idx['000688']['change_pct']):.2f}%，上证{'涨' if idx['000001']['change_pct'] > 0 else '跌'}{abs(idx['000001']['change_pct']):.2f}%。两市成交额约{total_amt:,.0f}亿。{'半导体、科创等科技方向继续走强，成交量放大。' if idx['000688']['change_pct'] > 1 else ('通信、半导体、创业板等科技方向全面反弹，成交量显著放大。' if idx['399006']['change_pct'] > 2 else '电力、公用事业等防御板块逆势走强，科技成长大幅杀跌。')}
 
 ---
 
