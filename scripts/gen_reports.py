@@ -148,6 +148,48 @@ def generate_dashboard(main, extra):
     if c_trigger: star += 1
     if d_trigger: star += 1
 
+    # 动态生成指数描述
+    up_indices = sum(1 for k in ["000001", "399001", "399006", "000300", "000688"] if idx[k]["change_pct"] > 0)
+    down_indices = sum(1 for k in ["000001", "399001", "399006", "000300", "000688"] if idx[k]["change_pct"] < 0)
+    if up_indices >= 5:
+        market_word = "三大指数集体上涨"
+    elif down_indices >= 5:
+        market_word = "三大指数集体下跌"
+    elif up_indices >= 3:
+        market_word = "多数指数上涨"
+    elif down_indices >= 3:
+        market_word = "多数指数下跌"
+    else:
+        market_word = "指数涨跌不一"
+
+    # 找最强和最弱指数
+    idx_changes = [(k, idx[k]["change_pct"], idx[k]["price"]) for k in ["000001", "399001", "399006", "000300", "000688"]]
+    idx_names = {"000001": "上证", "399001": "深证", "399006": "创业板", "000300": "沪深300", "000688": "科创50"}
+    best_idx = max(idx_changes, key=lambda x: x[1])
+    worst_idx = min(idx_changes, key=lambda x: x[1])
+
+    # 动态生成板块描述
+    etf_changes = [(c, etf[c]["change_pct"]) for c in ["510300", "159915", "588000", "512480"]]
+    etf_names_short = {"510300": "沪深300", "159915": "创业板", "588000": "科创50", "512480": "半导体"}
+    up_etfs = [c for c, chg in etf_changes if chg > 0]
+    down_etfs = [c for c, chg in etf_changes if chg < 0]
+    if len(up_etfs) >= 4:
+        top_up_code = max(up_etfs, key=lambda c: dict(etf_changes)[c])
+        etf_word = f"ETF全面上涨，{etf_names_short[top_up_code]}领涨"
+    elif len(down_etfs) >= 4:
+        top_down_code = min(down_etfs, key=lambda c: dict(etf_changes)[c])
+        etf_word = f"ETF全面下跌，{etf_names_short[top_down_code]}领跌"
+    elif len(up_etfs) >= 3:
+        top_up_code = max(up_etfs, key=lambda c: dict(etf_changes)[c])
+        etf_word = f"ETF多数上涨，{etf_names_short[top_up_code]}领涨"
+    elif len(down_etfs) >= 3:
+        top_down_code = min(down_etfs, key=lambda c: dict(etf_changes)[c])
+        etf_word = f"ETF多数下跌，{etf_names_short[top_down_code]}领跌"
+    else:
+        up_names = "、".join(etf_names_short[c] for c in up_etfs)
+        down_names = "、".join(etf_names_short[c] for c in down_etfs)
+        etf_word = f"ETF涨跌分化（{up_names}涨，{down_names}跌）"
+
     report = f"""# A股每日复盘 V3.0 — ETF异动择时模型
 
 **日期：{datetime.now().strftime('%Y年%m月%d日')}| 盘中快照（{fetch_time[-8:]}）| 数据源：mootdx + 腾讯财经 + 东财 + 同花顺**
@@ -164,7 +206,7 @@ def generate_dashboard(main, extra):
 | 沪深300 | {idx['000300']['price']:,.2f} | {fmt_pct(idx['000300']['change_pct'])} | {idx['000300']['amount_wan']/10000:,.0f} |
 | 科创50 | {idx['000688']['price']:,.2f} | {fmt_pct(idx['000688']['change_pct'])} | {idx['000688']['amount_wan']/10000:,.0f} |
 
-> {'科技方向持续反弹' if idx['000688']['change_pct'] > 1 else ('三大指数集体反弹' if idx['399006']['change_pct'] > 0 else '三大指数集体下跌')}，{'创业板暴涨' if idx['399006']['change_pct'] > 3 else ('创业板涨' if idx['399006']['change_pct'] > 0 else '创业板跌')}{abs(idx['399006']['change_pct']):.2f}%{'领涨' if idx['399006']['change_pct'] > 0 else '领跌'}，科创50{'涨' if idx['000688']['change_pct'] > 0 else '跌'}{abs(idx['000688']['change_pct']):.2f}%，上证{'涨' if idx['000001']['change_pct'] > 0 else '跌'}{abs(idx['000001']['change_pct']):.2f}%。两市成交额约{total_amt:,.0f}亿。{'半导体、科创等科技方向继续走强，成交量放大。' if idx['000688']['change_pct'] > 1 else ('通信、半导体、创业板等科技方向全面反弹，成交量显著放大。' if idx['399006']['change_pct'] > 2 else '电力、公用事业等防御板块逆势走强，科技成长大幅杀跌。')}
+> {market_word}，{idx_names[best_idx[0]]}{"涨" if best_idx[1] > 0 else "跌"}{abs(best_idx[1]):.2f}%{"领涨" if best_idx[1] > 0 else "最抗跌"}，{idx_names[worst_idx[0]]}{"跌" if worst_idx[1] < 0 else "涨"}{abs(worst_idx[1]):.2f}%{"领跌" if worst_idx[1] < 0 else "最强"}。两市成交额约{total_amt:,.0f}亿。{etf_word}。
 
 ---
 
@@ -185,7 +227,7 @@ def generate_dashboard(main, extra):
 |------|------|------|
 | 数据待补录 | 数据待补录 | 数据待补录 |
 
-> 市场涨跌家数因东财API限流未能获取完整数据。{'科技方向全面反弹，通信ETF涨超9%，创业板涨超5%，成交量显著放大。' if idx['399006']['change_pct'] > 2 else '从盘面看，涨停集中于电力、公用事业等防御方向，科技成长大面积杀跌。'}
+> 市场涨跌家数因东财API限流未能获取完整数据。从盘面看，{etf_word}，成交量为盘中半日量。
 
 ---
 
@@ -258,8 +300,28 @@ def generate_dashboard(main, extra):
         else:
             report += f"| {code} | — | — | — | — | — |\n"
 
+    # 动态生成行业ETF描述
+    ind_etf_changes = []
+    for code in ["512400", "515220", "159611", "515880", "512010", "512880"]:
+        if code in ind_etf:
+            q = ind_etf[code]
+            ind_etf_changes.append((q.get('name', code), q.get('change_pct', 0)))
+    if ind_etf_changes:
+        ind_up = [(n, c) for n, c in ind_etf_changes if c > 0]
+        ind_down = [(n, c) for n, c in ind_etf_changes if c < 0]
+        ind_desc_parts = []
+        if ind_up:
+            top_up = sorted(ind_up, key=lambda x: x[1], reverse=True)[:2]
+            ind_desc_parts.append("、".join(f"{n}（+{c:.2f}%）" for n, c in top_up) + "上涨")
+        if ind_down:
+            top_down = sorted(ind_down, key=lambda x: x[1])[:2]
+            ind_desc_parts.append("、".join(f"{n}（{c:.2f}%）" for n, c in top_down) + "下跌")
+        ind_etf_desc = "行业ETF分化明显：" + "，".join(ind_desc_parts) + "。" if ind_desc_parts else "行业ETF整体平稳。"
+    else:
+        ind_etf_desc = "行业ETF数据待补录。"
+
     report += f"""
-> 行业ETF分化明显：电力ETF（+1.03%）逆势上涨，通信ETF（+0.52%）小幅走强，煤炭、有色、医药全线下跌。半导体ETF暴跌6.25%最弱。
+> {ind_etf_desc}
 
 ---
 
@@ -285,29 +347,56 @@ def generate_dashboard(main, extra):
     else:
         report += "| 数据待补录 | 数据待补录 | — | — |\n"
 
+    # 动态生成最强主线
+    if industries:
+        top_ind = sorted(industries, key=lambda x: x['change_pct'], reverse=True)[:5]
+        bottom_ind = sorted(industries, key=lambda x: x['change_pct'])[:5]
+        top_str = "、".join(f"{ind['name']}（{'+' if ind['change_pct'] > 0 else ''}{ind['change_pct']:.2f}%）" for ind in top_ind)
+        bottom_str = "、".join(f"{ind['name']}（{ind['change_pct']:.2f}%）" for ind in bottom_ind)
+    else:
+        # 用ETF数据代替
+        top_str = "、".join(f"{etf_names_short[c]}ETF（{'+' if chg > 0 else ''}{chg:.2f}%）" for c, chg in sorted(etf_changes, key=lambda x: x[1], reverse=True))
+        bottom_str = top_str
+
+    # 动态判断市场风格
+    tech_up = idx['000688']['change_pct'] > 0 and etf['512480']['change_pct'] > 0
+    big_value_up = idx['000300']['change_pct'] > 0
+    if tech_up:
+        style_main = "成长科技"
+        style_desc = "科技方向走强，半导体、科创等成长板块反弹"
+    elif big_value_up:
+        style_main = "大盘价值"
+        style_desc = "大盘价值相对抗跌，沪深300表现优于创业板"
+    elif down_indices >= 4:
+        style_main = "防御避险"
+        style_desc = "市场整体偏弱，资金避险情绪明显"
+    else:
+        style_main = "震荡分化"
+        style_desc = "市场涨跌不一，板块分化明显"
+
     report += f"""
 
 ---
 
 ## 八、今日最强主线
 
-**涨幅方向：** 电力（+2.03%）、公用事业（+2.02%）、物流（+1.46%）、水泥（+1.46%）、家居用品（+1.58%）
-**跌幅方向：** 半导体ETF（-6.25%）、科创50（-4.44%）、存储芯片、AI算力方向
+**涨幅方向：** {top_str}
+**跌幅方向：** {bottom_str}
 
-市场风格切换为防御为主：电力公用事业领涨，科技成长全面回调。7/31的科技反弹确认为一日游，资金从高估值科技板块撤出，流向低估值防御板块。
+市场风格：{style_desc}。
 
 ---
 
 ## 九、市场风格
 
-- [x] 电力公用事业
-- [ ] 大盘价值
-- [ ] 资源周期
-- [ ] 成长科技
-- [ ] 消费医药
-- [ ] 小盘题材
+- [{"x" if style_main == "电力公用事业" else " "}] 电力公用事业
+- [{"x" if style_main == "大盘价值" else " "}] 大盘价值
+- [{"x" if style_main == "资源周期" else " "}] 资源周期
+- [{"x" if style_main == "成长科技" else " "}] 成长科技
+- [{"x" if style_main == "消费医药" else " "}] 消费医药
+- [{"x" if style_main == "小盘题材" else " "}] 小盘题材
 
-> 当前市场风格为「电力公用事业+防御」风格，资金避险情绪明显。
+> 当前市场风格为「{style_main}」风格，{style_desc}。
 
 ---
 
@@ -330,6 +419,14 @@ def generate_dashboard(main, extra):
     for n in news[:5]:
         report += f"| {n.get('time', '')} | {n.get('title', '')[:60]} |\n"
 
+    # 动态生成ETF异动描述
+    etf_change_desc = []
+    for code in ["510300", "159915", "588000", "512480"]:
+        chg = etf[code]["change_pct"]
+        name = etf_names_short[code]
+        etf_change_desc.append(f"{name}ETF（{code}）{'+' if chg > 0 else ''}{chg:.2f}%")
+    etf_change_str = "、".join(etf_change_desc)
+
     report += f"""
 ---
 
@@ -345,11 +442,7 @@ def generate_dashboard(main, extra):
 
 ## 十三、ETF异动历史匹配
 
-7/31全球科技史诗级反弹确认为一日游。今日科技ETF全面回调：
-- 半导体ETF（512480）从+3.55%回落至-6.25%，完全回吐昨日涨幅
-- 科创50ETF（588000）从+3.54%回落至-4.46%，同样完全回吐
-- 沪深300ETF（510300）从+1.04%转为-1.07%，大盘未能幸免
-- 创业板ETF（159915）从+3.00%转为-1.13%，相对抗跌
+{etf_change_str}。
 
 **B条件状态：** 盘中放量倍数均低于1.0x（半日量），需观察尾盘是否放量。当前B条件未触发。
 
@@ -430,7 +523,7 @@ def generate_dashboard(main, extra):
 | 信号等级 | {star}星 |
 | 是否触发拐点 | 否 |
 | 下跌占比极端值 | 待补录 |
-| 外部风险 | 科技股一日游反弹后继续回调，半导体ETF-6.25% |
+| 外部风险 | {style_desc} |
 
 ---
 
@@ -438,21 +531,21 @@ def generate_dashboard(main, extra):
 
 | 维度 | 状态 |
 |------|------|
-| 市场情绪 | 偏弱（科技杀跌，防御走强） |
-| 资金强弱 | 缩量（盘中半日量） |
-| ETF状态 | 全线下跌，512480-6.25%最弱 |
-| 市场风格 | 电力公用事业防御 |
-| 是否极端 | 部分极端（科创50-4.44%、512480-6.25%） |
+| 市场情绪 | {style_desc} |
+| 资金强弱 | {'放量' if total_amt > 15000 else '缩量'}（盘中{total_amt:,.0f}亿） |
+| ETF状态 | {etf_word} |
+| 市场风格 | {style_main} |
+| 是否极端 | {'是' if abs(worst_idx[1]) > 5 or abs(min(c for _, c in etf_changes)) > 5 else '否'} |
 | 是否ETF异动 | 否（放量倍数均<1.0x，盘中半日量） |
 | 是否值得跟踪 | 是（关注收盘后B条件是否触发） |
-| 外部环境 | 科技反弹一日游，资金转向防御 |
+| 外部环境 | {style_desc} |
 
 ---
 
 **报告生成时间：** {fetch_time}
 **模板版本：** V3.0
 **数据来源：** mootdx + 腾讯财经 + 东财 + 同花顺 + 公开市场数据
-**GitHub存档：** reports/20260803.md
+**GitHub存档：** reports/{datetime.now().strftime('%Y%m%d')}.md
 
 ---
 
@@ -486,6 +579,48 @@ def generate_analysis(main, extra):
             }
     b_count = sum(1 for v in vol_data.values() if v["ratio"] >= 1.5)
 
+    # ETF持仓数据（来自用户实际持仓）
+    etf_holdings = {
+        "510300": {"shares": 1300, "cost": 4.670, "break_price": 4.627},
+        "588000": {"shares": 3400, "cost": 1.834, "break_price": 1.785},
+        "159915": {"shares": 1400, "cost": 3.513, "break_price": 3.335},
+        "512480": {"shares": 3800, "cost": 1.056, "break_price": 1.031},
+    }
+    etf_names_map = {"510300": "沪深300ETF", "159915": "创业板ETF", "588000": "科创50ETF", "512480": "半导体ETF"}
+
+    # 计算ETF支撑压力位（从K线数据）
+    etf_levels = {}
+    for code in ["510300", "159915", "588000", "512480"]:
+        if code in etf_klines and len(etf_klines[code]) >= 2:
+            klines = etf_klines[code]
+            today_k = klines[-1]
+            yest_k = klines[-2] if len(klines) >= 2 else today_k
+            etf_levels[code] = {
+                "today_low": today_k["low"],
+                "today_high": today_k["high"],
+                "yest_close": yest_k["close"],
+            }
+
+    # 动态判断市场趋势
+    sh_chg = idx['000001']['change_pct']
+    cyb_chg = idx['399006']['change_pct']
+    kc_chg = idx['000688']['change_pct']
+
+    if sh_chg > 0 and cyb_chg > 0 and kc_chg > 0:
+        trend_summary = "三大指数集体上涨，市场情绪偏暖"
+    elif sh_chg < 0 and cyb_chg < 0 and kc_chg < 0:
+        trend_summary = "三大指数集体下跌，市场情绪偏弱"
+    else:
+        trend_summary = f"指数涨跌不一，上证{'涨' if sh_chg > 0 else '跌'}{abs(sh_chg):.2f}%，创业板{'跌' if cyb_chg < 0 else '涨'}{abs(cyb_chg):.2f}%"
+
+    # 计算ETF浮盈亏
+    def calc_pnl(code):
+        h = etf_holdings[code]
+        price = etf[code]["price"]
+        pnl_pct = (price - h["cost"]) / h["cost"] * 100
+        pnl_amt = (price - h["cost"]) * h["shares"]
+        return pnl_pct, pnl_amt
+
     report = f"""# 复盘分析 — {datetime.now().strftime('%Y年%m月%d日')} 盘中
 
 > 数据时间：{fetch_time} | 盘中快照，未收盘
@@ -496,52 +631,42 @@ def generate_analysis(main, extra):
 
 ### 上证指数
 - 当前点位：{idx['000001']['price']:.2f}，{fmt_pct(idx['000001']['change_pct'])}
-- 关键支撑：3800（整数关口）、3798（今日低点）
-- 关键压力：3828（今日高点）、3832（7/31收盘）
-- **判断：** 上证小幅回调-0.71%，在3800上方企稳。大盘相对抗跌，主要拖累来自科技板块。
+- 成交额：{sh_amt:,.0f}亿
+- **判断：** 上证{'涨' if sh_chg > 0 else '跌'}{abs(sh_chg):.2f}%，{'大盘相对抗跌' if sh_chg > 0 else '大盘偏弱'}。
 
 ### 科创50
 - 当前点位：{idx['000688']['price']:.2f}，{fmt_pct(idx['000688']['change_pct'])}
-- 7/31反弹从1636跌至1563，完全回吐昨日涨幅
-- **判断：** 科创50-4.44%是今日最弱指数，7/31的反弹确认为一日游。半导体方向继续杀估值。
+- 成交额：{idx['000688']['amount_wan']/10000:,.0f}亿
+- **判断：** 科创50{'涨' if kc_chg > 0 else '跌'}{abs(kc_chg):.2f}%，{'科技方向走强' if kc_chg > 0 else '科技方向偏弱'}。
 
 ### 创业板指
 - 当前点位：{idx['399006']['price']:.2f}，{fmt_pct(idx['399006']['change_pct'])}
-- **判断：** 创业板-1.10%，相对科创50抗跌，但也未能延续昨日反弹。
+- 成交额：{idx['399006']['amount_wan']/10000:,.0f}亿
+- **判断：** 创业板{'涨' if cyb_chg > 0 else '跌'}{abs(cyb_chg):.2f}%。
 
-**趋势总结：** 7/31全球科技史诗级反弹确认为一日游。科技成长方向全面回调，资金转向电力公用事业等防御板块。上证在3800企稳，但科创50和半导体ETF的暴跌说明科技方向的调整远未结束。
+**趋势总结：** {trend_summary}。两市成交额约{total_amt:,.0f}亿（盘中半日量）。
 
 ---
 
 ## 二、ETF趋势分析
 
-### 510300 沪深300ETF
-- 最新价：{etf['510300']['price']:.3f}，{fmt_pct(etf['510300']['change_pct'])}
-- 量比：{vol_data['510300']['ratio']:.2f}x（盘中半日量）
-- 关键支撑：4.596（今日低点）、4.536（7/30低点）
-- 关键压力：4.638（今日高点）、4.653（7/31收盘）
-- **建议：** 沪深300ETF微跌，大盘相对稳定。持有观望，不加不减。
+"""
 
-### 159915 创业板ETF
-- 最新价：{etf['159915']['price']:.3f}，{fmt_pct(etf['159915']['change_pct'])}
-- 量比：{vol_data['159915']['ratio']:.2f}x（盘中半日量）
-- 关键支撑：3.30（今日低点）、3.27（7/30收盘）
-- 关键压力：3.365（今日高点）、3.368（7/31收盘）
-- **建议：** 创业板ETF跌1.13%，在3.30附近获得支撑。等待收盘确认。
+    # 动态生成4只ETF分析
+    for code in ["510300", "159915", "588000", "512480"]:
+        pnl_pct, pnl_amt = calc_pnl(code)
+        above_break = etf[code]["price"] > etf_holdings[code]["break_price"]
+        report += f"""### {code} {etf_names_map[code]}
+- 最新价：{etf[code]['price']:.3f}，{fmt_pct(etf[code]['change_pct'])}
+- 量比：{vol_data[code]['ratio']:.2f}x（盘中半日量）
+- 成本价：{etf_holdings[code]['cost']:.3f}（{etf_holdings[code]['shares']}股），7/28破位价：{etf_holdings[code]['break_price']:.3f}
+- 浮盈亏：{pnl_pct:+.2f}%（{pnl_amt:+.0f}元）
+- **破位判断：** {'已站上7/28破位价' if above_break else '仍在7/28破位价下方'}
+- **建议：** {'持有' if above_break else '关注破位价，跌破即止损'}
 
-### 588000 科创50ETF
-- 最新价：{etf['588000']['price']:.3f}，{fmt_pct(etf['588000']['change_pct'])}
-- 量比：{vol_data['588000']['ratio']:.2f}x（盘中半日量）
-- 关键支撑：1.65（今日低点）、1.647（7/30低点）
-- 关键压力：1.71（今日高点）、1.728（7/31收盘）
-- **建议：** 科创50ETF暴跌4.46%，完全回吐7/31涨幅。短期不要接刀，等止跌信号。
+"""
 
-### 512480 半导体ETF
-- 最新价：{etf['512480']['price']:.3f}，{fmt_pct(etf['512480']['change_pct'])}
-- 量比：{vol_data['512480']['ratio']:.2f}x（盘中半日量）
-- 关键支撑：0.928（今日低点）、0.893（跌停价）
-- 关键压力：0.978（今日高点）、0.992（7/31收盘）
-- **建议：** 半导体ETF暴跌6.25%，最弱的ETF。短期不要介入，等技术指标修复。
+    report += f"""
 
 ---
 
@@ -562,51 +687,52 @@ def generate_analysis(main, extra):
 
 ## 四、仓位状态建议
 
-**总资金：220,000元**
-- ETF持仓：20,000元（510300:6000 + 159915:4000 + 588000:6000 + 512480:4000）
-- 个股持仓：80,000元（6只）
-- 闲置现金：120,000元
+**总资产：381,984元**
+- ETF持仓市值：约{sum(etf[code]["price"] * etf_holdings[code]["shares"] for code in ["510300", "588000", "159915", "512480"]):,.0f}元
+- 可用现金：约352,817元
+- ETF总浮盈亏：{sum(calc_pnl(code)[1] for code in ["510300", "588000", "159915", "512480"]):+,.0f}元
 
-### ETF仓位建议（纪律止损策略）
+### ETF仓位建议（趋势破位止损策略）
 
-| ETF | 持仓成本 | 最新价 | 浮盈亏 | 建议 |
-|-----|---------|--------|--------|------|
-| 510300 | ~4.65 | {etf['510300']['price']:.3f} | 微亏 | **持有**。大盘相对稳定，未触及止损线 |
-| 159915 | ~3.37 | {etf['159915']['price']:.3f} | 微亏 | **持有**。支撑位3.30未破，等收盘确认 |
-| 588000 | ~1.73 | {etf['588000']['price']:.3f} | -4.5% | **观察**。暴跌4.46%，但未破7/30低点1.647。如果收盘跌破1.647，考虑减仓 |
-| 512480 | ~0.99 | {etf['512480']['price']:.3f} | -6.3% | **关注止损线**。暴跌6.25%，如果跌破0.893（跌停价），必须纪律止损 |
+| ETF | 持仓/成本 | 最新价 | 浮盈亏 | 7/28破位价 | 建议 |
+|-----|---------|--------|--------|----------|------|
+| 510300 | {etf_holdings['510300']['shares']}股/{etf_holdings['510300']['cost']:.3f} | {etf['510300']['price']:.3f} | {calc_pnl('510300')[0]:+.2f}% | {etf_holdings['510300']['break_price']:.3f} | {'持有' if etf['510300']['price'] > etf_holdings['510300']['break_price'] else '关注止损'} |
+| 159915 | {etf_holdings['159915']['shares']}股/{etf_holdings['159915']['cost']:.3f} | {etf['159915']['price']:.3f} | {calc_pnl('159915')[0]:+.2f}% | {etf_holdings['159915']['break_price']:.3f} | {'持有' if etf['159915']['price'] > etf_holdings['159915']['break_price'] else '关注止损'} |
+| 588000 | {etf_holdings['588000']['shares']}股/{etf_holdings['588000']['cost']:.3f} | {etf['588000']['price']:.3f} | {calc_pnl('588000')[0]:+.2f}% | {etf_holdings['588000']['break_price']:.3f} | {'持有' if etf['588000']['price'] > etf_holdings['588000']['break_price'] else '关注止损'} |
+| 512480 | {etf_holdings['512480']['shares']}股/{etf_holdings['512480']['cost']:.3f} | {etf['512480']['price']:.3f} | {calc_pnl('512480')[0]:+.2f}% | {etf_holdings['512480']['break_price']:.3f} | {'持有' if etf['512480']['price'] > etf_holdings['512480']['break_price'] else '关注止损'} |
+
+> 止损规则：跌破7/28启动阳线低位即走，不设固定百分比。
 
 ### 闲置资金操作建议
 
-120,000元闲置资金暂不动。原因：
-1. {'科技方向全面反弹，但需观察是否为反转还是超跌反弹' if idx['399006']['change_pct'] > 2 else '盘中数据不完整，需收盘后确认B/C条件'}
-2. {'ETF持仓浮亏显著缩小，但588000/512480仍未回到7/28破位价上方' if idx['399006']['change_pct'] > 2 else '科技方向仍在杀跌，不宜接飞刀'}
-3. {'连续放量上涨3日方可确认趋势反转，当前仅第1日' if idx['399006']['change_pct'] > 2 else '防御方向（电力公用事业）虽然走强，但ETF持仓中无对应标的'}
+约35万元可用资金暂不动。原因：
+1. 盘中数据不完整，需收盘后确认B/C条件
+2. ETF持仓需观察是否站稳7/28破位价上方
+3. 个股方向根据技术指标灵活操作，不急于加仓
 
 ---
 
 ## 五、其他重点
 
-### 1. 市场风格切换
-7/31的科技反弹确认为一日游。资金从高估值科技板块撤出，流向电力（+2.03%）、公用事业（+2.02%）、物流（+1.46%）、水泥（+1.46%）等低估值防御板块。这种风格切换可能持续。
+### 1. 市场趋势
+{trend_summary}。两市成交额约{total_amt:,.0f}亿（盘中半日量），需收盘后确认最终量能。
 
 ### 2. 核心判断
-- **7/31拐点未确认**：科创50从1636跌至1563，完全回吐昨日涨幅，拐点判断失败
-- **科技调整未结束**：半导体ETF-6.25%，存储芯片概念持续走弱，科技方向的杀估值可能继续
-- **防御为王**：电力公用事业领涨，资金避险情绪明显
-- **操作策略**：ETF继续纪律止损，个股死扛等反转，120,000现金不动
+- **趋势判断：** {trend_summary}
+- **ETF策略：** 趋势破位止损，跌破7/28启动阳线低位即走
+- **个股策略：** 死扛等反转，依赖技术指标判断反转信号
+- **操作策略：** ETF执行纪律止损，个股死扛等反弹，现金不动
 
 ### 3. 关注点
-- 收盘后确认B条件是否触发（如果下午放量抛售可能触发）
-- 512480是否跌破0.893（纪律止损线）
-- 588000是否跌破1.647（7/30低点）
-- 上证3800支撑是否有效
+- 收盘后确认B条件是否触发
+- 4只ETF是否站稳7/28破位价上方
+- 个股技术指标变化（MACD/KDJ金叉/死叉）
 
 ---
 
 **报告生成时间：** {fetch_time}
 **策略框架：** ETF异动择时模型 + 趋势跟踪 + ABCD四条件
-**仓位管理：** 总资金22万，ETF 2万（纪律止损）+ 个股8万（死扛等反转）+ 现金12万
+**仓位管理：** 总资产38.2万，ETF约2万（趋势破位止损）+ 可用35万
 """
     return report
 
