@@ -104,6 +104,9 @@ def generate_dashboard(main, extra):
     breadth = extra.get("breadth", main.get("market_breadth", {}))
     meta = main.get("meta", {})
     fetch_time = meta.get("fetch_time", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    is_after_close = int(fetch_time[11:13]) >= 15 if len(fetch_time) >= 13 else False
+    session_label = "收盘" if is_after_close else "盘中快照"
+    vol_label = "" if is_after_close else "（盘中半日量）"
 
     # 计算两市成交额
     sh_amt = idx["000001"]["amount_wan"] / 10000  # 万→亿
@@ -192,7 +195,7 @@ def generate_dashboard(main, extra):
 
     report = f"""# A股每日复盘 V3.0 — ETF异动择时模型
 
-**日期：{datetime.now().strftime('%Y年%m月%d日')}| 盘中快照（{fetch_time[-8:]}）| 数据源：mootdx + 腾讯财经 + 东财 + 同花顺**
+**日期：{datetime.now().strftime('%Y年%m月%d日')}| {session_label}（{fetch_time[-8:]}）| 数据源：mootdx + 腾讯财经 + 东财 + 同花顺**
 
 ---
 
@@ -227,7 +230,7 @@ def generate_dashboard(main, extra):
 |------|------|------|
 | 数据待补录 | 数据待补录 | 数据待补录 |
 
-> 市场涨跌家数因东财API限流未能获取完整数据。从盘面看，{etf_word}，成交量为盘中半日量。
+> 市场涨跌家数因东财API限流未能获取完整数据。从盘面看，{etf_word}，成交量{'为全天量' if is_after_close else '为盘中半日量'}。
 
 ---
 
@@ -476,7 +479,7 @@ def generate_dashboard(main, extra):
 **当前星级：{"⭐" * star}（{star}/4星）**
 
 - A条件（下跌家数>3500）：{"✓ 触发" if a_trigger else "✗ 未触发（或数据待补）"}
-- B条件（≥2只ETF放量≥1.5x）：{"✓ 触发" if b_count >= 2 else "✗ 未触发（盘中半日量）"}
+- B条件（≥2只ETF放量≥1.5x）：{"✓ 触发" if b_count >= 2 else f"✗ 未触发{vol_label}"}
 - C条件（两市成交>2万亿）：{"✓ 触发" if c_trigger else "✗ 未触发（盘中缩量）"}
 - D条件（跌停>50家）：{"✓ 触发" if d_trigger else "✗ 未触发（或数据待补）"}
 
@@ -536,7 +539,7 @@ def generate_dashboard(main, extra):
 | ETF状态 | {etf_word} |
 | 市场风格 | {style_main} |
 | 是否极端 | {'是' if abs(worst_idx[1]) > 5 or abs(min(c for _, c in etf_changes)) > 5 else '否'} |
-| 是否ETF异动 | 否（放量倍数均<1.0x，盘中半日量） |
+| 是否ETF异动 | 否（放量倍数均<1.0x{vol_label}） |
 | 是否值得跟踪 | 是（关注收盘后B条件是否触发） |
 | 外部环境 | {style_desc} |
 
@@ -561,6 +564,9 @@ def generate_analysis(main, extra):
     etf_klines = main["etf_klines"]
     meta = main.get("meta", {})
     fetch_time = meta.get("fetch_time", "")
+    is_after_close = int(fetch_time[11:13]) >= 15 if len(fetch_time) >= 13 else False
+    session_label = "收盘" if is_after_close else "盘中快照"
+    vol_label = "" if is_after_close else "（盘中半日量）"
 
     sh_amt = idx["000001"]["amount_wan"] / 10000
     sz_amt = idx["399001"]["amount_wan"] / 10000
@@ -621,9 +627,9 @@ def generate_analysis(main, extra):
         pnl_amt = (price - h["cost"]) * h["shares"]
         return pnl_pct, pnl_amt
 
-    report = f"""# 复盘分析 — {datetime.now().strftime('%Y年%m月%d日')} 盘中
+    report = f"""# 复盘分析 — {datetime.now().strftime('%Y年%m月%d日')} {session_label}
 
-> 数据时间：{fetch_time} | 盘中快照，未收盘
+> 数据时间：{fetch_time} | {session_label}{'' if is_after_close else '，未收盘'}
 
 ---
 
@@ -644,7 +650,7 @@ def generate_analysis(main, extra):
 - 成交额：{idx['399006']['amount_wan']/10000:,.0f}亿
 - **判断：** 创业板{'涨' if cyb_chg > 0 else '跌'}{abs(cyb_chg):.2f}%。
 
-**趋势总结：** {trend_summary}。两市成交额约{total_amt:,.0f}亿（盘中半日量）。
+**趋势总结：** {trend_summary}。两市成交额约{total_amt:,.0f}亿{vol_label}。
 
 ---
 
@@ -658,7 +664,7 @@ def generate_analysis(main, extra):
         above_break = etf[code]["price"] > etf_holdings[code]["break_price"]
         report += f"""### {code} {etf_names_map[code]}
 - 最新价：{etf[code]['price']:.3f}，{fmt_pct(etf[code]['change_pct'])}
-- 量比：{vol_data[code]['ratio']:.2f}x（盘中半日量）
+- 量比：{vol_data[code]['ratio']:.2f}x{vol_label}
 - 成本价：{etf_holdings[code]['cost']:.3f}（{etf_holdings[code]['shares']}股），7/28破位价：{etf_holdings[code]['break_price']:.3f}
 - 浮盈亏：{pnl_pct:+.2f}%（{pnl_amt:+.0f}元）
 - **破位判断：** {'已站上7/28破位价' if above_break else '仍在7/28破位价下方'}
@@ -681,15 +687,17 @@ def generate_analysis(main, extra):
 
 **B条件状态：** {b_count}只ETF ≥ 1.5x → {"✓ 触发" if b_count >= 2 else "✗ 未触发"}
 
-> ⚠️ 盘中半日量，放量倍数偏低属正常。需收盘后最终确认。如果下午继续放量（特别是科技ETF恐慌性抛售），B条件可能在尾盘触发。
+> {"收盘确认：B条件未触发，4只ETF放量倍数均低于1.5x。" if is_after_close else "⚠️ 盘中半日量，放量倍数偏低属正常。需收盘后最终确认。如果下午继续放量（特别是科技ETF恐慌性抛售），B条件可能在尾盘触发。"}
 
 ---
 
 ## 四、仓位状态建议
 
-**总资产：381,984元**
+**总资产：501,837元**（三账户合计：广发91,444 + 国金77,078 + 东财333,315）
 - ETF持仓市值：约{sum(etf[code]["price"] * etf_holdings[code]["shares"] for code in ["510300", "588000", "159915", "512480"]):,.0f}元
-- 可用现金：约352,817元
+- 个股持仓市值：约127,785元（6只，分散在广发/国金账户）
+- 可用现金：约55,000元（广发478 + 国金229 + 东财54,234）
+- 通用回购/现金等价物：约250,000元（东财账户）
 - ETF总浮盈亏：{sum(calc_pnl(code)[1] for code in ["510300", "588000", "159915", "512480"]):+,.0f}元
 
 ### ETF仓位建议（趋势破位止损策略）
@@ -705,9 +713,9 @@ def generate_analysis(main, extra):
 
 ### 闲置资金操作建议
 
-约35万元可用资金暂不动。原因：
-1. 盘中数据不完整，需收盘后确认B/C条件
-2. ETF持仓需观察是否站稳7/28破位价上方
+约30万元可用资金（含通用回购）暂不动。原因：
+1. {'B条件未触发（放量倍数均<1.5x），ABCD模型无买入信号' if b_count == 0 else f'B条件触发{b_count}只，关注C条件确认'}
+2. ETF持仓{'全部站上7/28破位价，趋势修复中' if all(etf[c]['price'] > etf_holdings[c]['break_price'] for c in ['510300','588000','159915','512480']) else '部分仍在破位价下方，需观察'}
 3. 个股方向根据技术指标灵活操作，不急于加仓
 
 ---
@@ -715,7 +723,7 @@ def generate_analysis(main, extra):
 ## 五、其他重点
 
 ### 1. 市场趋势
-{trend_summary}。两市成交额约{total_amt:,.0f}亿（盘中半日量），需收盘后确认最终量能。
+{trend_summary}。两市成交额约{total_amt:,.0f}亿{vol_label}{'，收盘确认' if is_after_close else '，需收盘后确认最终量能'}。
 
 ### 2. 核心判断
 - **趋势判断：** {trend_summary}
@@ -732,7 +740,7 @@ def generate_analysis(main, extra):
 
 **报告生成时间：** {fetch_time}
 **策略框架：** ETF异动择时模型 + 趋势跟踪 + ABCD四条件
-**仓位管理：** 总资产38.2万，ETF约2万（趋势破位止损）+ 可用35万
+**仓位管理：** 总资产50.2万，ETF约2万（趋势破位止损）+ 个股约12.8万（死扛等反转）+ 可用约30万
 """
     return report
 
@@ -744,6 +752,9 @@ def generate_stock_tracking(main, extra):
     stock_quotes = main.get("stock_quotes", {})
     meta = main.get("meta", {})
     fetch_time = meta.get("fetch_time", "")
+    is_after_close = int(fetch_time[11:13]) >= 15 if len(fetch_time) >= 13 else False
+    session_label = "收盘" if is_after_close else "盘中快照"
+    vol_label = "" if is_after_close else "（盘中半日量）"
 
     stock_names = {
         "002080": "中材科技", "600160": "巨化股份", "000920": "沃顿科技",
@@ -756,7 +767,7 @@ def generate_stock_tracking(main, extra):
 
     report = f"""# 个股追踪报告 — {datetime.now().strftime('%Y年%m月%d日')}
 
-> 数据时间：{fetch_time} | 盘中快照
+> 数据时间：{fetch_time} | {session_label}
 > 数据源：mootdx K线 + 手动计算技术指标
 > 追踪标的：002080 / 600160 / 000920 / 603290 / 000063 / 002803
 
