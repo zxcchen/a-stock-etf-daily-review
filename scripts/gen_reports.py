@@ -100,8 +100,10 @@ def generate_dashboard(main, extra):
     ind_etf = main.get("industry_etfs", extra.get("industry_etfs", {}))
     news = main.get("news", [])
     ths = main.get("ths_hot", [])
-    industries = extra.get("industries", [])
-    breadth = extra.get("breadth", main.get("market_breadth", {}))
+    industries = main.get("industries", extra.get("industries", []))
+    if isinstance(industries, dict):
+        industries = industries.get("top", []) + industries.get("bottom", [])
+    breadth = main.get("market_breadth", extra.get("breadth", {}))
     meta = main.get("meta", {})
     fetch_time = meta.get("fetch_time", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     is_after_close = int(fetch_time[11:13]) >= 15 if len(fetch_time) >= 13 else False
@@ -217,7 +219,7 @@ def generate_dashboard(main, extra):
 
 | 指标 | 数值 | 指标 | 数值 |
 |------|------|------|------|
-| 两市成交额 | {total_amt:,.0f}亿（盘中） | 涨停家数 | {limit_up if limit_up else '数据待补录'} |
+| 两市成交额 | {total_amt:,.0f}亿{vol_label} | 涨停家数 | {limit_up if limit_up else '数据待补录'} |
 | 上涨家数 | {up if up else '数据待补录'} | 跌停家数 | {limit_down if limit_down else '数据待补录'} |
 | 下跌家数 | {down if down else '数据待补录'} | 炸板家数 | 数据待补录 |
 | 平盘家数 | {flat if flat else '数据待补录'} | 炸板率 | 数据待补录 |
@@ -230,7 +232,7 @@ def generate_dashboard(main, extra):
 |------|------|------|
 | 数据待补录 | 数据待补录 | 数据待补录 |
 
-> 市场涨跌家数因东财API限流未能获取完整数据。从盘面看，{etf_word}，成交量{'为全天量' if is_after_close else '为盘中半日量'}。
+> {'上涨' + str(up) + '家 vs 下跌' + str(down) + '家，涨停' + str(limit_up) + '只、跌停' + str(limit_down) + '只。' if up or down else '市场涨跌家数数据待补录。'}{etf_word}，成交量{'为全天量' if is_after_close else '为盘中半日量'}。
 
 ---
 
@@ -275,7 +277,7 @@ def generate_dashboard(main, extra):
         report += f"| {code} | {v.get('today', 0):.2f} | {v.get('yesterday', 0):.2f} | {v.get('avg5', 0):.2f} | {ratio_str} |\n"
 
     report += f"""
-> 今日为盘中数据（未收盘），成交额为半日量。放量倍数偏低属正常。B条件（≥2只ETF≥1.5x）暂未触发。
+> {'B条件（≥2只ETF≥1.5x）暂未触发，4只ETF放量倍数均低于1.5x。' if is_after_close else '今日为盘中数据（未收盘），成交额为半日量。放量倍数偏低属正常。B条件（≥2只ETF≥1.5x）暂未触发。'}
 
 ---
 
@@ -338,7 +340,9 @@ def generate_dashboard(main, extra):
 
     if industries:
         for ind in industries[:5]:
-            report += f"| {ind['rank']} | {ind['name']} | {fmt_pct(ind['change_pct'])} | 涨{ind['up_count']}/跌{ind['down_count']} |\n"
+            up_c = ind.get('up_count', '—')
+            dn_c = ind.get('down_count', '—')
+            report += f"| {ind.get('rank','—')} | {ind['name']} | {fmt_pct(ind['change_pct'])} | 涨{up_c}/跌{dn_c} |\n"
     else:
         report += "| 数据待补录 | 数据待补录 | — | — |\n"
 
@@ -346,7 +350,9 @@ def generate_dashboard(main, extra):
     if industries and len(industries) > 5:
         bottom = sorted(industries, key=lambda x: x['change_pct'])[:5]
         for ind in bottom:
-            report += f"| {ind['rank']} | {ind['name']} | {fmt_pct(ind['change_pct'])} | 涨{ind['up_count']}/跌{ind['down_count']} |\n"
+            up_c = ind.get('up_count', '—')
+            dn_c = ind.get('down_count', '—')
+            report += f"| {ind.get('rank','—')} | {ind['name']} | {fmt_pct(ind['change_pct'])} | 涨{up_c}/跌{dn_c} |\n"
     else:
         report += "| 数据待补录 | 数据待补录 | — | — |\n"
 
@@ -480,10 +486,10 @@ def generate_dashboard(main, extra):
 
 - A条件（下跌家数>3500）：{"✓ 触发" if a_trigger else "✗ 未触发（或数据待补）"}
 - B条件（≥2只ETF放量≥1.5x）：{"✓ 触发" if b_count >= 2 else f"✗ 未触发{vol_label}"}
-- C条件（两市成交>2万亿）：{"✓ 触发" if c_trigger else "✗ 未触发（盘中缩量）"}
+- C条件（两市成交>2万亿）：{"✓ 触发" if c_trigger else f"✗ 未触发{vol_label}"}
 - D条件（跌停>50家）：{"✓ 触发" if d_trigger else "✗ 未触发（或数据待补）"}
 
-> 盘中数据不完整，星级评定为参考值。需收盘后最终确认。
+> {'' if is_after_close else '盘中数据不完整，星级评定为参考值。需收盘后最终确认。'}
 
 ---
 
@@ -497,7 +503,7 @@ def generate_dashboard(main, extra):
 | ETF异动 | {b_count}只放量 | — |
 | 两市成交额 | {total_amt:,.0f}亿 | — |
 
-**极端情绪评分：—/25（盘中数据不完整）**
+**极端情绪评分：—/25{'' if is_after_close else '（盘中数据不完整）'}**
 
 ---
 

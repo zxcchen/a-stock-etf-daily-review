@@ -263,6 +263,7 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 
 EM_SESSION = requests.Session()
 EM_SESSION.headers.update({"User-Agent": UA})
+EM_SESSION.trust_env = False  # 绕过系统代理，解决东财push2 API被阻断问题
 EM_MIN_INTERVAL = 1.0
 _em_last_call = [0.0]
 
@@ -304,18 +305,19 @@ def eastmoney_global_news(page_size=20):
 
 
 def industry_comparison(top_n=20):
-    """全行业涨跌幅排名"""
-    url = "https://push2.eastmoney.com/api/qt/clist/get"
-    params = {
-        "pn": "1", "pz": "100", "po": "1", "np": "1",
-        "fltt": "2", "invt": "2",
-        "fs": "m:90+t:2",
-        "fields": "f2,f3,f4,f12,f13,f14,f104,f105,f128,f136,f140,f141",
-    }
+    """全行业涨跌幅排名（使用urllib绕过代理）"""
+    import ssl
+    base_url = "https://push2.eastmoney.com/api/qt/clist/get"
+    params = "pn=1&pz=100&po=1&np=1&fltt=2&invt=2&fs=m:90+t:2&fields=f2,f3,f4,f12,f13,f14,f104,f105,f128,f136,f140,f141"
+    url = f"{base_url}?{params}"
     headers = {"User-Agent": UA}
     try:
-        r = em_get(url, params=params, headers=headers, timeout=15)
-        d = r.json()
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        req = urllib.request.Request(url, headers=headers)
+        resp = urllib.request.urlopen(req, timeout=15, context=ctx)
+        d = json.loads(resp.read().decode("utf-8"))
         items = d.get("data", {}).get("diff", [])
         if not items:
             return {"top": [], "bottom": [], "total": 0}
@@ -368,30 +370,31 @@ def ths_hot_reason(date_str=None):
 # ============================================================
 
 def get_market_breadth():
-    """获取市场涨跌家数 - 通过东财全市场列表"""
-    url = "https://push2.eastmoney.com/api/qt/clist/get"
-    params = {
-        "pn": "1", "pz": "1", "po": "1", "np": "1",
-        "fltt": "2", "invt": "2",
-        "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23",
-        "fields": "f2,f3,f4,f12,f14",
-    }
+    """获取市场涨跌家数 - 通过东财全市场列表（使用urllib绕过代理）"""
+    import ssl
+    base_url = "https://push2.eastmoney.com/api/qt/clist/get"
     headers = {"User-Agent": UA}
+
     try:
         # 获取总数
-        r = em_get(url, params=params, headers=headers, timeout=10)
-        d = r.json()
+        params1 = "pn=1&pz=1&po=1&np=1&fltt=2&invt=2&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23&fields=f2,f3,f4,f12,f14"
+        url1 = f"{base_url}?{params1}"
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        req1 = urllib.request.Request(url1, headers=headers)
+        resp1 = urllib.request.urlopen(req1, timeout=15, context=ctx)
+        d = json.loads(resp1.read().decode("utf-8"))
         total = d.get("data", {}).get("total", 0)
 
         # 拉取所有股票涨跌统计
         up = down = flat = 0
         limit_up = limit_down = 0
-        page_size = 5000
-        params2 = params.copy()
-        params2["pz"] = str(page_size)
-        params2["fields"] = "f2,f3,f4,f6,f8,f15,f16,f17,f18,f12,f14"
-        r2 = em_get(url, params=params2, headers=headers, timeout=15)
-        d2 = r2.json()
+        params2 = "pn=1&pz=5000&po=1&np=1&fltt=2&invt=2&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23&fields=f2,f3,f4,f6,f8,f12,f14"
+        url2 = f"{base_url}?{params2}"
+        req2 = urllib.request.Request(url2, headers=headers)
+        resp2 = urllib.request.urlopen(req2, timeout=15, context=ctx)
+        d2 = json.loads(resp2.read().decode("utf-8"))
         items = d2.get("data", {}).get("diff", [])
         for item in items:
             pct_raw = item.get("f3", 0)
@@ -405,7 +408,6 @@ def get_market_breadth():
                 down += 1
             else:
                 flat += 1
-            # 涨停: 涨幅 >= 9.9% (主板) 或 >= 19.9% (创/科)
             code = str(item.get("f12", ""))
             if code.startswith(("300", "688")):
                 if pct >= 19.5:
