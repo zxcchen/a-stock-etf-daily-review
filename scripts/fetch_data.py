@@ -452,7 +452,7 @@ def main():
 
     # --- 2. ETF行情 ---
     print("[2/8] 拉取ETF行情...")
-    etfs = ["510300", "159915", "588000", "512480"]
+    etfs = ["510300", "159915", "588000", "512480", "588160", "515050", "588460"]
     etf_quotes = tencent_quote(etfs)
     output["etf_quotes"] = etf_quotes
     for code in etfs:

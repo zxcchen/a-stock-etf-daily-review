@@ -7,6 +7,28 @@ from datetime import datetime
 
 BASE = os.path.join(os.path.dirname(__file__), "..")
 
+# ETF追踪列表（7只）
+ETFS = ["510300", "159915", "588000", "512480", "588160", "515050", "588460"]
+ETF_SHORT_NAMES = {
+    "510300": "沪深300", "159915": "创业板", "588000": "科创50", "512480": "半导体",
+    "588160": "科创新材", "515050": "5G通信", "588460": "科创增强",
+}
+ETF_FULL_NAMES = {
+    "510300": "沪深300ETF", "159915": "创业板ETF", "588000": "科创50ETF", "512480": "半导体ETF",
+    "588160": "科创新材ETF", "515050": "5GETF", "588460": "科创增强ETF",
+}
+
+# ETF实际持仓（来自东财账户截图，2026-08-07更新）
+ETF_HOLDINGS = {
+    "510300": {"shares": 11500, "cost": 4.721, "break_price": 4.591},
+    "588000": {"shares": 24500, "cost": 1.806, "break_price": 1.635},
+    "159915": {"shares": 14300, "cost": 3.566, "break_price": 3.300},
+    "512480": {"shares": 49000, "cost": 1.057, "break_price": 0.919},
+    "588160": {"shares": 42000, "cost": 1.102, "break_price": 0.951},
+    "515050": {"shares": 35500, "cost": 1.042, "break_price": 0.887},
+    "588460": {"shares": 22200, "cost": 2.092, "break_price": 1.880},
+}
+
 def load_data():
     with open(os.path.join(BASE, "data", "market_data.json"), encoding="utf-8") as f:
         main = json.load(f)
@@ -126,7 +148,7 @@ def generate_dashboard(main, extra):
 
     # 放量倍数计算
     vol_data = {}
-    for code in ["510300", "159915", "588000", "512480"]:
+    for code in ETFS:
         if code in etf_klines:
             today_amt, yest_amt, avg5 = calc_vol_ratio(etf_klines[code])
             vol_data[code] = {
@@ -174,25 +196,24 @@ def generate_dashboard(main, extra):
     worst_idx = min(idx_changes, key=lambda x: x[1])
 
     # 动态生成板块描述
-    etf_changes = [(c, etf[c]["change_pct"]) for c in ["510300", "159915", "588000", "512480"]]
-    etf_names_short = {"510300": "沪深300", "159915": "创业板", "588000": "科创50", "512480": "半导体"}
+    etf_changes = [(c, etf[c]["change_pct"]) for c in ETFS]
     up_etfs = [c for c, chg in etf_changes if chg > 0]
     down_etfs = [c for c, chg in etf_changes if chg < 0]
     if len(up_etfs) >= 4:
         top_up_code = max(up_etfs, key=lambda c: dict(etf_changes)[c])
-        etf_word = f"ETF全面上涨，{etf_names_short[top_up_code]}领涨"
+        etf_word = f"ETF全面上涨，{ETF_SHORT_NAMES[top_up_code]}领涨"
     elif len(down_etfs) >= 4:
         top_down_code = min(down_etfs, key=lambda c: dict(etf_changes)[c])
-        etf_word = f"ETF全面下跌，{etf_names_short[top_down_code]}领跌"
+        etf_word = f"ETF全面下跌，{ETF_SHORT_NAMES[top_down_code]}领跌"
     elif len(up_etfs) >= 3:
         top_up_code = max(up_etfs, key=lambda c: dict(etf_changes)[c])
-        etf_word = f"ETF多数上涨，{etf_names_short[top_up_code]}领涨"
+        etf_word = f"ETF多数上涨，{ETF_SHORT_NAMES[top_up_code]}领涨"
     elif len(down_etfs) >= 3:
         top_down_code = min(down_etfs, key=lambda c: dict(etf_changes)[c])
-        etf_word = f"ETF多数下跌，{etf_names_short[top_down_code]}领跌"
+        etf_word = f"ETF多数下跌，{ETF_SHORT_NAMES[top_down_code]}领跌"
     else:
-        up_names = "、".join(etf_names_short[c] for c in up_etfs)
-        down_names = "、".join(etf_names_short[c] for c in down_etfs)
+        up_names = "、".join(ETF_SHORT_NAMES[c] for c in up_etfs)
+        down_names = "、".join(ETF_SHORT_NAMES[c] for c in down_etfs)
         etf_word = f"ETF涨跌分化（{up_names}涨，{down_names}跌）"
 
     report = f"""# A股每日复盘 V3.0 — ETF异动择时模型
@@ -238,31 +259,23 @@ def generate_dashboard(main, extra):
 
 ## 三、ETF成交数据（重点）
 
-### 3.1 四大ETF行情表
+### 3.1 七只ETF行情表
 
 | ETF | 名称 | 最新价 | 涨跌幅 | 成交额（亿） | 换手率 |
 |-----|------|--------|--------|-------------|--------|
-| 510300 | {etf['510300']['name']} | {etf['510300']['price']:.3f} | {fmt_pct(etf['510300']['change_pct'])} | {etf['510300']['amount_wan']/10000:.2f} | {etf['510300']['turnover_pct']:.2f}% |
-| 159915 | {etf['159915']['name']} | {etf['159915']['price']:.3f} | {fmt_pct(etf['159915']['change_pct'])} | {etf['159915']['amount_wan']/10000:.2f} | {etf['159915']['turnover_pct']:.2f}% |
-| 588000 | {etf['588000']['name']} | {etf['588000']['price']:.3f} | {fmt_pct(etf['588000']['change_pct'])} | {etf['588000']['amount_wan']/10000:.2f} | {etf['588000']['turnover_pct']:.2f}% |
-| 512480 | {etf['512480']['name']} | {etf['512480']['price']:.3f} | {fmt_pct(etf['512480']['change_pct'])} | {etf['512480']['amount_wan']/10000:.2f} | {etf['512480']['turnover_pct']:.2f}% |
+"""
+    for code in ETFS:
+        q = etf.get(code, {})
+        report += f"| {code} | {q.get('name', ETF_FULL_NAMES.get(code, ''))} | {q.get('price', 0):.3f} | {fmt_pct(q.get('change_pct', 0))} | {q.get('amount_wan', 0)/10000:.2f} | {q.get('turnover_pct', 0):.2f}% |\n"
 
-### 3.2 510300 沪深300ETF 近5日OHLC表
+    for code in ETFS:
+        report += f"""
+### 3.{2 + ETFS.index(code)} {code} {ETF_FULL_NAMES.get(code, '')} 近5日OHLC表
 
-{gen_kline_table(etf_klines['510300'], etf['510300']['name'])}
+{gen_kline_table(etf_klines.get(code, []), etf.get(code, {}).get('name', ETF_FULL_NAMES.get(code, '')))}
+"""
 
-### 3.3 159915 创业板ETF 近5日OHLC表
-
-{gen_kline_table(etf_klines['159915'], etf['159915']['name'])}
-
-### 3.4 588000 科创50ETF 近5日OHLC表
-
-{gen_kline_table(etf_klines['588000'], etf['588000']['name'])}
-
-### 3.5 512480 半导体ETF 近5日OHLC表
-
-{gen_kline_table(etf_klines['512480'], etf['512480']['name'])}
-
+    report += f"""
 ---
 
 ## 四、【V3.0】ETF放量倍数量化表
@@ -271,24 +284,26 @@ def generate_dashboard(main, extra):
 |-----|----------------|----------------|---------------|---------|
 """
 
-    for code in ["510300", "159915", "588000", "512480"]:
+    for code in ETFS:
         v = vol_data.get(code, {})
         ratio_str = f"{v.get('ratio', 0):.2f}x" if v.get('ratio') else "—"
         report += f"| {code} | {v.get('today', 0):.2f} | {v.get('yesterday', 0):.2f} | {v.get('avg5', 0):.2f} | {ratio_str} |\n"
 
     report += f"""
-> {'B条件（≥2只ETF≥1.5x）暂未触发，4只ETF放量倍数均低于1.5x。' if is_after_close else '今日为盘中数据（未收盘），成交额为半日量。放量倍数偏低属正常。B条件（≥2只ETF≥1.5x）暂未触发。'}
+> {'B条件（≥2只ETF≥1.5x）暂未触发，7只ETF放量倍数均低于1.5x。' if is_after_close else '今日为盘中数据（未收盘），成交额为半日量。放量倍数偏低属正常。B条件（≥2只ETF≥1.5x）暂未触发。'}
+"""
 
+    report += f"""
 ---
 
 ## 五、【V3.0】ETF净申赎数据
 
 | ETF | 今日主力净流入 | 近5日净流入合计 | 资金方向 |
 |-----|--------------|---------------|---------|
-| 510300 | 数据待补录 | 数据待补录 | — |
-| 159915 | 数据待补录 | 数据待补录 | — |
-| 588000 | 数据待补录 | 数据待补录 | — |
-| 512480 | 数据待补录 | 数据待补录 | — |
+"""
+    for code in ETFS:
+        report += f"| {code} | 数据待补录 | 数据待补录 | — |\n"
+    report += f"""
 
 ---
 
@@ -364,7 +379,7 @@ def generate_dashboard(main, extra):
         bottom_str = "、".join(f"{ind['name']}（{ind['change_pct']:.2f}%）" for ind in bottom_ind)
     else:
         # 用ETF数据代替
-        top_str = "、".join(f"{etf_names_short[c]}ETF（{'+' if chg > 0 else ''}{chg:.2f}%）" for c, chg in sorted(etf_changes, key=lambda x: x[1], reverse=True))
+        top_str = "、".join(f"{ETF_SHORT_NAMES[c]}ETF（{'+' if chg > 0 else ''}{chg:.2f}%）" for c, chg in sorted(etf_changes, key=lambda x: x[1], reverse=True))
         bottom_str = top_str
 
     # 动态判断市场风格
@@ -430,9 +445,9 @@ def generate_dashboard(main, extra):
 
     # 动态生成ETF异动描述
     etf_change_desc = []
-    for code in ["510300", "159915", "588000", "512480"]:
+    for code in ETFS:
         chg = etf[code]["change_pct"]
-        name = etf_names_short[code]
+        name = ETF_SHORT_NAMES[code]
         etf_change_desc.append(f"{name}ETF（{code}）{'+' if chg > 0 else ''}{chg:.2f}%")
     etf_change_str = "、".join(etf_change_desc)
 
@@ -580,7 +595,7 @@ def generate_analysis(main, extra):
 
     # 放量倍数
     vol_data = {}
-    for code in ["510300", "159915", "588000", "512480"]:
+    for code in ETFS:
         if code in etf_klines:
             today_amt, yest_amt, avg5 = calc_vol_ratio(etf_klines[code])
             vol_data[code] = {
@@ -591,18 +606,11 @@ def generate_analysis(main, extra):
             }
     b_count = sum(1 for v in vol_data.values() if v["ratio"] >= 1.5)
 
-    # ETF持仓数据（来自用户实际持仓）
-    etf_holdings = {
-        "510300": {"shares": 1300, "cost": 4.670, "break_price": 4.627},
-        "588000": {"shares": 3400, "cost": 1.834, "break_price": 1.785},
-        "159915": {"shares": 1400, "cost": 3.513, "break_price": 3.335},
-        "512480": {"shares": 3800, "cost": 1.056, "break_price": 1.031},
-    }
-    etf_names_map = {"510300": "沪深300ETF", "159915": "创业板ETF", "588000": "科创50ETF", "512480": "半导体ETF"}
+    # ETF持仓数据使用全局 ETF_HOLDINGS / ETF_FULL_NAMES
 
     # 计算ETF支撑压力位（从K线数据）
     etf_levels = {}
-    for code in ["510300", "159915", "588000", "512480"]:
+    for code in ETFS:
         if code in etf_klines and len(etf_klines[code]) >= 2:
             klines = etf_klines[code]
             today_k = klines[-1]
@@ -627,7 +635,7 @@ def generate_analysis(main, extra):
 
     # 计算ETF浮盈亏
     def calc_pnl(code):
-        h = etf_holdings[code]
+        h = ETF_HOLDINGS[code]
         price = etf[code]["price"]
         pnl_pct = (price - h["cost"]) / h["cost"] * 100
         pnl_amt = (price - h["cost"]) * h["shares"]
@@ -664,16 +672,16 @@ def generate_analysis(main, extra):
 
 """
 
-    # 动态生成4只ETF分析
-    for code in ["510300", "159915", "588000", "512480"]:
+    # 动态生成7只ETF分析
+    for code in ETFS:
         pnl_pct, pnl_amt = calc_pnl(code)
-        above_break = etf[code]["price"] > etf_holdings[code]["break_price"]
-        report += f"""### {code} {etf_names_map[code]}
+        above_break = etf[code]["price"] > ETF_HOLDINGS[code]["break_price"]
+        report += f"""### {code} {ETF_FULL_NAMES[code]}
 - 最新价：{etf[code]['price']:.3f}，{fmt_pct(etf[code]['change_pct'])}
 - 量比：{vol_data[code]['ratio']:.2f}x{vol_label}
-- 成本价：{etf_holdings[code]['cost']:.3f}（{etf_holdings[code]['shares']}股），7/28破位价：{etf_holdings[code]['break_price']:.3f}
+- 成本价：{ETF_HOLDINGS[code]['cost']:.3f}（{ETF_HOLDINGS[code]['shares']}股），8/5启动阳线低位：{ETF_HOLDINGS[code]['break_price']:.3f}
 - 浮盈亏：{pnl_pct:+.2f}%（{pnl_amt:+.0f}元）
-- **破位判断：** {'已站上7/28破位价' if above_break else '仍在7/28破位价下方'}
+- **破位判断：** {'已站上8/5启动阳线低位' if above_break else '仍在8/5启动阳线低位下方'}
 - **建议：** {'持有' if above_break else '关注破位价，跌破即止损'}
 
 """
@@ -686,42 +694,40 @@ def generate_analysis(main, extra):
 
 | ETF | 今日成交额 | 近5日均值 | 放量倍数 | 是否≥1.5x |
 |-----|----------|---------|---------|----------|
-| 510300 | {vol_data['510300']['today']:.2f}亿 | {vol_data['510300']['avg5']:.2f}亿 | {vol_data['510300']['ratio']:.2f}x | {"✓" if vol_data['510300']['ratio'] >= 1.5 else "✗"} |
-| 159915 | {vol_data['159915']['today']:.2f}亿 | {vol_data['159915']['avg5']:.2f}亿 | {vol_data['159915']['ratio']:.2f}x | {"✓" if vol_data['159915']['ratio'] >= 1.5 else "✗"} |
-| 588000 | {vol_data['588000']['today']:.2f}亿 | {vol_data['588000']['avg5']:.2f}亿 | {vol_data['588000']['ratio']:.2f}x | {"✓" if vol_data['588000']['ratio'] >= 1.5 else "✗"} |
-| 512480 | {vol_data['512480']['today']:.2f}亿 | {vol_data['512480']['avg5']:.2f}亿 | {vol_data['512480']['ratio']:.2f}x | {"✓" if vol_data['512480']['ratio'] >= 1.5 else "✗"} |
-
+"""
+    for code in ETFS:
+        v = vol_data.get(code, {})
+        report += f"| {code} | {v.get('today', 0):.2f}亿 | {v.get('avg5', 0):.2f}亿 | {v.get('ratio', 0):.2f}x | {'✓' if v.get('ratio', 0) >= 1.5 else '✗'} |\n"
+    report += f"""
 **B条件状态：** {b_count}只ETF ≥ 1.5x → {"✓ 触发" if b_count >= 2 else "✗ 未触发"}
 
-> {"收盘确认：B条件未触发，4只ETF放量倍数均低于1.5x。" if is_after_close else "⚠️ 盘中半日量，放量倍数偏低属正常。需收盘后最终确认。如果下午继续放量（特别是科技ETF恐慌性抛售），B条件可能在尾盘触发。"}
+> {"收盘确认：B条件未触发，7只ETF放量倍数均低于1.5x。" if is_after_close else "⚠️ 盘中半日量，放量倍数偏低属正常。需收盘后最终确认。如果下午继续放量（特别是科技ETF恐慌性抛售），B条件可能在尾盘触发。"}
 
 ---
 
 ## 四、仓位状态建议
 
 **总资产：501,837元**（三账户合计：广发91,444 + 国金77,078 + 东财333,315）
-- ETF持仓市值：约{sum(etf[code]["price"] * etf_holdings[code]["shares"] for code in ["510300", "588000", "159915", "512480"]):,.0f}元
+- ETF持仓市值：约{sum(etf[code]["price"] * ETF_HOLDINGS[code]["shares"] for code in ETFS):,.0f}元（东财场内基金）
 - 个股持仓市值：约127,785元（6只，分散在广发/国金账户）
-- 可用现金：约55,000元（广发478 + 国金229 + 东财54,234）
-- 通用回购/现金等价物：约250,000元（东财账户）
-- ETF总浮盈亏：{sum(calc_pnl(code)[1] for code in ["510300", "588000", "159915", "512480"]):+,.0f}元
+- 可用现金：约20,000元（账户剩余可用）
+- ETF总浮盈亏：{sum(calc_pnl(code)[1] for code in ETFS):+,.0f}元
 
 ### ETF仓位建议（趋势破位止损策略）
 
-| ETF | 持仓/成本 | 最新价 | 浮盈亏 | 7/28破位价 | 建议 |
-|-----|---------|--------|--------|----------|------|
-| 510300 | {etf_holdings['510300']['shares']}股/{etf_holdings['510300']['cost']:.3f} | {etf['510300']['price']:.3f} | {calc_pnl('510300')[0]:+.2f}% | {etf_holdings['510300']['break_price']:.3f} | {'持有' if etf['510300']['price'] > etf_holdings['510300']['break_price'] else '关注止损'} |
-| 159915 | {etf_holdings['159915']['shares']}股/{etf_holdings['159915']['cost']:.3f} | {etf['159915']['price']:.3f} | {calc_pnl('159915')[0]:+.2f}% | {etf_holdings['159915']['break_price']:.3f} | {'持有' if etf['159915']['price'] > etf_holdings['159915']['break_price'] else '关注止损'} |
-| 588000 | {etf_holdings['588000']['shares']}股/{etf_holdings['588000']['cost']:.3f} | {etf['588000']['price']:.3f} | {calc_pnl('588000')[0]:+.2f}% | {etf_holdings['588000']['break_price']:.3f} | {'持有' if etf['588000']['price'] > etf_holdings['588000']['break_price'] else '关注止损'} |
-| 512480 | {etf_holdings['512480']['shares']}股/{etf_holdings['512480']['cost']:.3f} | {etf['512480']['price']:.3f} | {calc_pnl('512480')[0]:+.2f}% | {etf_holdings['512480']['break_price']:.3f} | {'持有' if etf['512480']['price'] > etf_holdings['512480']['break_price'] else '关注止损'} |
-
-> 止损规则：跌破7/28启动阳线低位即走，不设固定百分比。
+| ETF | 持仓/成本 | 最新价 | 浮盈亏 | 8/5启动阳线低位 | 建议 |
+|-----|---------|--------|--------|----------------|------|
+"""
+    for code in ETFS:
+        report += f"| {code} | {ETF_HOLDINGS[code]['shares']}股/{ETF_HOLDINGS[code]['cost']:.3f} | {etf[code]['price']:.3f} | {calc_pnl(code)[0]:+.2f}% | {ETF_HOLDINGS[code]['break_price']:.3f} | {'持有' if etf[code]['price'] > ETF_HOLDINGS[code]['break_price'] else '关注止损'} |\n"
+    report += f"""
+> 止损规则：跌破8/5启动阳线低位即走，不设固定百分比。
 
 ### 闲置资金操作建议
 
-约30万元可用资金（含通用回购）暂不动。原因：
+约2万元可用资金暂不动，等待更清晰信号。原因：
 1. {'B条件未触发（放量倍数均<1.5x），ABCD模型无买入信号' if b_count == 0 else f'B条件触发{b_count}只，关注C条件确认'}
-2. ETF持仓{'全部站上7/28破位价，趋势修复中' if all(etf[c]['price'] > etf_holdings[c]['break_price'] for c in ['510300','588000','159915','512480']) else '部分仍在破位价下方，需观察'}
+2. ETF持仓{'全部站上8/5启动阳线低位，趋势修复中' if all(etf[c]['price'] > ETF_HOLDINGS[c]['break_price'] for c in ETFS) else '部分仍在启动阳线低位下方，需观察'}
 3. 个股方向根据技术指标灵活操作，不急于加仓
 
 ---
@@ -733,20 +739,20 @@ def generate_analysis(main, extra):
 
 ### 2. 核心判断
 - **趋势判断：** {trend_summary}
-- **ETF策略：** 趋势破位止损，跌破7/28启动阳线低位即走
+- **ETF策略：** 趋势破位止损，跌破8/5启动阳线低位即走
 - **个股策略：** 死扛等反转，依赖技术指标判断反转信号
 - **操作策略：** ETF执行纪律止损，个股死扛等反弹，现金不动
 
 ### 3. 关注点
 - 收盘后确认B条件是否触发
-- 4只ETF是否站稳7/28破位价上方
+- 7只ETF是否站稳8/5启动阳线低位上方
 - 个股技术指标变化（MACD/KDJ金叉/死叉）
 
 ---
 
 **报告生成时间：** {fetch_time}
 **策略框架：** ETF异动择时模型 + 趋势跟踪 + ABCD四条件
-**仓位管理：** 总资产50.2万，ETF约2万（趋势破位止损）+ 个股约12.8万（死扛等反转）+ 可用约30万
+**仓位管理：** 总资产50.2万，ETF约33.4万（趋势破位止损）+ 个股约12.8万（死扛等反转）+ 可用约2万
 """
     return report
 
