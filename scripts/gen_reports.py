@@ -114,6 +114,171 @@ def gen_kline_table(klines, etf_name):
     return table
 
 
+def detect_kline_patterns(klines):
+    """K线形态分析 — 检测特殊K线形态，返回形态列表和综合判断
+
+    检测形态：
+    - 单根：光脚阴线/光脚阳线、光头阴线/光头阳线、十字星、锤子线、上吊线、
+            射击之星、倒锤子线、长下影/长上影、大阳线/大阴线
+    - 双根：阳包阴、阴包阳
+    - 三根：顶分型、底分型、高低点抬升/下移（趋势结构）
+    """
+    if not klines or len(klines) < 3:
+        return [], "数据不足"
+
+    patterns = []
+    today = klines[-1]
+    yest = klines[-2] if len(klines) >= 2 else None
+    prev = klines[-3] if len(klines) >= 3 else None
+
+    o, h, l, c = float(today["open"]), float(today["high"]), float(today["low"]), float(today["close"])
+    body = abs(c - o)
+    body_pct = body / o * 100 if o > 0 else 0
+    upper_shadow = h - max(o, c)
+    lower_shadow = min(o, c) - l
+    total_range = h - l
+    is_bullish = c > o
+    is_bearish = c < o
+
+    # 实体占整根K线的比例
+    body_ratio = body / total_range if total_range > 0 else 0
+    # 上下影线占整根K线的比例
+    upper_ratio = upper_shadow / total_range if total_range > 0 else 0
+    lower_ratio = lower_shadow / total_range if total_range > 0 else 0
+
+    # === 单根K线形态 ===
+
+    # 1. 十字星（实体极小，开盘≈收盘）
+    if body_pct < 0.5 and total_range > 0:
+        if upper_shadow > 0 and lower_shadow > 0:
+            patterns.append(("十字星", "⚠️ 多空平衡，变盘信号。出现在高位=见顶预警，出现在低位=见底预警", "中性"))
+        elif upper_shadow > 0 and lower_shadow == 0:
+            patterns.append(("T字星", "⚠️ 下方支撑强但上方有抛压，低位出现偏多", "偏多"))
+        elif lower_shadow > 0 and upper_shadow == 0:
+            patterns.append(("倒T字星", "⚠️ 上方压力大，高位出现偏空", "偏空"))
+
+    # 2. 光脚阳线（无下影线，收盘=最高或有极小下影线）
+    if is_bullish and lower_ratio < 0.02 and body_ratio > 0.5:
+        patterns.append(("光脚阳线", "🔴 多头强势，买盘积极推升收盘到最高附近，次日大概率延续上涨", "看多"))
+
+    # 3. 光脚阴线（无下影线，开盘=最高，收盘=最低或有极小上影线）
+    if is_bearish and lower_ratio < 0.02 and body_ratio > 0.5:
+        patterns.append(("光脚阴线", "🟢 空头强势，卖盘持续打压收盘到最低附近，次日大概率延续下跌", "看空"))
+
+    # 4. 光头阳线（无上影线，收盘=最高）
+    if is_bullish and upper_ratio < 0.02 and body_ratio > 0.5:
+        patterns.append(("光头阳线", "🔴 多头主导，收盘即最高价，上方无抛压，强势特征", "看多"))
+
+    # 5. 光头阴线（无上影线，开盘=最高）
+    if is_bearish and upper_ratio < 0.02 and body_ratio > 0.5:
+        patterns.append(("光头阴线", "🟢 空头主导，开盘即最高价，全天单边下跌，弱势特征", "看空"))
+
+    # 6. 锤子线（下影线长≥2倍实体，上影线极小，出现在下跌末期）
+    if lower_shadow > body * 2 and upper_ratio < 0.1 and body_ratio < 0.4:
+        if is_bullish:
+            patterns.append(("锤子线", "🔴 下跌中出现，长下影+小阳实体=下方有承接，潜在见底信号", "看多"))
+        else:
+            patterns.append(("锤子线(阴)", "🔴 下跌中出现，长下影+小阴实体=下方有承接，潜在见底信号", "看多"))
+
+    # 7. 上吊线（与锤子线形态相同，但出现在上涨末期）
+    if lower_shadow > body * 2 and upper_ratio < 0.1 and body_ratio < 0.4:
+        # 需要结合趋势判断，如果近期上涨则为上吊线
+        if yest and float(yest["close"]) < float(yest["open"]):
+            pass  # 下跌中，已在锤子线处理
+        elif yest and float(yest["close"]) > float(yest["open"]):
+            patterns.append(("上吊线", "🟢 上涨中出现锤子形态=上吊线，潜在见顶信号，需次日确认", "看空"))
+
+    # 8. 射击之星（上影线长≥2倍实体，下影线极小，出现在上涨末期）
+    if upper_shadow > body * 2 and lower_ratio < 0.1 and body_ratio < 0.4:
+        patterns.append(("射击之星", "🟢 长上影+小实体=上方抛压沉重，潜在见顶信号", "看空"))
+
+    # 9. 倒锤子线（上影线长，下影线极小，出现在下跌末期）
+    if upper_shadow > body * 2 and lower_ratio < 0.1 and body_ratio < 0.4:
+        if yest and float(yest["close"]) < float(yest["open"]):
+            patterns.append(("倒锤子线", "🔴 下跌中出现长上影=多头尝试反击，潜在见底信号", "看多"))
+
+    # 10. 大阳线（实体涨幅>3%）
+    if is_bullish and body_pct > 3:
+        patterns.append(("大阳线", f"🔴 实体涨幅{body_pct:.1f}%，多头强势发力", "看多"))
+
+    # 11. 大阴线（实体跌幅>3%）
+    if is_bearish and body_pct > 3:
+        patterns.append(("大阴线", f"🟢 实体跌幅{body_pct:.1f}%，空头强势打压", "看空"))
+
+    # 12. 长下影线（下影线占总振幅>50%）
+    if lower_ratio > 0.5 and body_ratio < 0.3:
+        patterns.append(("长下影线", "🔴 下方承接力强，盘中被砸后拉回，多头抵抗", "偏多"))
+
+    # 13. 长上影线（上影线占总振幅>50%）
+    if upper_ratio > 0.5 and body_ratio < 0.3:
+        patterns.append(("长上影线", "🟢 上方抛压重，盘中冲高后回落，空头施压", "偏空"))
+
+    # === 双根K线形态 ===
+    if yest:
+        y_o, y_h, y_l, y_c = float(yest["open"]), float(yest["high"]), float(yest["low"]), float(yest["close"])
+
+        # 14. 阳包阴（今日阳线完全吞噬昨日阴线实体）
+        if y_c < y_o and c > o and c >= y_o and o <= y_c:
+            patterns.append(("阳包阴", "🔴 今日阳线完全吞没昨日阴线实体，多头强力反转信号", "看多"))
+
+        # 15. 阴包阳（今日阴线完全吞噬昨日阳线实体）
+        if y_c > y_o and c < o and o >= y_c and c <= y_o:
+            patterns.append(("阴包阳", "🟢 今日阴线完全吞没昨日阳线实体，空头强力反转信号", "看空"))
+
+    # === 三根K线形态（分型结构）===
+    if prev and yest:
+        p_h, p_l = float(prev["high"]), float(prev["low"])
+        y_h, y_l = float(yest["high"]), float(yest["low"])
+
+        # 16. 顶分型（昨日高点为三根中最高）
+        if y_h > h and y_h > p_h:
+            patterns.append(("顶分型", "🟢 昨日高点为近期最高，今日回落确认顶分型，短期见顶信号", "看空"))
+
+        # 17. 底分型（昨日低点为三根中最低）
+        if y_l < l and y_l < p_l:
+            patterns.append(("底分型", "🔴 昨日低点为近期最低，今日回升确认底分型，短期见底信号", "看多"))
+
+        # 18. 高低点同时抬升（反转K线结构）
+        if h > y_h and l > y_l:
+            patterns.append(("高低点抬升", "🔴 今日高低点同时高于昨日，趋势反转/延续上涨结构", "看多"))
+
+        # 19. 高低点同时下移（下跌延续结构）
+        if h < y_h and l < y_l:
+            patterns.append(("高低点下移", "🟢 今日高低点同时低于昨日，趋势延续下跌结构", "看空"))
+
+    # === 综合判断 ===
+    if not patterns:
+        return [], "无明显特殊形态"
+
+    bullish_count = sum(1 for _, _, s in patterns if s in ("看多", "偏多"))
+    bearish_count = sum(1 for _, _, s in patterns if s in ("看空", "偏空"))
+
+    if bullish_count > bearish_count:
+        overall = f"偏多（{bullish_count}多/{bearish_count}空）"
+    elif bearish_count > bullish_count:
+        overall = f"偏空（{bullish_count}多/{bearish_count}空）"
+    else:
+        overall = f"中性（{bullish_count}多/{bearish_count}空）"
+
+    return patterns, overall
+
+
+def gen_kline_pattern_section(klines, name=""):
+    """生成K线形态分析段落"""
+    patterns, overall = detect_kline_patterns(klines)
+    if not patterns:
+        return f"**K线形态：** 无明显特殊形态。当前实体较小，上下影线均衡，多空暂处平衡状态。\n"
+
+    lines = [f"**K线形态分析：** 综合{overall}\n"]
+    lines.append("| 形态 | 含义 | 方向 |")
+    lines.append("|------|------|------|")
+    for pname, pdesc, pdir in patterns:
+        dir_emoji = {"看多": "🔴", "看空": "🟢", "偏多": "🔴", "偏空": "🟢", "中性": "🟡"}.get(pdir, "🟡")
+        lines.append(f"| {pname} | {pdesc} | {dir_emoji}{pdir} |")
+
+    return "\n".join(lines) + "\n"
+
+
 def generate_dashboard(main, extra):
     """生成今日看板报告"""
     idx = main["indices"]
@@ -273,6 +438,7 @@ def generate_dashboard(main, extra):
 ### 3.{2 + ETFS.index(code)} {code} {ETF_FULL_NAMES.get(code, '')} 近5日OHLC表
 
 {gen_kline_table(etf_klines.get(code, []), etf.get(code, {}).get('name', ETF_FULL_NAMES.get(code, '')))}
+{gen_kline_pattern_section(etf_klines.get(code, []), ETF_FULL_NAMES.get(code, ''))}
 """
 
     report += f"""
@@ -676,6 +842,16 @@ def generate_analysis(main, extra):
     for code in ETFS:
         pnl_pct, pnl_amt = calc_pnl(code)
         above_break = etf[code]["price"] > ETF_HOLDINGS[code]["break_price"]
+        # K线形态
+        etf_kl = etf_klines.get(code, [])
+        patterns, pattern_overall = detect_kline_patterns(etf_kl)
+        pattern_str = ""
+        if patterns:
+            pattern_items = "; ".join(f"{p[0]}({p[2]})" for p in patterns)
+            pattern_str = f"- **K线形态：** {pattern_items} → {pattern_overall}"
+        else:
+            pattern_str = f"- **K线形态：** 无明显特殊形态"
+
         report += f"""### {code} {ETF_FULL_NAMES[code]}
 - 最新价：{etf[code]['price']:.3f}，{fmt_pct(etf[code]['change_pct'])}
 - 量比：{vol_data[code]['ratio']:.2f}x{vol_label}
@@ -683,6 +859,7 @@ def generate_analysis(main, extra):
 - 浮盈亏：{pnl_pct:+.2f}%（{pnl_amt:+.0f}元）
 - **破位判断：** {'已站上8/5启动阳线低位' if above_break else '仍在8/5启动阳线低位下方'}
 - **建议：** {'持有' if above_break else '关注破位价，跌破即止损'}
+{pattern_str}
 
 """
 
@@ -690,7 +867,86 @@ def generate_analysis(main, extra):
 
 ---
 
-## 三、ETF放量倍数（B条件检测）
+## 三、K线形态综合分析
+
+> ⚠️ **大盘处于年线下方，任何反弹结构都需警惕K线形态信号。** 以下为7只ETF + 6只个股的最新K线形态检测。
+
+### ETF K线形态汇总
+
+| ETF | 今日形态 | 方向 | 关键信号 |
+|-----|---------|------|---------|
+"""
+    # Check if we have stock_klines for stocks too
+    stock_klines = main.get("stock_klines", {})
+    stock_names_local = {
+        "002080": "中材科技", "600160": "巨化股份", "000920": "沃顿科技",
+        "603290": "斯达半导", "000063": "中兴通讯", "002803": "吉宏股份",
+    }
+
+    for code in ETFS:
+        kl = etf_klines.get(code, [])
+        pats, overall = detect_kline_patterns(kl)
+        if pats:
+            pat_names = ", ".join(p[0] for p in pats)
+            dir_str = overall
+        else:
+            pat_names = "无特殊形态"
+            dir_str = "中性"
+        report += f"| {code} {ETF_SHORT_NAMES.get(code, '')} | {pat_names} | {dir_str} | {pats[0][1][:40] + '...' if pats and len(pats[0][1]) > 40 else (pats[0][1] if pats else '—')} |\n"
+
+    report += f"""
+### 个股 K线形态汇总
+
+| 个股 | 今日形态 | 方向 | 关键信号 |
+|-----|---------|------|---------|
+"""
+    for code in ["002080", "600160", "000920", "603290", "000063", "002803"]:
+        kl = stock_klines.get(code, [])
+        pats, overall = detect_kline_patterns(kl)
+        if pats:
+            pat_names = ", ".join(p[0] for p in pats)
+            dir_str = overall
+        else:
+            pat_names = "无特殊形态"
+            dir_str = "中性"
+        signal = pats[0][1][:40] + "..." if pats and len(pats[0][1]) > 40 else (pats[0][1] if pats else "—")
+        report += f"| {code} {stock_names_local.get(code, '')} | {pat_names} | {dir_str} | {signal} |\n"
+
+    # Count bullish/bearish patterns
+    all_bullish = 0
+    all_bearish = 0
+    for code in ETFS:
+        kl = etf_klines.get(code, [])
+        pats, _ = detect_kline_patterns(kl)
+        for _, _, d in pats:
+            if d in ("看多", "偏多"): all_bullish += 1
+            elif d in ("看空", "偏空"): all_bearish += 1
+    for code in ["002080", "600160", "000920", "603290", "000063", "002803"]:
+        kl = stock_klines.get(code, [])
+        pats, _ = detect_kline_patterns(kl)
+        for _, _, d in pats:
+            if d in ("看多", "偏多"): all_bullish += 1
+            elif d in ("看空", "偏空"): all_bearish += 1
+
+    if all_bullish > all_bearish:
+        kline_summary = f"整体偏多（{all_bullish}个看多信号 vs {all_bearish}个看空信号），反弹结构暂时维持，但年线下方需保持警惕"
+    elif all_bearish > all_bullish:
+        kline_summary = f"整体偏空（{all_bullish}个看多信号 vs {all_bearish}个看空信号），反弹结构出现裂痕，注意减仓/止损"
+    else:
+        kline_summary = f"多空平衡（{all_bullish}个看多信号 vs {all_bearish}个看空信号），方向不明，控制仓位"
+
+    report += f"""
+**K线形态总结：** {kline_summary}
+
+> **形态交易规则（年线下方）：**
+> - 出现**底分型/阳包阴/高低点抬升/锤子线** → 反转信号，可逢低建仓
+> - 出现**顶分型/阴包阳/高低点下移/射击之星** → 减仓信号，果断止盈/止损
+> - 出现**十字星** → 变盘预警，缩量观望，等次日方向确认
+> - **光脚阴线/大阴线** → 空头强势，不抄底；**光脚阳线/大阳线** → 多头强势，可跟进
+
+---
+
+## 四、ETF放量倍数（B条件检测）
 
 | ETF | 今日成交额 | 近5日均值 | 放量倍数 | 是否≥1.5x |
 |-----|----------|---------|---------|----------|
@@ -705,7 +961,7 @@ def generate_analysis(main, extra):
 
 ---
 
-## 四、仓位状态建议
+## 五、仓位状态建议
 
 **总资产：501,837元**（三账户合计：广发91,444 + 国金77,078 + 东财333,315）
 - ETF持仓市值：约{sum(etf[code]["price"] * ETF_HOLDINGS[code]["shares"] for code in ETFS):,.0f}元（东财场内基金）
@@ -732,7 +988,7 @@ def generate_analysis(main, extra):
 
 ---
 
-## 五、其他重点
+## 六、其他重点
 
 ### 1. 市场趋势
 {trend_summary}。两市成交额约{total_amt:,.0f}亿{vol_label}{'，收盘确认' if is_after_close else '，需收盘后确认最终量能'}。
@@ -980,6 +1236,8 @@ def generate_stock_tracking(main, extra):
 | KDJ K/D/J | {kdj_k}/{kdj_d}/{kdj_j} | {kdj_signal} |
 | RSI6/RSI12 | {rsi6}/{rsi12} | {rsi_signal} |
 | BOLL中轨 | {boll_mid}（上轨{boll_upper}/下轨{boll_lower}） | {boll_signal} |
+
+{gen_kline_pattern_section(klines, name)}
 
 **信号综合：** {overall}（{bullish}正{bearish}负）
 

@@ -1,22 +1,13 @@
 {
   "trading_day": true,
-  "latest_date": "20260807",
-  "today": "20260807",
+  "latest_date": "20260810",
+  "today": "20260810",
   "stocks": {
     "002080": {
       "name": "中材科技",
       "setcode": 0,
       "industry": "玻璃纤维/建材",
       "klines_6d": [
-        {
-          "datetime": "2026-07-31 15:00",
-          "open": 46.56,
-          "close": 43.14,
-          "high": 46.56,
-          "low": 43.06,
-          "vol": 676969.0,
-          "amount": 3044353792.0
-        },
         {
           "datetime": "2026-08-03 15:00",
           "open": 42.8,
@@ -56,48 +47,48 @@
         {
           "datetime": "2026-08-07 15:00",
           "open": 52.1,
-          "close": 54.87,
-          "high": 55.95,
+          "close": 56.56,
+          "high": 56.67,
           "low": 51.21,
-          "vol": 532910.0,
-          "amount": 2853176320.0
+          "vol": 853326.0,
+          "amount": 4656492032.0
+        },
+        {
+          "datetime": "2026-08-10 15:00",
+          "open": 58.82,
+          "close": 55.33,
+          "high": 59.5,
+          "low": 55.1,
+          "vol": 462318.0,
+          "amount": 2641213184.0
         }
       ],
       "indicators": {
-        "MA5": 47.98,
-        "MA10": 46.77,
-        "MA20": 52.12,
-        "MA60": 66.42,
-        "MACD_DIF": -5.8979,
-        "MACD_DEA": -7.0309,
-        "MACD_HIST": 2.2659,
-        "KDJ_K": 68.2,
-        "KDJ_D": 44.37,
-        "KDJ_J": 115.88,
-        "RSI_6": 84.56,
-        "RSI_12": 56.77,
-        "BOLL_MID": 52.12,
-        "BOLL_UPPER": 69.34,
-        "BOLL_LOWER": 34.89
+        "MA5": 51.32,
+        "MA10": 47.28,
+        "MA20": 51.64,
+        "MA60": 66.3,
+        "MACD_DIF": -4.9263,
+        "MACD_DEA": -6.5937,
+        "MACD_HIST": 3.3347,
+        "KDJ_K": 73.02,
+        "KDJ_D": 54.37,
+        "KDJ_J": 110.3,
+        "RSI_6": 80.1,
+        "RSI_12": 56.83,
+        "BOLL_MID": 51.64,
+        "BOLL_UPPER": 67.7,
+        "BOLL_LOWER": 35.57
       },
-      "change_5d_pct": 27.19,
-      "change_today_pct": 6.5,
-      "latest_date": "20260807"
+      "change_5d_pct": 37.16,
+      "change_today_pct": -2.17,
+      "latest_date": "20260810"
     },
     "600160": {
       "name": "巨化股份",
       "setcode": 1,
       "industry": "氟化工/化学制品",
       "klines_6d": [
-        {
-          "datetime": "2026-07-31 15:00",
-          "open": 40.99,
-          "close": 39.52,
-          "high": 41.28,
-          "low": 39.13,
-          "vol": 446194.0,
-          "amount": 1792106496.0
-        },
         {
           "datetime": "2026-08-03 15:00",
           "open": 39.3,
@@ -137,48 +128,48 @@
         {
           "datetime": "2026-08-07 15:00",
           "open": 43.54,
-          "close": 43.16,
+          "close": 43.29,
           "high": 43.69,
           "low": 42.74,
-          "vol": 200185.0,
-          "amount": 862987136.0
+          "vol": 319395.0,
+          "amount": 1379460992.0
+        },
+        {
+          "datetime": "2026-08-10 15:00",
+          "open": 43.0,
+          "close": 43.74,
+          "high": 43.98,
+          "low": 43.0,
+          "vol": 156087.0,
+          "amount": 679443392.0
         }
       ],
       "indicators": {
-        "MA5": 42.26,
-        "MA10": 40.81,
-        "MA20": 40.6,
-        "MA60": 41.85,
-        "MACD_DIF": -0.3748,
-        "MACD_DEA": -0.8769,
-        "MACD_HIST": 1.0043,
-        "KDJ_K": 86.31,
-        "KDJ_D": 76.45,
-        "KDJ_J": 106.02,
-        "RSI_6": 84.87,
-        "RSI_12": 69.11,
-        "BOLL_MID": 40.6,
-        "BOLL_UPPER": 43.97,
-        "BOLL_LOWER": 37.22
+        "MA5": 43.06,
+        "MA10": 41.19,
+        "MA20": 40.69,
+        "MA60": 41.98,
+        "MACD_DIF": -0.149,
+        "MACD_DEA": -0.7085,
+        "MACD_HIST": 1.119,
+        "KDJ_K": 90.07,
+        "KDJ_D": 81.13,
+        "KDJ_J": 107.94,
+        "RSI_6": 89.66,
+        "RSI_12": 64.95,
+        "BOLL_MID": 40.69,
+        "BOLL_UPPER": 44.31,
+        "BOLL_LOWER": 37.07
       },
-      "change_5d_pct": 9.21,
-      "change_today_pct": -1.55,
-      "latest_date": "20260807"
+      "change_5d_pct": 9.73,
+      "change_today_pct": 1.04,
+      "latest_date": "20260810"
     },
     "000920": {
       "name": "沃顿科技",
       "setcode": 0,
       "industry": "环保/膜材料",
       "klines_6d": [
-        {
-          "datetime": "2026-07-31 15:00",
-          "open": 10.89,
-          "close": 10.71,
-          "high": 11.18,
-          "low": 10.71,
-          "vol": 135548.0,
-          "amount": 148239312.0
-        },
         {
           "datetime": "2026-08-03 15:00",
           "open": 10.74,
@@ -218,48 +209,48 @@
         {
           "datetime": "2026-08-07 15:00",
           "open": 11.58,
-          "close": 11.49,
-          "high": 11.58,
+          "close": 11.6,
+          "high": 11.6,
           "low": 11.24,
-          "vol": 57544.0,
-          "amount": 65611648.0
+          "vol": 102657.0,
+          "amount": 117703984.0
+        },
+        {
+          "datetime": "2026-08-10 15:00",
+          "open": 11.51,
+          "close": 11.56,
+          "high": 11.66,
+          "low": 11.46,
+          "vol": 34821.0,
+          "amount": 40200928.0
         }
       ],
       "indicators": {
-        "MA5": 11.29,
-        "MA10": 11.23,
-        "MA20": 12.07,
-        "MA60": 12.68,
-        "MACD_DIF": -0.5084,
-        "MACD_DEA": -0.5033,
-        "MACD_HIST": -0.0102,
-        "KDJ_K": 51.63,
-        "KDJ_D": 37.71,
-        "KDJ_J": 79.47,
-        "RSI_6": 94.59,
-        "RSI_12": 44.14,
-        "BOLL_MID": 12.07,
-        "BOLL_UPPER": 14.3,
-        "BOLL_LOWER": 9.84
+        "MA5": 11.46,
+        "MA10": 11.2,
+        "MA20": 11.95,
+        "MA60": 12.69,
+        "MACD_DIF": -0.4569,
+        "MACD_DEA": -0.4881,
+        "MACD_HIST": 0.0625,
+        "KDJ_K": 66.5,
+        "KDJ_D": 47.8,
+        "KDJ_J": 103.89,
+        "RSI_6": 95.7,
+        "RSI_12": 43.21,
+        "BOLL_MID": 11.95,
+        "BOLL_UPPER": 14.0,
+        "BOLL_LOWER": 9.91
       },
-      "change_5d_pct": 7.28,
-      "change_today_pct": -0.52,
-      "latest_date": "20260807"
+      "change_5d_pct": 6.74,
+      "change_today_pct": -0.34,
+      "latest_date": "20260810"
     },
     "603290": {
       "name": "斯达半导",
       "setcode": 1,
       "industry": "半导体/IGBT",
       "klines_6d": [
-        {
-          "datetime": "2026-07-31 15:00",
-          "open": 83.5,
-          "close": 80.49,
-          "high": 84.5,
-          "low": 80.49,
-          "vol": 83001.0,
-          "amount": 685846272.0
-        },
         {
           "datetime": "2026-08-03 15:00",
           "open": 80.0,
@@ -299,48 +290,48 @@
         {
           "datetime": "2026-08-07 15:00",
           "open": 86.27,
-          "close": 87.8,
-          "high": 88.6,
+          "close": 88.53,
+          "high": 89.28,
           "low": 85.96,
-          "vol": 50907.0,
-          "amount": 445566944.0
+          "vol": 83880.0,
+          "amount": 737791232.0
+        },
+        {
+          "datetime": "2026-08-10 15:00",
+          "open": 89.43,
+          "close": 86.8,
+          "high": 89.98,
+          "low": 86.38,
+          "vol": 34932.0,
+          "amount": 305830400.0
         }
       ],
       "indicators": {
-        "MA5": 84.68,
-        "MA10": 83.17,
-        "MA20": 89.08,
-        "MA60": 114.83,
-        "MACD_DIF": -9.1928,
-        "MACD_DEA": -10.6522,
-        "MACD_HIST": 2.9187,
-        "KDJ_K": 73.63,
-        "KDJ_D": 53.46,
-        "KDJ_J": 113.98,
-        "RSI_6": 96.19,
-        "RSI_12": 52.4,
-        "BOLL_MID": 89.08,
-        "BOLL_UPPER": 110.88,
-        "BOLL_LOWER": 67.28
+        "MA5": 86.16,
+        "MA10": 83.44,
+        "MA20": 87.61,
+        "MA60": 114.21,
+        "MACD_DIF": -8.4963,
+        "MACD_DEA": -10.2568,
+        "MACD_HIST": 3.5209,
+        "KDJ_K": 74.3,
+        "KDJ_D": 60.46,
+        "KDJ_J": 101.97,
+        "RSI_6": 80.08,
+        "RSI_12": 54.46,
+        "BOLL_MID": 87.61,
+        "BOLL_UPPER": 105.26,
+        "BOLL_LOWER": 69.96
       },
-      "change_5d_pct": 9.08,
-      "change_today_pct": 1.68,
-      "latest_date": "20260807"
+      "change_5d_pct": 8.32,
+      "change_today_pct": -1.95,
+      "latest_date": "20260810"
     },
     "000063": {
       "name": "中兴通讯",
       "setcode": 0,
       "industry": "通信设备/5G",
       "klines_6d": [
-        {
-          "datetime": "2026-07-31 15:00",
-          "open": 34.48,
-          "close": 33.81,
-          "high": 34.61,
-          "low": 33.8,
-          "vol": 1391570.0,
-          "amount": 4754839040.0
-        },
         {
           "datetime": "2026-08-03 15:00",
           "open": 33.5,
@@ -380,48 +371,48 @@
         {
           "datetime": "2026-08-07 15:00",
           "open": 34.78,
-          "close": 34.6,
+          "close": 34.7,
           "high": 35.38,
           "low": 34.49,
-          "vol": 1061944.0,
-          "amount": 3697115904.0
+          "vol": 1586405.0,
+          "amount": 5516773888.0
+        },
+        {
+          "datetime": "2026-08-10 15:00",
+          "open": 34.47,
+          "close": 34.14,
+          "high": 34.5,
+          "low": 34.02,
+          "vol": 533011.0,
+          "amount": 1821472896.0
         }
       ],
       "indicators": {
-        "MA5": 34.49,
-        "MA10": 34.29,
-        "MA20": 35.77,
-        "MA60": 36.66,
-        "MACD_DIF": -0.8004,
-        "MACD_DEA": -0.7655,
-        "MACD_HIST": -0.0698,
-        "KDJ_K": 54.9,
-        "KDJ_D": 41.84,
-        "KDJ_J": 81.03,
-        "RSI_6": 91.14,
-        "RSI_12": 27.27,
-        "BOLL_MID": 35.77,
-        "BOLL_UPPER": 40.24,
-        "BOLL_LOWER": 31.29
+        "MA5": 34.53,
+        "MA10": 34.19,
+        "MA20": 35.48,
+        "MA60": 36.62,
+        "MACD_DIF": -0.7853,
+        "MACD_DEA": -0.7644,
+        "MACD_HIST": -0.0417,
+        "KDJ_K": 53.08,
+        "KDJ_D": 45.9,
+        "KDJ_J": 67.42,
+        "RSI_6": 60.78,
+        "RSI_12": 33.08,
+        "BOLL_MID": 35.48,
+        "BOLL_UPPER": 39.54,
+        "BOLL_LOWER": 31.41
       },
-      "change_5d_pct": 2.34,
-      "change_today_pct": -0.29,
-      "latest_date": "20260807"
+      "change_5d_pct": 0.35,
+      "change_today_pct": -1.61,
+      "latest_date": "20260810"
     },
     "002803": {
       "name": "吉宏股份",
       "setcode": 0,
       "industry": "跨境电商",
       "klines_6d": [
-        {
-          "datetime": "2026-07-31 15:00",
-          "open": 17.97,
-          "close": 17.5,
-          "high": 18.3,
-          "low": 17.39,
-          "vol": 174895.0,
-          "amount": 312052832.0
-        },
         {
           "datetime": "2026-08-03 15:00",
           "open": 17.57,
@@ -461,34 +452,43 @@
         {
           "datetime": "2026-08-07 15:00",
           "open": 19.8,
-          "close": 19.55,
+          "close": 19.48,
           "high": 19.9,
           "low": 19.22,
-          "vol": 80444.0,
-          "amount": 156649392.0
+          "vol": 148093.0,
+          "amount": 288787424.0
+        },
+        {
+          "datetime": "2026-08-10 15:00",
+          "open": 19.47,
+          "close": 19.16,
+          "high": 19.47,
+          "low": 18.85,
+          "vol": 59554.0,
+          "amount": 113715064.0
         }
       ],
       "indicators": {
-        "MA5": 19.63,
-        "MA10": 18.74,
-        "MA20": 19.34,
-        "MA60": 21.75,
-        "MACD_DIF": -0.8288,
-        "MACD_DEA": -1.1061,
-        "MACD_HIST": 0.5547,
-        "KDJ_K": 68.69,
-        "KDJ_D": 56.79,
-        "KDJ_J": 92.5,
-        "RSI_6": 81.07,
-        "RSI_12": 64.7,
-        "BOLL_MID": 19.34,
-        "BOLL_UPPER": 22.39,
-        "BOLL_LOWER": 16.3
+        "MA5": 19.6,
+        "MA10": 18.84,
+        "MA20": 19.19,
+        "MA60": 21.69,
+        "MACD_DIF": -0.7812,
+        "MACD_DEA": -1.0419,
+        "MACD_HIST": 0.5214,
+        "KDJ_K": 64.11,
+        "KDJ_D": 59.07,
+        "KDJ_J": 74.19,
+        "RSI_6": 72.31,
+        "RSI_12": 58.26,
+        "BOLL_MID": 19.19,
+        "BOLL_UPPER": 21.96,
+        "BOLL_LOWER": 16.42
       },
-      "change_5d_pct": 11.71,
-      "change_today_pct": -2.15,
-      "latest_date": "20260807"
+      "change_5d_pct": -0.47,
+      "change_today_pct": -1.64,
+      "latest_date": "20260810"
     }
   },
-  "fetch_time": "2026-08-07 11:45:20"
+  "fetch_time": "2026-08-10 10:32:59"
 }
