@@ -263,18 +263,196 @@ def detect_kline_patterns(klines):
     return patterns, overall
 
 
+def analyze_intraday_pattern(klines):
+    """分析日内分时走势：高开/低开 + 高走/低走 + 量能配合
+
+    日内分时走势往往提前预演接下来1-5个交易日的走势。
+    结合日线K线形态给出综合信号矩阵。
+
+    核心逻辑：
+    - 高低点抬升 + 高开低走 = 警惕回调/横盘（1-5个工作日）
+    - 高低点抬升 + 高开高走 = 强势确认
+    - 高低点抬升 + 低开高走 = 洗盘拉升（更强）
+    - 高低点下移 + 高开低走 = 强空确认
+    - 高低点下移 + 低开高走 = 可能见底
+    """
+    if not klines or len(klines) < 2:
+        return None
+
+    today = klines[-1]
+    yest = klines[-2]
+
+    o = float(today["open"])
+    c = float(today["close"])
+    y_c = float(yest["close"])
+    vol = float(today.get("vol", 0))
+
+    # 开盘类型
+    gap_pct = (o - y_c) / y_c * 100
+    if gap_pct > 0.3:
+        open_type = "高开"
+        open_desc = f"高开{gap_pct:+.2f}%"
+    elif gap_pct < -0.3:
+        open_type = "低开"
+        open_desc = f"低开{gap_pct:+.2f}%"
+    else:
+        open_type = "平开"
+        open_desc = f"平开{gap_pct:+.2f}%"
+
+    # 走势类型
+    intraday_chg = (c - o) / o * 100
+    if intraday_chg > 0.3:
+        close_type = "高走"
+        close_desc = f"高走{intraday_chg:+.2f}%"
+    elif intraday_chg < -0.3:
+        close_type = "低走"
+        close_desc = f"低走{intraday_chg:+.2f}%"
+    else:
+        close_type = "平收"
+        close_desc = f"平收{intraday_chg:+.2f}%"
+
+    intraday_pattern = f"{open_type}{close_type}"
+
+    # 量能分析
+    if len(klines) >= 6:
+        avg_vol5 = sum(float(k.get("vol", 0)) for k in klines[-6:-1]) / 5
+        vol_ratio = vol / avg_vol5 if avg_vol5 > 0 else 1.0
+        if vol_ratio >= 1.5:
+            vol_desc = f"放量{vol_ratio:.2f}倍"
+        elif vol_ratio >= 1.0:
+            vol_desc = f"温和放量{vol_ratio:.2f}倍"
+        elif vol_ratio >= 0.7:
+            vol_desc = f"缩量{vol_ratio:.2f}倍"
+        else:
+            vol_desc = f"显著缩量{vol_ratio:.2f}倍"
+    else:
+        vol_ratio = 1.0
+        vol_desc = "量能数据不足"
+
+    # 日线形态方向
+    daily_pats, daily_overall = detect_kline_patterns(klines)
+    has_high_low_up = any(p[0] == "高低点抬升" for p in daily_pats)
+    has_high_low_down = any(p[0] == "高低点下移" for p in daily_pats)
+    daily_bullish = any(d in ("看多", "偏多") for _, _, d in daily_pats)
+    daily_bearish = any(d in ("看空", "偏空") for _, _, d in daily_pats)
+
+    # === 综合信号矩阵 ===
+    if has_high_low_up:
+        if intraday_pattern == "高开高走":
+            combined = "强势确认"
+            combined_desc = "日线高低点抬升+高开高走=多头强势延续，趋势确认"
+            signal = "看多"
+        elif intraday_pattern == "高开低走":
+            if vol_ratio >= 1.5:
+                combined = "警惕回调"
+                combined_desc = "日线虽高低点抬升，但分时高开低走+放量=盘中抛压重，主力可能派发，接下来1-5个交易日大概率回调或横盘"
+                signal = "偏空"
+            else:
+                combined = "短线回调"
+                combined_desc = "日线高低点抬升但分时高开低走=盘中获利回吐，缩量则回调幅度有限，接下来1-5个交易日可能横盘整理"
+                signal = "偏空"
+        elif intraday_pattern == "低开高走":
+            combined = "洗盘拉升"
+            combined_desc = "日线高低点抬升+低开高走=开盘洗盘后多头反攻，主力吸筹特征，强势看多"
+            signal = "看多"
+        elif intraday_pattern == "低开低走":
+            combined = "假信号风险"
+            combined_desc = "日线虽高低点抬升但分时低开低走=多头未能延续，结构可能被破坏，警惕假突破"
+            signal = "偏空"
+        else:
+            combined = "观望"
+            combined_desc = "日线高低点抬升但分时走势不明"
+            signal = "中性"
+    elif has_high_low_down:
+        if intraday_pattern == "高开低走":
+            if vol_ratio >= 1.5:
+                combined = "强空确认"
+                combined_desc = "日线高低点下移+高开低走+放量=空头强势派发，趋势延续下跌"
+                signal = "看空"
+            else:
+                combined = "空头延续"
+                combined_desc = "日线高低点下移+高开低走=抛压延续，下跌趋势未改"
+                signal = "看空"
+        elif intraday_pattern == "高开高走":
+            combined = "可能反转"
+            combined_desc = "日线虽高低点下移但分时高开高走=多头尝试反击，需次日确认"
+            signal = "偏多"
+        elif intraday_pattern == "低开低走":
+            combined = "继续下跌"
+            combined_desc = "日线高低点下移+低开低走=空头主导，下跌加速"
+            signal = "看空"
+        elif intraday_pattern == "低开高走":
+            if vol_ratio >= 1.5:
+                combined = "可能见底"
+                combined_desc = "日线虽高低点下移但分时低开高走+放量=底部承接力强，主力可能吸筹，潜在见底信号"
+                signal = "偏多"
+            else:
+                combined = "弱势反弹"
+                combined_desc = "日线高低点下移但分时低开高走=缩量反弹，持续性存疑"
+                signal = "中性"
+        else:
+            combined = "观望"
+            combined_desc = "日线高低点下移但分时走势不明"
+            signal = "中性"
+    else:
+        # 没有高低点结构信号，用一般形态判断
+        if daily_bullish and intraday_pattern in ("高开高走", "低开高走"):
+            combined = "偏多"
+            combined_desc = f"日线形态偏多+{intraday_pattern}=多头占优"
+            signal = "偏多"
+        elif daily_bearish and intraday_pattern in ("高开低走", "低开低走"):
+            combined = "偏空"
+            combined_desc = f"日线形态偏空+{intraday_pattern}=空头占优"
+            signal = "偏空"
+        elif daily_bullish and intraday_pattern in ("高开低走", "低开低走"):
+            combined = "多空分歧"
+            combined_desc = f"日线形态偏多但分时{intraday_pattern}=形态与走势背离，警惕反转"
+            signal = "中性"
+        elif daily_bearish and intraday_pattern in ("高开高走", "低开高走"):
+            combined = "多空分歧"
+            combined_desc = f"日线形态偏空但分时{intraday_pattern}=形态与走势背离，可能反转"
+            signal = "中性"
+        else:
+            combined = "中性"
+            combined_desc = "形态与分时走势方向一致度不高"
+            signal = "中性"
+
+    return {
+        "intraday_pattern": intraday_pattern,
+        "open_desc": open_desc,
+        "close_desc": close_desc,
+        "vol_desc": vol_desc,
+        "vol_ratio": round(vol_ratio, 2),
+        "combined_signal": combined,
+        "combined_desc": combined_desc,
+        "signal": signal,
+    }
+
+
 def gen_kline_pattern_section(klines, name=""):
-    """生成K线形态分析段落"""
+    """生成K线形态分析段落（含日内分时走势分析）"""
     patterns, overall = detect_kline_patterns(klines)
-    if not patterns:
+    intraday = analyze_intraday_pattern(klines)
+
+    lines = []
+
+    if not patterns and not intraday:
         return f"**K线形态：** 无明显特殊形态。当前实体较小，上下影线均衡，多空暂处平衡状态。\n"
 
-    lines = [f"**K线形态分析：** 综合{overall}\n"]
-    lines.append("| 形态 | 含义 | 方向 |")
-    lines.append("|------|------|------|")
-    for pname, pdesc, pdir in patterns:
-        dir_emoji = {"看多": "🔴", "看空": "🟢", "偏多": "🔴", "偏空": "🟢", "中性": "🟡"}.get(pdir, "🟡")
-        lines.append(f"| {pname} | {pdesc} | {dir_emoji}{pdir} |")
+    if patterns:
+        lines.append(f"**K线形态分析：** 综合{overall}\n")
+        lines.append("| 形态 | 含义 | 方向 |")
+        lines.append("|------|------|------|")
+        for pname, pdesc, pdir in patterns:
+            dir_emoji = {"看多": "🔴", "看空": "🟢", "偏多": "🔴", "偏空": "🟢", "中性": "🟡"}.get(pdir, "🟡")
+            lines.append(f"| {pname} | {pdesc} | {dir_emoji}{pdir} |")
+        lines.append("")
+
+    if intraday:
+        lines.append(f"**日内分时走势分析：** {intraday['intraday_pattern']}（{intraday['open_desc']}，{intraday['close_desc']}），{intraday['vol_desc']}")
+        lines.append(f"> {intraday['combined_desc']}")
+        sig_emoji = {"看多": "🔴", "看空": "🟢", "偏多": "🔴", "偏空": "🟢", "中性": "🟡"}.get(intraday['signal'], "🟡")
+        lines.append(f"> **综合信号：** {sig_emoji}{intraday['combined_signal']}（{intraday['signal']}）")
 
     return "\n".join(lines) + "\n"
 
@@ -871,46 +1049,55 @@ def generate_analysis(main, extra):
 
 > ⚠️ **大盘处于年线下方，任何反弹结构都需警惕K线形态信号。** 以下为7只ETF + 6只个股的最新K线形态检测。
 
-### ETF K线形态汇总
+### ETF K线形态 + 分时走势汇总
 
-| ETF | 今日形态 | 方向 | 关键信号 |
-|-----|---------|------|---------|
+| ETF | 今日形态 | 方向 | 分时走势 | 量能 | 综合信号 | 关键信号 |
+|-----|---------|------|---------|------|---------|---------|
 """
     # Check if we have stock_klines for stocks too
     stock_klines = main.get("stock_klines", {})
     stock_names_local = {
-        "002080": "中材科技", "600160": "巨化股份", "000920": "沃顿科技",
+        "600160": "巨化股份", "000920": "沃顿科技",
         "603290": "斯达半导", "000063": "中兴通讯", "002803": "吉宏股份",
     }
 
     for code in ETFS:
         kl = etf_klines.get(code, [])
         pats, overall = detect_kline_patterns(kl)
+        intraday = analyze_intraday_pattern(kl)
         if pats:
             pat_names = ", ".join(p[0] for p in pats)
             dir_str = overall
         else:
             pat_names = "无特殊形态"
             dir_str = "中性"
-        report += f"| {code} {ETF_SHORT_NAMES.get(code, '')} | {pat_names} | {dir_str} | {pats[0][1][:40] + '...' if pats and len(pats[0][1]) > 40 else (pats[0][1] if pats else '—')} |\n"
+        intraday_str = intraday["intraday_pattern"] if intraday else "—"
+        vol_str = intraday["vol_desc"] if intraday else "—"
+        combined_str = intraday["combined_signal"] if intraday else "—"
+        signal = pats[0][1][:30] + "..." if pats and len(pats[0][1]) > 30 else (pats[0][1] if pats else "—")
+        report += f"| {code} {ETF_SHORT_NAMES.get(code, '')} | {pat_names} | {dir_str} | {intraday_str} | {vol_str} | {combined_str} | {signal} |\n"
 
     report += f"""
-### 个股 K线形态汇总
+### 个股 K线形态 + 分时走势汇总
 
-| 个股 | 今日形态 | 方向 | 关键信号 |
-|-----|---------|------|---------|
+| 个股 | 今日形态 | 方向 | 分时走势 | 量能 | 综合信号 | 关键信号 |
+|-----|---------|------|---------|------|---------|---------|
 """
-    for code in ["002080", "600160", "000920", "603290", "000063", "002803"]:
+    for code in ["600160", "000920", "603290", "000063", "002803"]:
         kl = stock_klines.get(code, [])
         pats, overall = detect_kline_patterns(kl)
+        intraday = analyze_intraday_pattern(kl)
         if pats:
             pat_names = ", ".join(p[0] for p in pats)
             dir_str = overall
         else:
             pat_names = "无特殊形态"
             dir_str = "中性"
-        signal = pats[0][1][:40] + "..." if pats and len(pats[0][1]) > 40 else (pats[0][1] if pats else "—")
-        report += f"| {code} {stock_names_local.get(code, '')} | {pat_names} | {dir_str} | {signal} |\n"
+        intraday_str = intraday["intraday_pattern"] if intraday else "—"
+        vol_str = intraday["vol_desc"] if intraday else "—"
+        combined_str = intraday["combined_signal"] if intraday else "—"
+        signal = pats[0][1][:30] + "..." if pats and len(pats[0][1]) > 30 else (pats[0][1] if pats else "—")
+        report += f"| {code} {stock_names_local.get(code, '')} | {pat_names} | {dir_str} | {intraday_str} | {vol_str} | {combined_str} | {signal} |\n"
 
     # Count bullish/bearish patterns
     all_bullish = 0
@@ -921,7 +1108,7 @@ def generate_analysis(main, extra):
         for _, _, d in pats:
             if d in ("看多", "偏多"): all_bullish += 1
             elif d in ("看空", "偏空"): all_bearish += 1
-    for code in ["002080", "600160", "000920", "603290", "000063", "002803"]:
+    for code in ["600160", "000920", "603290", "000063", "002803"]:
         kl = stock_klines.get(code, [])
         pats, _ = detect_kline_patterns(kl)
         for _, _, d in pats:
@@ -943,6 +1130,14 @@ def generate_analysis(main, extra):
 > - 出现**顶分型/阴包阳/高低点下移/射击之星** → 减仓信号，果断止盈/止损
 > - 出现**十字星** → 变盘预警，缩量观望，等次日方向确认
 > - **光脚阴线/大阴线** → 空头强势，不抄底；**光脚阳线/大阳线** → 多头强势，可跟进
+
+> **⚠️ 分时走势配合规则（重要！）：**
+> - 日线**高低点抬升** + 分时**高开低走** → 警惕回调/横盘1-5个交易日（放量=主力派发，缩量=获利回吐）
+> - 日线**高低点抬升** + 分时**高开高走** → 强势确认，趋势延续
+> - 日线**高低点抬升** + 分时**低开高走** → 洗盘拉升，主力吸筹，更强势
+> - 日线**高低点下移** + 分时**高开低走** → 强空确认（放量=派发加速）
+> - 日线**高低点下移** + 分时**低开高走** → 可能见底（放量=吸筹信号）
+> - **分时走势往往提前预演接下来1-5个交易日的走势，不可忽视！**
 
 ---
 
@@ -1025,11 +1220,11 @@ def generate_stock_tracking(main, extra):
     vol_label = "" if is_after_close else "（盘中半日量）"
 
     stock_names = {
-        "002080": "中材科技", "600160": "巨化股份", "000920": "沃顿科技",
+        "600160": "巨化股份", "000920": "沃顿科技",
         "603290": "斯达半导", "000063": "中兴通讯", "002803": "吉宏股份",
     }
     stock_industries = {
-        "002080": "玻璃纤维/建材", "600160": "氟化工/化学制品", "000920": "环保/膜材料",
+        "600160": "氟化工/化学制品", "000920": "环保/膜材料",
         "603290": "半导体/IGBT", "000063": "通信设备/5G", "002803": "跨境电商",
     }
 
@@ -1037,7 +1232,7 @@ def generate_stock_tracking(main, extra):
 
 > 数据时间：{fetch_time} | {session_label}
 > 数据源：mootdx K线 + 手动计算技术指标
-> 追踪标的：002080 / 600160 / 000920 / 603290 / 000063 / 002803
+> 追踪标的：600160 / 000920 / 603290 / 000063 / 002803
 
 ---
 
@@ -1045,7 +1240,7 @@ def generate_stock_tracking(main, extra):
 
     # 计算每只股票的5日涨跌并排序
     stock_5d = {}
-    for code in ["002080", "600160", "000920", "603290", "000063", "002803"]:
+    for code in ["600160", "000920", "603290", "000063", "002803"]:
         if code in stock_klines and len(stock_klines[code]) >= 6:
             klines = stock_klines[code]
             close_5d_ago = klines[-6]["close"] if len(klines) >= 6 else klines[0]["close"]

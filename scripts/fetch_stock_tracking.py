@@ -11,7 +11,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 from fetch_data import get_klines, calc_indicators
 
 STOCKS = [
-    ("002080", "中材科技", 0, "玻璃纤维/建材"),
     ("600160", "巨化股份", 1, "氟化工/化学制品"),
     ("000920", "沃顿科技", 0, "环保/膜材料"),
     ("603290", "斯达半导", 1, "半导体/IGBT"),

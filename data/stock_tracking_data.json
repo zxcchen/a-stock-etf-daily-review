@@ -3,87 +3,6 @@
   "latest_date": "20260810",
   "today": "20260810",
   "stocks": {
-    "002080": {
-      "name": "中材科技",
-      "setcode": 0,
-      "industry": "玻璃纤维/建材",
-      "klines_6d": [
-        {
-          "datetime": "2026-08-03 15:00",
-          "open": 42.8,
-          "close": 40.34,
-          "high": 43.22,
-          "low": 40.06,
-          "vol": 451328.0,
-          "amount": 1857888512.0
-        },
-        {
-          "datetime": "2026-08-04 15:00",
-          "open": 41.05,
-          "close": 44.37,
-          "high": 44.37,
-          "low": 40.65,
-          "vol": 402629.0,
-          "amount": 1735950976.0
-        },
-        {
-          "datetime": "2026-08-05 15:00",
-          "open": 45.16,
-          "close": 48.81,
-          "high": 48.81,
-          "low": 44.46,
-          "vol": 564823.0,
-          "amount": 2649229312.0
-        },
-        {
-          "datetime": "2026-08-06 15:00",
-          "open": 48.76,
-          "close": 51.52,
-          "high": 52.11,
-          "low": 47.68,
-          "vol": 774664.0,
-          "amount": 3905074176.0
-        },
-        {
-          "datetime": "2026-08-07 15:00",
-          "open": 52.1,
-          "close": 56.56,
-          "high": 56.67,
-          "low": 51.21,
-          "vol": 853326.0,
-          "amount": 4656492032.0
-        },
-        {
-          "datetime": "2026-08-10 15:00",
-          "open": 58.82,
-          "close": 55.33,
-          "high": 59.5,
-          "low": 55.1,
-          "vol": 462318.0,
-          "amount": 2641213184.0
-        }
-      ],
-      "indicators": {
-        "MA5": 51.32,
-        "MA10": 47.28,
-        "MA20": 51.64,
-        "MA60": 66.3,
-        "MACD_DIF": -4.9263,
-        "MACD_DEA": -6.5937,
-        "MACD_HIST": 3.3347,
-        "KDJ_K": 73.02,
-        "KDJ_D": 54.37,
-        "KDJ_J": 110.3,
-        "RSI_6": 80.1,
-        "RSI_12": 56.83,
-        "BOLL_MID": 51.64,
-        "BOLL_UPPER": 67.7,
-        "BOLL_LOWER": 35.57
-      },
-      "change_5d_pct": 37.16,
-      "change_today_pct": -2.17,
-      "latest_date": "20260810"
-    },
     "600160": {
       "name": "巨化股份",
       "setcode": 1,
@@ -137,32 +56,32 @@
         {
           "datetime": "2026-08-10 15:00",
           "open": 43.0,
-          "close": 43.74,
-          "high": 43.98,
+          "close": 43.96,
+          "high": 44.0,
           "low": 43.0,
-          "vol": 156087.0,
-          "amount": 679443392.0
+          "vol": 190125.0,
+          "amount": 828631808.0
         }
       ],
       "indicators": {
-        "MA5": 43.06,
-        "MA10": 41.19,
-        "MA20": 40.69,
+        "MA5": 43.11,
+        "MA10": 41.21,
+        "MA20": 40.7,
         "MA60": 41.98,
-        "MACD_DIF": -0.149,
-        "MACD_DEA": -0.7085,
-        "MACD_HIST": 1.119,
-        "KDJ_K": 90.07,
-        "KDJ_D": 81.13,
-        "KDJ_J": 107.94,
-        "RSI_6": 89.66,
-        "RSI_12": 64.95,
-        "BOLL_MID": 40.69,
-        "BOLL_UPPER": 44.31,
-        "BOLL_LOWER": 37.07
+        "MACD_DIF": -0.1315,
+        "MACD_DEA": -0.705,
+        "MACD_HIST": 1.1469,
+        "KDJ_K": 91.1,
+        "KDJ_D": 81.48,
+        "KDJ_J": 110.35,
+        "RSI_6": 90.07,
+        "RSI_12": 65.73,
+        "BOLL_MID": 40.7,
+        "BOLL_UPPER": 44.36,
+        "BOLL_LOWER": 37.05
       },
-      "change_5d_pct": 9.73,
-      "change_today_pct": 1.04,
+      "change_5d_pct": 10.29,
+      "change_today_pct": 1.55,
       "latest_date": "20260810"
     },
     "000920": {
@@ -218,32 +137,32 @@
         {
           "datetime": "2026-08-10 15:00",
           "open": 11.51,
-          "close": 11.56,
+          "close": 11.51,
           "high": 11.66,
           "low": 11.46,
-          "vol": 34821.0,
-          "amount": 40200928.0
+          "vol": 39202.0,
+          "amount": 45254284.0
         }
       ],
       "indicators": {
-        "MA5": 11.46,
+        "MA5": 11.45,
         "MA10": 11.2,
         "MA20": 11.95,
         "MA60": 12.69,
-        "MACD_DIF": -0.4569,
-        "MACD_DEA": -0.4881,
-        "MACD_HIST": 0.0625,
-        "KDJ_K": 66.5,
-        "KDJ_D": 47.8,
-        "KDJ_J": 103.89,
-        "RSI_6": 95.7,
-        "RSI_12": 43.21,
+        "MACD_DIF": -0.4609,
+        "MACD_DEA": -0.4889,
+        "MACD_HIST": 0.0561,
+        "KDJ_K": 65.13,
+        "KDJ_D": 47.34,
+        "KDJ_J": 100.7,
+        "RSI_6": 90.82,
+        "RSI_12": 42.55,
         "BOLL_MID": 11.95,
         "BOLL_UPPER": 14.0,
-        "BOLL_LOWER": 9.91
+        "BOLL_LOWER": 9.9
       },
-      "change_5d_pct": 6.74,
-      "change_today_pct": -0.34,
+      "change_5d_pct": 6.28,
+      "change_today_pct": -0.78,
       "latest_date": "20260810"
     },
     "603290": {
@@ -299,32 +218,32 @@
         {
           "datetime": "2026-08-10 15:00",
           "open": 89.43,
-          "close": 86.8,
+          "close": 86.63,
           "high": 89.98,
           "low": 86.38,
-          "vol": 34932.0,
-          "amount": 305830400.0
+          "vol": 38344.0,
+          "amount": 335435872.0
         }
       ],
       "indicators": {
-        "MA5": 86.16,
-        "MA10": 83.44,
-        "MA20": 87.61,
+        "MA5": 86.13,
+        "MA10": 83.42,
+        "MA20": 87.6,
         "MA60": 114.21,
-        "MACD_DIF": -8.4963,
-        "MACD_DEA": -10.2568,
-        "MACD_HIST": 3.5209,
-        "KDJ_K": 74.3,
-        "KDJ_D": 60.46,
-        "KDJ_J": 101.97,
-        "RSI_6": 80.08,
-        "RSI_12": 54.46,
-        "BOLL_MID": 87.61,
+        "MACD_DIF": -8.5098,
+        "MACD_DEA": -10.2595,
+        "MACD_HIST": 3.4993,
+        "KDJ_K": 73.86,
+        "KDJ_D": 60.32,
+        "KDJ_J": 100.94,
+        "RSI_6": 78.8,
+        "RSI_12": 54.04,
+        "BOLL_MID": 87.6,
         "BOLL_UPPER": 105.26,
-        "BOLL_LOWER": 69.96
+        "BOLL_LOWER": 69.95
       },
-      "change_5d_pct": 8.32,
-      "change_today_pct": -1.95,
+      "change_5d_pct": 8.11,
+      "change_today_pct": -2.15,
       "latest_date": "20260810"
     },
     "000063": {
@@ -380,32 +299,32 @@
         {
           "datetime": "2026-08-10 15:00",
           "open": 34.47,
-          "close": 34.14,
+          "close": 34.07,
           "high": 34.5,
           "low": 34.02,
-          "vol": 533011.0,
-          "amount": 1821472896.0
+          "vol": 607127.0,
+          "amount": 2074204544.0
         }
       ],
       "indicators": {
-        "MA5": 34.53,
-        "MA10": 34.19,
-        "MA20": 35.48,
+        "MA5": 34.52,
+        "MA10": 34.18,
+        "MA20": 35.47,
         "MA60": 36.62,
-        "MACD_DIF": -0.7853,
-        "MACD_DEA": -0.7644,
-        "MACD_HIST": -0.0417,
-        "KDJ_K": 53.08,
-        "KDJ_D": 45.9,
-        "KDJ_J": 67.42,
-        "RSI_6": 60.78,
-        "RSI_12": 33.08,
-        "BOLL_MID": 35.48,
+        "MACD_DIF": -0.7909,
+        "MACD_DEA": -0.7656,
+        "MACD_HIST": -0.0507,
+        "KDJ_K": 52.07,
+        "KDJ_D": 45.57,
+        "KDJ_J": 65.07,
+        "RSI_6": 58.12,
+        "RSI_12": 32.65,
+        "BOLL_MID": 35.47,
         "BOLL_UPPER": 39.54,
-        "BOLL_LOWER": 31.41
+        "BOLL_LOWER": 31.4
       },
-      "change_5d_pct": 0.35,
-      "change_today_pct": -1.61,
+      "change_5d_pct": 0.15,
+      "change_today_pct": -1.82,
       "latest_date": "20260810"
     },
     "002803": {
@@ -461,34 +380,34 @@
         {
           "datetime": "2026-08-10 15:00",
           "open": 19.47,
-          "close": 19.16,
+          "close": 19.14,
           "high": 19.47,
           "low": 18.85,
-          "vol": 59554.0,
-          "amount": 113715064.0
+          "vol": 65061.0,
+          "amount": 124279832.0
         }
       ],
       "indicators": {
-        "MA5": 19.6,
+        "MA5": 19.59,
         "MA10": 18.84,
         "MA20": 19.19,
         "MA60": 21.69,
-        "MACD_DIF": -0.7812,
-        "MACD_DEA": -1.0419,
-        "MACD_HIST": 0.5214,
-        "KDJ_K": 64.11,
-        "KDJ_D": 59.07,
-        "KDJ_J": 74.19,
-        "RSI_6": 72.31,
-        "RSI_12": 58.26,
+        "MACD_DIF": -0.7828,
+        "MACD_DEA": -1.0422,
+        "MACD_HIST": 0.5188,
+        "KDJ_K": 63.9,
+        "KDJ_D": 59.0,
+        "KDJ_J": 73.7,
+        "RSI_6": 71.93,
+        "RSI_12": 58.05,
         "BOLL_MID": 19.19,
         "BOLL_UPPER": 21.96,
         "BOLL_LOWER": 16.42
       },
-      "change_5d_pct": -0.47,
-      "change_today_pct": -1.64,
+      "change_5d_pct": -0.57,
+      "change_today_pct": -1.75,
       "latest_date": "20260810"
     }
   },
-  "fetch_time": "2026-08-10 10:32:59"
+  "fetch_time": "2026-08-10 10:56:05"
 }
