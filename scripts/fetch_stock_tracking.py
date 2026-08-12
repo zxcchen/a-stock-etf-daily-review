@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 from fetch_data import get_klines, calc_indicators
 
 STOCKS = [
-    ("600160", "巨化股份", 1, "氟化工/化学制品"),
+    # 600160 巨化股份 已于2026-08-12清仓，停止追踪
     ("000920", "沃顿科技", 0, "环保/膜材料"),
     ("603290", "斯达半导", 1, "半导体/IGBT"),
     ("000063", "中兴通讯", 0, "通信设备/5G"),
@@ -22,15 +22,16 @@ def main():
     output = {}
     today_str = date.today().strftime("%Y%m%d")
 
-    # Step 1: 确认交易日 - 查600160近3根日线
+    # Step 1: 确认交易日 - 查首只追踪股近3根日线
+    check_code = STOCKS[0][0]
     print("=" * 60)
-    print("Step 1: 确认交易日 (600160 近3根日线)")
+    print(f"Step 1: 确认交易日 ({check_code} 近3根日线)")
     print("=" * 60)
-    klines_check = get_klines("600160", count=3, category=4)
+    klines_check = get_klines(check_code, count=3, category=4)
     if not klines_check:
-        print("[ERROR] 无法获取600160 K线数据")
+        print(f"[ERROR] 无法获取{check_code} K线数据")
         output["trading_day"] = False
-        output["error"] = "无法获取600160 K线数据"
+        output["error"] = f"无法获取{check_code} K线数据"
         print(json.dumps(output, ensure_ascii=False, indent=2))
         return
 
@@ -49,7 +50,7 @@ def main():
 
     print(f"  [交易日确认通过]")
 
-    # Step 2: 并行拉取6只个股K线 (65根用于MA60) + 技术指标
+    # Step 2: 并行拉取4只个股K线 (65根用于MA60) + 技术指标
     print("\n" + "=" * 60)
     print("Step 2: 拉取6只个股K线 + 技术指标")
     print("=" * 60)

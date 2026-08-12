@@ -18,15 +18,16 @@ ETF_FULL_NAMES = {
     "588160": "科创新材ETF", "515050": "5GETF", "588460": "科创增强ETF",
 }
 
-# ETF实际持仓（来自东财账户截图，2026-08-07更新）
+# ETF实际持仓（来自东财账户截图，2026-08-12更新）
+# 说明：510300/588000/159915/512480/588160 于8/10清仓；当前仅持有515050和588460
 ETF_HOLDINGS = {
-    "510300": {"shares": 11500, "cost": 4.721, "break_price": 4.591},
-    "588000": {"shares": 24500, "cost": 1.806, "break_price": 1.635},
-    "159915": {"shares": 14300, "cost": 3.566, "break_price": 3.300},
-    "512480": {"shares": 49000, "cost": 1.057, "break_price": 0.919},
-    "588160": {"shares": 42000, "cost": 1.102, "break_price": 0.951},
-    "515050": {"shares": 35500, "cost": 1.042, "break_price": 0.887},
-    "588460": {"shares": 22200, "cost": 2.092, "break_price": 1.880},
+    "510300": {"shares": 0, "cost": 4.721, "break_price": 4.591},
+    "588000": {"shares": 0, "cost": 1.806, "break_price": 1.635},
+    "159915": {"shares": 0, "cost": 3.566, "break_price": 3.300},
+    "512480": {"shares": 0, "cost": 1.057, "break_price": 0.919},
+    "588160": {"shares": 0, "cost": 1.102, "break_price": 0.951},
+    "515050": {"shares": 9500, "cost": 1.044, "break_price": 0.887},
+    "588460": {"shares": 4700, "cost": 2.124, "break_price": 1.880},
 }
 
 def load_data():
@@ -1047,7 +1048,7 @@ def generate_analysis(main, extra):
 
 ## 三、K线形态综合分析
 
-> ⚠️ **大盘处于年线下方，任何反弹结构都需警惕K线形态信号。** 以下为7只ETF + 5只追踪个股的最新K线形态检测。
+> ⚠️ **大盘处于年线下方，任何反弹结构都需警惕K线形态信号。** 以下为7只ETF + 4只追踪个股的最新K线形态检测。
 
 ### ETF K线形态 + 分时走势汇总
 
@@ -1057,8 +1058,8 @@ def generate_analysis(main, extra):
     # Check if we have stock_klines for stocks too
     stock_klines = main.get("stock_klines", {})
     stock_names_local = {
-        "600160": "巨化股份", "000920": "沃顿科技",
-        "603290": "斯达半导", "000063": "中兴通讯", "002803": "吉宏股份",
+        "000920": "沃顿科技", "603290": "斯达半导",
+        "000063": "中兴通讯", "002803": "吉宏股份",
     }
 
     for code in ETFS:
@@ -1083,7 +1084,7 @@ def generate_analysis(main, extra):
 | 个股 | 今日形态 | 方向 | 分时走势 | 量能 | 综合信号 | 关键信号 |
 |-----|---------|------|---------|------|---------|---------|
 """
-    for code in ["600160", "000920", "603290", "000063", "002803"]:
+    for code in ["000920", "603290", "000063", "002803"]:
         kl = stock_klines.get(code, [])
         pats, overall = detect_kline_patterns(kl)
         intraday = analyze_intraday_pattern(kl)
@@ -1108,7 +1109,7 @@ def generate_analysis(main, extra):
         for _, _, d in pats:
             if d in ("看多", "偏多"): all_bullish += 1
             elif d in ("看空", "偏空"): all_bearish += 1
-    for code in ["600160", "000920", "603290", "000063", "002803"]:
+    for code in ["000920", "603290", "000063", "002803"]:
         kl = stock_klines.get(code, [])
         pats, _ = detect_kline_patterns(kl)
         for _, _, d in pats:
@@ -1158,10 +1159,10 @@ def generate_analysis(main, extra):
 
 ## 五、仓位状态建议
 
-**总资产：501,837元**（三账户合计：广发91,444 + 国金77,078 + 东财333,315）
-- ETF持仓市值：约{sum(etf[code]["price"] * ETF_HOLDINGS[code]["shares"] for code in ETFS):,.0f}元（东财场内基金）
-- 个股持仓市值：约127,785元（5只追踪+1只未追踪，分散在广发/国金账户）
-- 可用现金：约20,000元（账户剩余可用）
+**总资产：514,503元**（三账户合计：东财389,725 + 国金61,088 + 广发63,689）
+- ETF持仓市值：约{sum(etf[code]["price"] * ETF_HOLDINGS[code]["shares"] for code in ETFS):,.0f}元（515050+588460，东财账户）
+- 个股持仓市值：约109,071元（4只追踪，分散在广发/国金账户）
+- 可用现金：约46,536元 + 逆回购339,000元（可随时释放）
 - ETF总浮盈亏：{sum(calc_pnl(code)[1] for code in ETFS):+,.0f}元
 
 ### ETF仓位建议（趋势破位止损策略）
@@ -1203,7 +1204,7 @@ def generate_analysis(main, extra):
 
 **报告生成时间：** {fetch_time}
 **策略框架：** ETF异动择时模型 + 趋势跟踪 + ABCD四条件
-**仓位管理：** 总资产50.2万，ETF约33.4万（趋势破位止损）+ 个股约12.8万（死扛等反转）+ 可用约2万
+**仓位管理：** 总资产51.5万，ETF约2.0万（趋势破位止损）+ 个股约10.9万（死扛等反转）+ 可用约4.7万 + 逆回购33.9万
 """
     return report
 
@@ -1220,19 +1221,20 @@ def generate_stock_tracking(main, extra):
     vol_label = "" if is_after_close else "（盘中半日量）"
 
     stock_names = {
-        "600160": "巨化股份", "000920": "沃顿科技",
-        "603290": "斯达半导", "000063": "中兴通讯", "002803": "吉宏股份",
+        "000920": "沃顿科技", "603290": "斯达半导",
+        "000063": "中兴通讯", "002803": "吉宏股份",
     }
     stock_industries = {
-        "600160": "氟化工/化学制品", "000920": "环保/膜材料",
-        "603290": "半导体/IGBT", "000063": "通信设备/5G", "002803": "跨境电商",
+        "000920": "环保/膜材料", "603290": "半导体/IGBT",
+        "000063": "通信设备/5G", "002803": "跨境电商",
     }
 
     report = f"""# 个股追踪报告 — {datetime.now().strftime('%Y年%m月%d日')}
 
 > 数据时间：{fetch_time} | {session_label}
 > 数据源：mootdx K线 + 手动计算技术指标
-> 追踪标的：600160 / 000920 / 603290 / 000063 / 002803
+> 追踪标的：000920 / 603290 / 000063 / 002803
+> 注：600160 巨化股份已于2026-08-12清仓，停止追踪
 
 ---
 
@@ -1240,7 +1242,7 @@ def generate_stock_tracking(main, extra):
 
     # 计算每只股票的5日涨跌并排序
     stock_5d = {}
-    for code in ["600160", "000920", "603290", "000063", "002803"]:
+    for code in ["000920", "603290", "000063", "002803"]:
         if code in stock_klines and len(stock_klines[code]) >= 6:
             klines = stock_klines[code]
             close_5d_ago = klines[-6]["close"] if len(klines) >= 6 else klines[0]["close"]
@@ -1418,7 +1420,7 @@ def generate_stock_tracking(main, extra):
 ### 分析
 
 - **5日区间：** {low5:.2f} ~ {high5:.2f}，振幅{(high5-low5)/low5*100:.1f}%
-- **5日涨跌：** {chg_5d_val:+.2f}%，{"6只中涨幅最大" if rank == 1 and chg_5d_val > 0 else "6只中跌幅最大" if rank == len(sorted_codes) and chg_5d_val < 0 else "中等表现"}
+- **5日涨跌：** {chg_5d_val:+.2f}%，{"4只中涨幅最大" if rank == 1 and chg_5d_val > 0 else "4只中跌幅最大" if rank == len(sorted_codes) and chg_5d_val < 0 else "中等表现"}
 - **支撑位：** {klines[-1]['low']:.2f}（今日低点）、{low5:.2f}（5日最低）
 - **压力位：** {klines[-1]['high']:.2f}（今日高点）、{high5:.2f}（5日最高）
 
