@@ -1854,5 +1854,281 @@
   "meta": {
     "fetch_time": "2026-08-12 19:32:22",
     "today": "20260812"
+  },
+  "fund_flow": {
+    "indices": {
+      "000001": {
+        "name": "上证指数",
+        "change_pct": 0.37,
+        "main_net_yi": 28.61,
+        "super_net_yi": 31.29,
+        "large_net_yi": -2.68,
+        "mid_net_yi": -38.19,
+        "small_net_yi": 9.56,
+        "main_ratio": 0.85
+      },
+      "399001": {
+        "name": "深证成指",
+        "change_pct": 0.67,
+        "main_net_yi": 24.64,
+        "super_net_yi": 31.12,
+        "large_net_yi": -6.48,
+        "mid_net_yi": -53.29,
+        "small_net_yi": 28.66,
+        "main_ratio": 0.61
+      },
+      "399006": {
+        "name": "创业板指",
+        "change_pct": 1.24,
+        "main_net_yi": 31.12,
+        "super_net_yi": 17.5,
+        "large_net_yi": 13.63,
+        "mid_net_yi": -29.39,
+        "small_net_yi": -1.73,
+        "main_ratio": 1.58
+      },
+      "000300": {
+        "name": "沪深300",
+        "change_pct": 0.47,
+        "main_net_yi": 15.5,
+        "super_net_yi": 7.66,
+        "large_net_yi": 7.84,
+        "mid_net_yi": -29.49,
+        "small_net_yi": 13.97,
+        "main_ratio": 0.83
+      },
+      "000688": {
+        "name": "科创50",
+        "change_pct": 1.45,
+        "main_net_yi": 9.89,
+        "super_net_yi": 11.66,
+        "large_net_yi": -1.78,
+        "mid_net_yi": -8.06,
+        "small_net_yi": -1.84,
+        "main_ratio": 2.75
+      },
+      "000016": {
+        "name": "上证50",
+        "change_pct": 0.51,
+        "main_net_yi": 2.18,
+        "super_net_yi": 5.77,
+        "large_net_yi": -3.59,
+        "mid_net_yi": -8.77,
+        "small_net_yi": 6.57,
+        "main_ratio": 0.44
+      }
+    },
+    "market": {
+      "main": 53.25,
+      "super": 62.41,
+      "large": -9.16,
+      "mid": -91.48,
+      "small": 38.22
+    },
+    "northbound": {
+      "date": "2026-08-13",
+      "hgt_yi": -9.28,
+      "sgt_yi": null,
+      "total_yi": null,
+      "history": [
+        {
+          "date": "2026-08-13",
+          "hgt_yi": -9.28,
+          "sgt_yi": null
+        }
+      ]
+    },
+    "industry_flow": {
+      "in_top": [
+        {
+          "name": "电子",
+          "change_pct": 0.59,
+          "main_net_yi": 54.71,
+          "super_net_yi": 39.23,
+          "main_ratio": 2.61
+        },
+        {
+          "name": "半导体",
+          "change_pct": 0.51,
+          "main_net_yi": 24.2,
+          "super_net_yi": 18.06,
+          "main_ratio": 2.27
+        },
+        {
+          "name": "通信",
+          "change_pct": 1.6,
+          "main_net_yi": 22.44,
+          "super_net_yi": 6.49,
+          "main_ratio": 3.11
+        },
+        {
+          "name": "通信设备",
+          "change_pct": 1.16,
+          "main_net_yi": 15.73,
+          "super_net_yi": 1.13,
+          "main_ratio": 2.47
+        },
+        {
+          "name": "元件",
+          "change_pct": 0.77,
+          "main_net_yi": 14.81,
+          "super_net_yi": 5.9,
+          "main_ratio": 3.18
+        },
+        {
+          "name": "消费电子",
+          "change_pct": 0.67,
+          "main_net_yi": 12.84,
+          "super_net_yi": 15.25,
+          "main_ratio": 5.54
+        },
+        {
+          "name": "计算机",
+          "change_pct": 1.51,
+          "main_net_yi": 11.76,
+          "super_net_yi": 14.82,
+          "main_ratio": 2.1
+        },
+        {
+          "name": "通用设备",
+          "change_pct": 0.58,
+          "main_net_yi": 10.86,
+          "super_net_yi": 8.81,
+          "main_ratio": 4.54
+        },
+        {
+          "name": "机械设备",
+          "change_pct": 0.25,
+          "main_net_yi": 9.75,
+          "super_net_yi": 8.0,
+          "main_ratio": 1.81
+        },
+        {
+          "name": "传媒",
+          "change_pct": 2.44,
+          "main_net_yi": 9.71,
+          "super_net_yi": 8.37,
+          "main_ratio": 3.69
+        }
+      ],
+      "out_top": [
+        {
+          "name": "有色金属",
+          "change_pct": -0.59,
+          "main_net_yi": -39.37,
+          "super_net_yi": -23.53,
+          "main_ratio": -8.68
+        },
+        {
+          "name": "贵金属",
+          "change_pct": -1.84,
+          "main_net_yi": -8.76,
+          "super_net_yi": -6.08,
+          "main_ratio": -9.68
+        },
+        {
+          "name": "医药生物",
+          "change_pct": 0.37,
+          "main_net_yi": -8.7,
+          "super_net_yi": -6.03,
+          "main_ratio": -1.64
+        },
+        {
+          "name": "小金属",
+          "change_pct": -0.72,
+          "main_net_yi": -7.79,
+          "super_net_yi": -5.24,
+          "main_ratio": -6.3
+        },
+        {
+          "name": "基础化工",
+          "change_pct": -0.06,
+          "main_net_yi": -5.4,
+          "super_net_yi": -1.87,
+          "main_ratio": -1.57
+        },
+        {
+          "name": "化学制药",
+          "change_pct": 0.36,
+          "main_net_yi": -5.02,
+          "super_net_yi": -2.56,
+          "main_ratio": -2.8
+        },
+        {
+          "name": "能源金属",
+          "change_pct": -0.92,
+          "main_net_yi": -4.52,
+          "super_net_yi": -2.19,
+          "main_ratio": -10.22
+        },
+        {
+          "name": "农化制品",
+          "change_pct": -0.89,
+          "main_net_yi": -4.05,
+          "super_net_yi": -2.2,
+          "main_ratio": -9.46
+        },
+        {
+          "name": "房地产",
+          "change_pct": -0.71,
+          "main_net_yi": -4.03,
+          "super_net_yi": -1.57,
+          "main_ratio": -5.61
+        },
+        {
+          "name": "房地产开发",
+          "change_pct": -0.65,
+          "main_net_yi": -3.7,
+          "super_net_yi": -1.56,
+          "main_ratio": -5.56
+        }
+      ]
+    },
+    "volume": {
+      "000001": {
+        "name": "上证指数",
+        "change_pct": 0.37,
+        "amount_yi": 3362.2,
+        "ratio_5d": 2.93,
+        "vol_note": "放量2.9倍"
+      },
+      "399001": {
+        "name": "深证成指",
+        "change_pct": 0.67,
+        "amount_yi": 4055.4,
+        "ratio_5d": 3.1,
+        "vol_note": "放量3.1倍"
+      },
+      "399006": {
+        "name": "创业板指",
+        "change_pct": 1.26,
+        "amount_yi": 1956.2,
+        "ratio_5d": 2.87,
+        "vol_note": "放量2.9倍"
+      },
+      "000300": {
+        "name": "沪深300",
+        "change_pct": 0.47,
+        "amount_yi": 1863.2,
+        "ratio_5d": 2.3,
+        "vol_note": "放量2.3倍"
+      },
+      "000688": {
+        "name": "科创50",
+        "change_pct": 1.45,
+        "amount_yi": 360.0,
+        "ratio_5d": 2.21,
+        "vol_note": "放量2.2倍"
+      },
+      "000016": {
+        "name": "上证50",
+        "change_pct": 0.51,
+        "amount_yi": 499.8,
+        "ratio_5d": 2.19,
+        "vol_note": "放量2.2倍"
+      }
+    },
+    "total_amount_yi": 7423.3,
+    "fetch_time": "2026-08-13 09:54:48"
   }
 }

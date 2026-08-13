@@ -458,6 +458,381 @@ def gen_kline_pattern_section(klines, name=""):
     return "\n".join(lines) + "\n"
 
 
+def fmt_flow_yi(yi):
+    """资金净流入格式化 - 流入红流出绿（中国股市惯例）"""
+    if yi is None:
+        return "—"
+    if yi > 0:
+        return f'<span style="color:red">+{yi:.2f}</span>'
+    elif yi < 0:
+        return f'<span style="color:green">{yi:.2f}</span>'
+    return "0.00"
+
+
+def gen_fund_flow_section(main):
+    """生成第七章资金流向分析（V4.0资金流向模块）
+
+    数据源：data/market_data.json 的 fund_flow 字段（fetch_fund_flow.py 采集）
+    结构：
+    7.1 大盘资金流总览（主力/超大/大/中/小单 + 北向 + 两市成交额）
+    7.2 指数资金流明细（6指数）
+    7.3 北向资金明细（含历史趋势）
+    7.4 行业资金流TOP流入/流出
+    7.5 指数量能观察（腾讯量比vol_ratio）
+    7.6 资金面观察要点（AI研判 + 手动补录区）
+    """
+    ff = main.get("fund_flow") or {}
+    lines = []
+    lines.append("## 七、资金流向")
+
+    fetch_time = ff.get("fetch_time", "")
+    if fetch_time:
+        lines.append(f"\n> 数据时间：{fetch_time}")
+
+    # ============ 7.1 大盘资金流总览 ============
+    market = ff.get("market") or {}
+    nb = ff.get("northbound") or {}
+    total_amt = ff.get("total_amount_yi")
+
+    lines.append("\n### 7.1 大盘资金流总览")
+    if market:
+        main_yi = market.get("main")
+        super_yi = market.get("super")
+        large_yi = market.get("large")
+        mid_yi = market.get("mid")
+        small_yi = market.get("small")
+        lines.append("\n| 资金类型 | 净流入(亿) | 说明 |")
+        lines.append("|---------|-----------|------|")
+        lines.append(f"| 主力资金 | {fmt_flow_yi(main_yi)} | 超大单+大单合计，机构/游资方向 |")
+        lines.append(f"| ├ 超大单 | {fmt_flow_yi(super_yi)} | 单笔≥100万，主力大资金 |")
+        lines.append(f"| └ 大单 | {fmt_flow_yi(large_yi)} | 单笔20-100万，中大户 |")
+        lines.append(f"| 中单 | {fmt_flow_yi(mid_yi)} | 单笔4-20万 |")
+        lines.append(f"| 小单(散户) | {fmt_flow_yi(small_yi)} | 单笔&lt;4万 |")
+        # 北向 + 成交额
+        hgt = nb.get("hgt_yi")
+        sgt = nb.get("sgt_yi")
+        nb_total = nb.get("total_yi")
+        if nb_total is not None:
+            nb_str = fmt_flow_yi(nb_total) + "亿"
+            nb_parts = []
+            if hgt is not None:
+                nb_parts.append(f"沪股通{fmt_flow_yi(hgt)}亿")
+            if sgt is not None:
+                nb_parts.append(f"深股通{fmt_flow_yi(sgt)}亿")
+            if nb_parts:
+                nb_str += f"（{'，'.join(nb_parts)}）"
+            lines.append(f"| 北向资金 | {nb_str} | 当日合计 |")
+        elif hgt is not None or sgt is not None:
+            nb_parts = []
+            if hgt is not None:
+                nb_parts.append(f"沪股通{fmt_flow_yi(hgt)}亿")
+            if sgt is not None:
+                nb_parts.append(f"深股通{fmt_flow_yi(sgt)}亿")
+            lines.append(f"| 北向资金 | — | {'，'.join(nb_parts)}（深股通数据异常未计入） |")
+        else:
+            lines.append("| 北向资金 | — | 数据待补录 |")
+        if total_amt:
+            lines.append(f"| 两市总成交额 | **{total_amt:.0f}亿** | 上证+深成（盘中） |")
+    else:
+        lines.append("\n| 资金类型 | 净流入(亿) | 说明 |")
+        lines.append("|---------|-----------|------|")
+        lines.append("| 数据待补录 | — | — |")
+
+    # ============ 7.2 指数资金流明细 ============
+    indices = ff.get("indices") or {}
+    if indices:
+        lines.append("\n### 7.2 指数资金流明细")
+        lines.append("\n| 指数 | 涨跌幅 | 主力净流入(亿) | 超大单(亿) | 大单(亿) | 中单(亿) | 小单(亿) | 主力净占比% |")
+        lines.append("|------|--------|--------------|-----------|---------|---------|---------|------------|")
+        for code, ind in indices.items():
+            name = ind.get("name", code)
+            chg = ind.get("change_pct")
+            mr = ind.get("main_ratio")
+            mr_str = f"{mr:.2f}" if mr is not None else "—"
+            lines.append(
+                f"| {name} | {fmt_pct(chg)} | {fmt_flow_yi(ind.get('main_net_yi'))} | "
+                f"{fmt_flow_yi(ind.get('super_net_yi'))} | {fmt_flow_yi(ind.get('large_net_yi'))} | "
+                f"{fmt_flow_yi(ind.get('mid_net_yi'))} | {fmt_flow_yi(ind.get('small_net_yi'))} | {mr_str} |"
+            )
+
+    # ============ 7.3 北向资金 ============
+    history = nb.get("history") or []
+    lines.append("\n### 7.3 北向资金")
+    hgt = nb.get("hgt_yi")
+    sgt = nb.get("sgt_yi")
+    nb_total = nb.get("total_yi")
+    lines.append("\n| 指标 | 数值 |")
+    lines.append("|------|------|")
+    lines.append(f"| 沪股通净流入 | {fmt_flow_yi(hgt)}亿 |" if hgt is not None else "| 沪股通净流入 | 数据待补录 |")
+    lines.append(f"| 深股通净流入 | {fmt_flow_yi(sgt)}亿 |" if sgt is not None else "| 深股通净流入 | 数据待补录 |")
+    lines.append(f"| 北向合计 | {fmt_flow_yi(nb_total)}亿 |" if nb_total is not None else "| 北向合计 | 数据待补录 |")
+    if len(history) > 1:
+        lines.append("\n**近5日北向净流入趋势（亿）：**")
+        lines.append("\n| 日期 | 沪股通 | 深股通 |")
+        lines.append("|------|--------|--------|")
+        for h in history[-5:]:
+            lines.append(f"| {h.get('date', '—')} | {fmt_flow_yi(h.get('hgt_yi'))} | {fmt_flow_yi(h.get('sgt_yi'))} |")
+    elif history:
+        lines.append("\n> 仅当日数据，历史趋势待累积（缓存文件：data/northbound_cache.csv）。")
+
+    # ============ 7.4 行业资金流TOP ============
+    ind_flow = ff.get("industry_flow") or {}
+    in_top = ind_flow.get("in_top") or []
+    out_top = ind_flow.get("out_top") or []
+    lines.append("\n### 7.4 行业资金流TOP")
+    lines.append("\n**主力净流入TOP10：**")
+    if in_top:
+        lines.append("\n| 排名 | 行业 | 涨跌幅 | 主力净流入(亿) | 超大单(亿) | 主力净占比% |")
+        lines.append("|------|------|--------|--------------|-----------|------------|")
+        for i, ind in enumerate(in_top[:10], 1):
+            mr = ind.get("main_ratio")
+            mr_str = f"{mr:.2f}" if mr is not None else "—"
+            lines.append(
+                f"| {i} | {ind.get('name', '—')} | {fmt_pct(ind.get('change_pct'))} | "
+                f"{fmt_flow_yi(ind.get('main_net_yi'))} | {fmt_flow_yi(ind.get('super_net_yi'))} | {mr_str} |"
+            )
+    else:
+        lines.append("\n| 数据待补录 |")
+    lines.append("\n**主力净流出TOP10：**")
+    if out_top:
+        lines.append("\n| 排名 | 行业 | 涨跌幅 | 主力净流出(亿) | 超大单(亿) | 主力净占比% |")
+        lines.append("|------|------|--------|--------------|-----------|------------|")
+        for i, ind in enumerate(out_top[:10], 1):
+            mr = ind.get("main_ratio")
+            mr_str = f"{mr:.2f}" if mr is not None else "—"
+            lines.append(
+                f"| {i} | {ind.get('name', '—')} | {fmt_pct(ind.get('change_pct'))} | "
+                f"{fmt_flow_yi(ind.get('main_net_yi'))} | {fmt_flow_yi(ind.get('super_net_yi'))} | {mr_str} |"
+            )
+    else:
+        lines.append("\n| 数据待补录 |")
+
+    # ============ 7.5 指数量能观察 ============
+    volume = ff.get("volume") or {}
+    if volume:
+        lines.append("\n### 7.5 指数量能观察")
+        lines.append("\n| 指数 | 涨跌幅 | 成交额(亿) | 量比 | 量能状态 |")
+        lines.append("|------|--------|-----------|------|---------|")
+        for code, v in volume.items():
+            ratio = v.get("ratio_5d")
+            note = v.get("vol_note", "—")
+            ratio_str = f"{ratio:.2f}" if ratio is not None else "—"
+            lines.append(f"| {v.get('name', code)} | {fmt_pct(v.get('change_pct'))} | {v.get('amount_yi', 0):.1f} | {ratio_str} | {note} |")
+        # 量能总结
+        ratios = [v.get("ratio_5d") for v in volume.values() if v.get("ratio_5d") is not None]
+        if ratios:
+            max_r = max(ratios)
+            min_r = min(ratios)
+            if max_r >= 1.5:
+                vol_summary = f"全面放量（量比{min_r:.1f}~{max_r:.1f}倍），量能显著放大，市场活跃度提升"
+            elif max_r >= 1.2:
+                vol_summary = f"温和放量（量比{min_r:.1f}~{max_r:.1f}倍），交投趋于活跃"
+            else:
+                vol_summary = f"量能平稳/缩量（量比{min_r:.1f}~{max_r:.1f}倍），资金参与度不足"
+            lines.append(f"\n> **量能结论：** {vol_summary}。")
+
+    # ============ 7.6 资金面观察要点 ============
+    lines.append("\n### 7.6 资金面观察要点")
+    insights = []
+    # 主力方向
+    if market:
+        main_yi = market.get("main")
+        if main_yi is not None:
+            if main_yi > 0:
+                insights.append(f"主力资金净流入**{main_yi:.1f}亿**，机构做多意愿明显，其中超大单{market.get('super', 0):.1f}亿主导")
+            elif main_yi < 0:
+                insights.append(f"主力资金净流出**{abs(main_yi):.1f}亿**，机构整体偏谨慎")
+            else:
+                insights.append("主力资金进出平衡")
+        small_yi = market.get("small")
+        if small_yi is not None:
+            if small_yi > 0:
+                insights.append(f"散户（小单）净流入**{small_yi:.1f}亿**，与主力形成{ '同向' if main_yi and main_yi > 0 else '反向' }")
+            elif small_yi < 0:
+                insights.append(f"散户（小单）净流出**{abs(small_yi):.1f}亿**")
+    # 北向方向
+    if nb_total is not None:
+        if nb_total > 0:
+            insights.append(f"北向资金净流入**{nb_total:.1f}亿**，外资偏多")
+        elif nb_total < 0:
+            insights.append(f"北向资金净流出**{abs(nb_total):.1f}亿**，外资偏谨慎")
+    elif hgt is not None:
+        if hgt > 0:
+            insights.append(f"沪股通净流入**{hgt:.1f}亿**（深股通数据异常）")
+        elif hgt < 0:
+            insights.append(f"沪股通净流出**{abs(hgt):.1f}亿**（深股通数据异常）")
+    # 行业偏好
+    if in_top:
+        in_names = "、".join(i.get("name", "") for i in in_top[:3])
+        insights.append(f"主力资金偏好方向：**{in_names}**")
+    if out_top:
+        out_names = "、".join(i.get("name", "") for i in out_top[:3])
+        insights.append(f"主力资金流出方向：**{out_names}**")
+    # 量能
+    if volume:
+        ratios = [v.get("ratio_5d") for v in volume.values() if v.get("ratio_5d") is not None]
+        if ratios:
+            max_r = max(ratios)
+            if max_r >= 1.5:
+                insights.append("量能全面放大，放量上涨的真实性更高；若缩量上涨需警惕资金不足")
+            else:
+                insights.append("量能不足，缩量状态下需警惕上涨动能衰竭")
+
+    if insights:
+        for ins in insights:
+            lines.append(f"- {ins}")
+    else:
+        lines.append("- 数据待补录。")
+
+    # 手动补录区（视频/人工观察维度）
+    ff_manual = main.get("fund_flow_manual") or {}
+    lines.append("\n**🔧 手动补录区**（以下维度无自动数据源，需人工从盘中观察/机构观点补充）：")
+    manual_rows = [
+        ("期指对冲", "当日净减空___手，期指买入___亿（按1:8对冲→对冲到股市约___亿）"),
+        ("资金结构占比", "公募约5%（流动性慢，观察9-20天）；私募约50%（主观12-15%+量化30-40%）；量化贝塔与北向高度绑定"),
+        ("超大资金流入方向", "英伟达/两融/半导体芯片/光纤/商业航天"),
+        ("超大资金流出方向", "医疗/锂矿/绿电/工业金属/小金属"),
+        ("北向资金流入方向", "英伟达/新能源汽车/人形机器人"),
+        ("北向资金流出方向", "医药/绿电/央国企"),
+    ]
+    for key, default in manual_rows:
+        if key in ff_manual and ff_manual[key]:
+            lines.append(f"- **{key}：** {ff_manual[key]}")
+        else:
+            lines.append(f"- **{key}：** {default}")
+
+    return "\n".join(lines) + "\n"
+
+
+def gen_fund_flow_analysis_section(main):
+    """生成复盘分析"资金流向综合分析"专章
+
+    侧重解读与结论（区别于今日看板第七章的明细表格）：
+    - 大盘资金结构解读
+    - 指数资金流向
+    - 行业资金偏好
+    - 量能与北向传导（量化贝塔逻辑）
+    - 资金结构占比框架（公募/私募/量化，手动补录）
+    - 资金面综合结论
+    """
+    ff = main.get("fund_flow") or {}
+    market = ff.get("market") or {}
+    nb = ff.get("northbound") or {}
+    in_top = (ff.get("industry_flow") or {}).get("in_top") or []
+    out_top = (ff.get("industry_flow") or {}).get("out_top") or []
+    volume = ff.get("volume") or {}
+    total_amt = ff.get("total_amount_yi")
+
+    lines = []
+    lines.append("## 五、资金流向综合分析\n")
+
+    # ---- 5.1 大盘资金结构 ----
+    lines.append("### 5.1 大盘资金结构")
+    if market:
+        main_yi = market.get("main")
+        super_yi = market.get("super")
+        small_yi = market.get("small")
+        lines.append("\n| 资金类型 | 净流入(亿) |")
+        lines.append("|---------|-----------|")
+        lines.append(f"| 主力资金 | {fmt_flow_yi(main_yi)} |")
+        lines.append(f"| ├ 超大单 | {fmt_flow_yi(super_yi)} |")
+        lines.append(f"| └ 大单 | {fmt_flow_yi(market.get('large'))} |")
+        lines.append(f"| 中单 | {fmt_flow_yi(market.get('mid'))} |")
+        lines.append(f"| 小单(散户) | {fmt_flow_yi(small_yi)} |")
+        # 结构解读
+        if main_yi is not None and small_yi is not None:
+            if main_yi > 0 and small_yi < 0:
+                lines.append(f"\n> **结构解读：** 主力净流入{main_yi:.1f}亿、散户净流出{abs(small_yi):.1f}亿——\"机构进场、散户离场\"，筹码向主力集中，属于偏健康的资金结构（主力吸筹特征）。")
+            elif main_yi > 0 and small_yi > 0:
+                lines.append(f"\n> **结构解读：** 主力与散户同向净流入（主力{main_yi:.1f}亿/散户{small_yi:.1f}亿），市场增量资金进场，但需警惕散户追高后主力派发。")
+            elif main_yi < 0 and small_yi > 0:
+                lines.append(f"\n> **结构解读：** 主力净流出{abs(main_yi):.1f}亿、散户净流入{small_yi:.1f}亿——\"机构离场、散户接盘\"，典型派发结构，需警惕下跌风险。")
+            elif main_yi < 0 and small_yi < 0:
+                lines.append(f"\n> **结构解读：** 主力与散户同向流出，市场资金整体撤退，观望情绪浓厚。")
+    else:
+        lines.append("\n| 数据待补录 | — |")
+
+    # ---- 5.2 指数资金流向 ----
+    indices = ff.get("indices") or {}
+    if indices:
+        lines.append("\n### 5.2 指数资金流向")
+        lines.append("\n| 指数 | 涨跌幅 | 主力净流入(亿) | 主力净占比% |")
+        lines.append("|------|--------|--------------|------------|")
+        for code, ind in indices.items():
+            mr = ind.get("main_ratio")
+            mr_str = f"{mr:.2f}" if mr is not None else "—"
+            lines.append(f"| {ind.get('name', code)} | {fmt_pct(ind.get('change_pct'))} | {fmt_flow_yi(ind.get('main_net_yi'))} | {mr_str} |")
+
+    # ---- 5.3 行业资金偏好 ----
+    lines.append("\n### 5.3 行业资金偏好")
+    if in_top:
+        in3 = "、".join(f"{i.get('name','')}（{i.get('main_net_yi',0):+.1f}亿）" for i in in_top[:3])
+        lines.append(f"- **主力流入方向：** {in3}")
+    if out_top:
+        out3 = "、".join(f"{i.get('name','')}（{i.get('main_net_yi',0):+.1f}亿）" for i in out_top[:3])
+        lines.append(f"- **主力流出方向：** {out3}")
+    if in_top and out_top:
+        top_name = in_top[0].get("name", "")
+        out_name = out_top[0].get("name", "")
+        lines.append(f"> 资金主线明确指向**{top_name}**，回避**{out_name}**等方向。")
+
+    # ---- 5.4 量能与北向传导 ----
+    lines.append("\n### 5.4 量能与北向传导")
+    ratios = [v.get("ratio_5d") for v in volume.values() if v.get("ratio_5d") is not None]
+    if ratios:
+        max_r = max(ratios)
+        min_r = min(ratios)
+        if max_r >= 1.5:
+            lines.append(f"- 全市场**放量**（量比{min_r:.1f}~{max_r:.1f}倍），成交额{total_amt:.0f}亿（盘中）。放量上涨真实性强于缩量上涨。")
+        elif max_r >= 1.2:
+            lines.append(f"- 温和放量（量比{min_r:.1f}~{max_r:.1f}倍），成交额{total_amt:.0f}亿（盘中）。")
+        else:
+            lines.append(f"- 量能不足（量比{min_r:.1f}~{max_r:.1f}倍），成交额{total_amt:.0f}亿（盘中）。**缩量上涨本质是资金不足**，追高需谨慎。")
+    hgt = nb.get("hgt_yi")
+    sgt = nb.get("sgt_yi")
+    nb_total = nb.get("total_yi")
+    if nb_total is not None:
+        nb_dir = "净流入" if nb_total > 0 else "净流出"
+        lines.append(f"- 北向资金{nb_dir}**{abs(nb_total):.1f}亿**。")
+    elif hgt is not None:
+        h_dir = "净流入" if hgt > 0 else "净流出"
+        lines.append(f"- 沪股通{h_dir}**{abs(hgt):.1f}亿**（深股通数据异常未计入）。")
+    lines.append("- **量化传导逻辑：** 量化私募贝塔因子与北向资金高度绑定，北向方向会直接影响量化私募的加减仓节奏——北向连续流出时，量化策略大概率同步减仓，放大下跌；北向回流时，量化买盘同步入场，放大反弹。观察北向趋势（而非单日）对判断短线资金面更有效。")
+
+    # ---- 5.5 资金结构占比框架 ----
+    lines.append("\n### 5.5 资金结构占比（分析框架）")
+    lines.append("> 以下为市场资金结构分析框架（参考机构观察），具体数值需人工确认后补录：")
+    lines.append("- **公募：** 约5%流动性。公募调仓极慢，从买入到完成通常需观察**9-20天**，其持仓方向反映的是中长线逻辑，不适合作为短线信号。")
+    lines.append("- **私募：** 约占市场一半——主观私募约12-15%，量化私募约30-40%。")
+    lines.append("- **量化私募：** 贝塔因子与北向资金高度绑定（见5.4传导逻辑），是短线波动的主要放大器。")
+
+    # ---- 5.6 资金面综合结论 ----
+    lines.append("\n### 5.6 资金面综合结论")
+    conclusions = []
+    if market:
+        main_yi = market.get("main")
+        if main_yi is not None:
+            if main_yi > 0:
+                conclusions.append(f"主力净流入{main_yi:.1f}亿，做多意愿明确")
+            else:
+                conclusions.append(f"主力净流出{abs(main_yi):.1f}亿，机构态度谨慎")
+    if ratios and max(ratios) >= 1.5:
+        conclusions.append("量能全面放大，上涨有资金支撑")
+    elif ratios:
+        conclusions.append("量能不足，反弹持续性存疑")
+    if in_top:
+        conclusions.append(f"主线方向：{in_top[0].get('name','')}")
+    if nb_total is not None:
+        conclusions.append(f"北向{'流入' if nb_total > 0 else '流出'}（{abs(nb_total):.1f}亿）")
+    if conclusions:
+        for c in conclusions:
+            lines.append(f"- **{c}**")
+    else:
+        lines.append("- 数据待补录。")
+
+    return "\n".join(lines) + "\n"
+
+
 def generate_dashboard(main, extra):
     """生成今日看板报告"""
     idx = main["indices"]
@@ -690,31 +1065,10 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 七、资金流向
-
-### 行业资金流入TOP5
-
-| 排名 | 行业 | 涨跌幅 | 上涨/下跌 |
-|------|------|--------|----------|
 """
 
-    if industries:
-        for ind in industries[:5]:
-            up_c = ind.get('up_count', '—')
-            dn_c = ind.get('down_count', '—')
-            report += f"| {ind.get('rank','—')} | {ind['name']} | {fmt_pct(ind['change_pct'])} | 涨{up_c}/跌{dn_c} |\n"
-    else:
-        report += "| 数据待补录 | 数据待补录 | — | — |\n"
-
-    report += "\n### 板块跌幅TOP5\n\n| 排名 | 行业 | 涨跌幅 | 上涨/下跌 |\n|------|------|--------|----------|\n"
-    if industries and len(industries) > 5:
-        bottom = sorted(industries, key=lambda x: x['change_pct'])[:5]
-        for ind in bottom:
-            up_c = ind.get('up_count', '—')
-            dn_c = ind.get('down_count', '—')
-            report += f"| {ind.get('rank','—')} | {ind['name']} | {fmt_pct(ind['change_pct'])} | 涨{up_c}/跌{dn_c} |\n"
-    else:
-        report += "| 数据待补录 | 数据待补录 | — | — |\n"
+    # 第七章：资金流向分析（V4.0资金流向模块）
+    report += gen_fund_flow_section(main)
 
     # 动态生成最强主线
     if industries:
@@ -1157,7 +1511,14 @@ def generate_analysis(main, extra):
 
 ---
 
-## 五、仓位状态建议
+"""
+    # 资金流向综合分析专章（V4.0）
+    report += gen_fund_flow_analysis_section(main)
+
+    report += f"""
+---
+
+## 六、仓位状态建议
 
 **总资产：514,503元**（三账户合计：东财389,725 + 国金61,088 + 广发63,689）
 - ETF持仓市值：约{sum(etf[code]["price"] * ETF_HOLDINGS[code]["shares"] for code in ETFS):,.0f}元（515050+588460，东财账户）
@@ -1184,7 +1545,7 @@ def generate_analysis(main, extra):
 
 ---
 
-## 六、其他重点
+## 七、其他重点
 
 ### 1. 市场趋势
 {trend_summary}。两市成交额约{total_amt:,.0f}亿{vol_label}{'，收盘确认' if is_after_close else '，需收盘后确认最终量能'}。
