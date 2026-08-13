@@ -765,11 +765,16 @@ def gen_fund_flow_analysis_section(main):
 
     # ---- 5.3 行业资金偏好 ----
     lines.append("\n### 5.3 行业资金偏好")
+    def _fmt_ind_flow(item):
+        v = item.get("main_net_yi")
+        if v is None:
+            return f"{item.get('name','')}（待补录）"
+        return f"{item.get('name','')}（{v:+.1f}亿）"
     if in_top:
-        in3 = "、".join(f"{i.get('name','')}（{i.get('main_net_yi',0):+.1f}亿）" for i in in_top[:3])
+        in3 = "、".join(_fmt_ind_flow(i) for i in in_top[:3])
         lines.append(f"- **主力流入方向：** {in3}")
     if out_top:
-        out3 = "、".join(f"{i.get('name','')}（{i.get('main_net_yi',0):+.1f}亿）" for i in out_top[:3])
+        out3 = "、".join(_fmt_ind_flow(i) for i in out_top[:3])
         lines.append(f"- **主力流出方向：** {out3}")
     if in_top and out_top:
         top_name = in_top[0].get("name", "")
