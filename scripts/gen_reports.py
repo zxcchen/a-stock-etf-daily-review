@@ -470,31 +470,31 @@ def fmt_flow_yi(yi):
 
 
 def gen_fund_flow_section(main):
-    """生成第七章资金流向分析（V4.0资金流向模块）
+    """生成第五章资金流向分析（V4.0资金流向模块）
 
     数据源：data/market_data.json 的 fund_flow 字段（fetch_fund_flow.py 采集）
     结构：
-    7.1 大盘资金流总览（主力/超大/大/中/小单 + 北向 + 两市成交额）
-    7.2 指数资金流明细（6指数）
-    7.3 北向资金明细（含历史趋势）
-    7.4 行业资金流TOP流入/流出
-    7.5 指数量能观察（腾讯量比vol_ratio）
-    7.6 资金面观察要点（AI研判 + 手动补录区）
+    5.1 大盘资金流总览（主力/超大/大/中/小单 + 北向 + 两市成交额）
+    5.2 指数资金流明细（6指数）
+    5.3 北向资金明细（含历史趋势）
+    5.4 行业资金流TOP流入/流出
+    5.5 指数量能观察（腾讯量比vol_ratio）
+    5.6 资金面观察要点（AI研判 + 手动补录区）
     """
     ff = main.get("fund_flow") or {}
     lines = []
-    lines.append("## 七、资金流向")
+    lines.append("## 五、资金流向")
 
     fetch_time = ff.get("fetch_time", "")
     if fetch_time:
         lines.append(f"\n> 数据时间：{fetch_time}")
 
-    # ============ 7.1 大盘资金流总览 ============
+    # ============ 5.1 大盘资金流总览 ============
     market = ff.get("market") or {}
     nb = ff.get("northbound") or {}
     total_amt = ff.get("total_amount_yi")
 
-    lines.append("\n### 7.1 大盘资金流总览")
+    lines.append("\n### 5.1 大盘资金流总览")
     if market:
         main_yi = market.get("main")
         super_yi = market.get("super")
@@ -538,10 +538,10 @@ def gen_fund_flow_section(main):
         lines.append("|---------|-----------|------|")
         lines.append("| 数据待补录 | — | — |")
 
-    # ============ 7.2 指数资金流明细 ============
+    # ============ 5.2 指数资金流明细 ============
     indices = ff.get("indices") or {}
     if indices:
-        lines.append("\n### 7.2 指数资金流明细")
+        lines.append("\n### 5.2 指数资金流明细")
         lines.append("\n| 指数 | 涨跌幅 | 主力净流入(亿) | 超大单(亿) | 大单(亿) | 中单(亿) | 小单(亿) | 主力净占比% |")
         lines.append("|------|--------|--------------|-----------|---------|---------|---------|------------|")
         for code, ind in indices.items():
@@ -555,9 +555,9 @@ def gen_fund_flow_section(main):
                 f"{fmt_flow_yi(ind.get('mid_net_yi'))} | {fmt_flow_yi(ind.get('small_net_yi'))} | {mr_str} |"
             )
 
-    # ============ 7.3 北向资金 ============
+    # ============ 5.3 北向资金 ============
     history = nb.get("history") or []
-    lines.append("\n### 7.3 北向资金")
+    lines.append("\n### 5.3 北向资金")
     hgt = nb.get("hgt_yi")
     sgt = nb.get("sgt_yi")
     nb_total = nb.get("total_yi")
@@ -575,11 +575,11 @@ def gen_fund_flow_section(main):
     elif history:
         lines.append("\n> 仅当日数据，历史趋势待累积（缓存文件：data/northbound_cache.csv）。")
 
-    # ============ 7.4 行业资金流TOP ============
+    # ============ 5.4 行业资金流TOP ============
     ind_flow = ff.get("industry_flow") or {}
     in_top = ind_flow.get("in_top") or []
     out_top = ind_flow.get("out_top") or []
-    lines.append("\n### 7.4 行业资金流TOP")
+    lines.append("\n### 5.4 行业资金流TOP")
     lines.append("\n**主力净流入TOP10：**")
     if in_top:
         lines.append("\n| 排名 | 行业 | 涨跌幅 | 主力净流入(亿) | 超大单(亿) | 主力净占比% |")
@@ -607,10 +607,10 @@ def gen_fund_flow_section(main):
     else:
         lines.append("\n| 数据待补录 |")
 
-    # ============ 7.5 指数量能观察 ============
+    # ============ 5.5 指数量能观察 ============
     volume = ff.get("volume") or {}
     if volume:
-        lines.append("\n### 7.5 指数量能观察")
+        lines.append("\n### 5.5 指数量能观察")
         lines.append("\n| 指数 | 涨跌幅 | 成交额(亿) | 量比 | 量能状态 |")
         lines.append("|------|--------|-----------|------|---------|")
         for code, v in volume.items():
@@ -631,8 +631,8 @@ def gen_fund_flow_section(main):
                 vol_summary = f"量能平稳/缩量（量比{min_r:.1f}~{max_r:.1f}倍），资金参与度不足"
             lines.append(f"\n> **量能结论：** {vol_summary}。")
 
-    # ============ 7.6 资金面观察要点 ============
-    lines.append("\n### 7.6 资金面观察要点")
+    # ============ 5.6 资金面观察要点 ============
+    lines.append("\n### 5.6 资金面观察要点")
     insights = []
     # 主力方向
     if market:
@@ -707,7 +707,7 @@ def gen_fund_flow_section(main):
 def gen_fund_flow_analysis_section(main):
     """生成复盘分析"资金流向综合分析"专章
 
-    侧重解读与结论（区别于今日看板第七章的明细表格）：
+    侧重解读与结论（区别于今日看板第五章的明细表格）：
     - 大盘资金结构解读
     - 指数资金流向
     - 行业资金偏好
@@ -976,29 +976,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 三、ETF成交数据（重点）
-
-### 3.1 七只ETF行情表
-
-| ETF | 名称 | 最新价 | 涨跌幅 | 成交额（亿） | 换手率 |
-|-----|------|--------|--------|-------------|--------|
-"""
-    for code in ETFS:
-        q = etf.get(code, {})
-        report += f"| {code} | {q.get('name', ETF_FULL_NAMES.get(code, ''))} | {q.get('price', 0):.3f} | {fmt_pct(q.get('change_pct', 0))} | {q.get('amount_wan', 0)/10000:.2f} | {q.get('turnover_pct', 0):.2f}% |\n"
-
-    for code in ETFS:
-        report += f"""
-### 3.{2 + ETFS.index(code)} {code} {ETF_FULL_NAMES.get(code, '')} 近5日OHLC表
-
-{gen_kline_table(etf_klines.get(code, []), etf.get(code, {}).get('name', ETF_FULL_NAMES.get(code, '')))}
-{gen_kline_pattern_section(etf_klines.get(code, []), ETF_FULL_NAMES.get(code, ''))}
-"""
-
-    report += f"""
----
-
-## 四、【V3.0】ETF放量倍数量化表
+## 三、【V3.0】ETF放量倍数量化表
 
 | ETF | 今日成交额（亿） | 昨日成交额（亿） | 近5日均值（亿） | 放量倍数 |
 |-----|----------------|----------------|---------------|---------|
@@ -1014,20 +992,10 @@ def generate_dashboard(main, extra):
 """
 
     report += f"""
----
-
-## 五、【V3.0】ETF净申赎数据
-
-| ETF | 今日主力净流入 | 近5日净流入合计 | 资金方向 |
-|-----|--------------|---------------|---------|
-"""
-    for code in ETFS:
-        report += f"| {code} | 数据待补录 | 数据待补录 | — |\n"
-    report += f"""
 
 ---
 
-## 六、行业ETF异动
+## 四、行业ETF异动
 
 | 行业ETF | 名称 | 最新价 | 涨跌幅 | 成交额（亿） | 换手率 |
 |---------|------|--------|--------|-------------|--------|
@@ -1101,7 +1069,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 八、今日最强主线
+## 六、今日最强主线
 
 **涨幅方向：** {top_str}
 **跌幅方向：** {bottom_str}
@@ -1110,7 +1078,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 九、市场风格
+## 七、市场风格
 
 - [{"x" if style_main == "电力公用事业" else " "}] 电力公用事业
 - [{"x" if style_main == "大盘价值" else " "}] 大盘价值
@@ -1123,7 +1091,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 十、【V3.0】融资融券数据
+## 八、【V3.0】融资融券数据
 
 | 指标 | 数值 |
 |------|------|
@@ -1133,7 +1101,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 十一、重要新闻
+## 九、重要新闻
 
 | 时间 | 标题 |
 |------|------|
@@ -1153,17 +1121,7 @@ def generate_dashboard(main, extra):
     report += f"""
 ---
 
-## 十二、政策消息
-
-| 类型 | 内容 |
-|------|------|
-| 产业 | 数据待补录 |
-| 宏观 | 数据待补录 |
-| 国际 | 数据待补录 |
-
----
-
-## 十三、ETF异动历史匹配
+## 十、ETF异动历史匹配
 
 {etf_change_str}。
 
@@ -1171,7 +1129,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 十四、风险指标
+## 十一、风险指标
 
 | 风险指标 | 今日状态 | 触发 |
 |---------|---------|------|
@@ -1183,7 +1141,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 十五、【V3.0】信号阈值检测表
+## 十二、【V3.0】信号阈值检测表
 
 | 条件 | 代号 | 阈值 | 今日数值 | 是否触发 |
 |------|------|------|---------|---------|
@@ -1194,7 +1152,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 十六、【V3.0】信号等级评级
+## 十三、【V3.0】信号等级评级
 
 **当前星级：{"⭐" * star}（{star}/4星）**
 
@@ -1207,21 +1165,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 十七、【V3.0】极端情绪指数
-
-| 指标 | 今日数值 | 评分（1-5） |
-|------|---------|-----------|
-| 上涨家数 | {up if up else '待补录'} | — |
-| 下跌家数 | {down if down else '待补录'} | — |
-| 跌停家数 | {limit_down if limit_down else '待补录'} | — |
-| ETF异动 | {b_count}只放量 | — |
-| 两市成交额 | {total_amt:,.0f}亿 | — |
-
-**极端情绪评分：—/25{'' if is_after_close else '（盘中数据不完整）'}**
-
----
-
-## 十八、【V3.0】跨市场参考数据
+## 十四、【V3.0】跨市场参考数据
 
 | 指标 | 数值 | 涨跌 |
 |------|------|------|
@@ -1236,21 +1180,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 十九、【V3.0】后续标记字段
-
-| 标记项 | 数值 |
-|--------|------|
-| 次日涨跌幅 | 待填 |
-| 5日累计涨跌幅 | 待填 |
-| 20日累计涨跌幅 | 待填 |
-| 信号等级 | {star}星 |
-| 是否触发拐点 | 否 |
-| 下跌占比极端值 | 待补录 |
-| 外部风险 | {style_desc} |
-
----
-
-## 二十、总结表
+## 十五、总结表
 
 | 维度 | 状态 |
 |------|------|
@@ -1266,7 +1196,7 @@ def generate_dashboard(main, extra):
 ---
 
 **报告生成时间：** {fetch_time}
-**模板版本：** V3.0
+**模板版本：** V4.1
 **数据来源：** mootdx + 腾讯财经 + 东财 + 同花顺 + 公开市场数据
 **GitHub存档：** reports/{datetime.now().strftime('%Y%m%d')}.md
 
