@@ -850,6 +850,7 @@ def generate_dashboard(main, extra):
     if isinstance(industries, dict):
         industries = industries.get("top", []) + industries.get("bottom", [])
     breadth = main.get("market_breadth", extra.get("breadth", {}))
+    lianban = main.get("lianban", {}) or {}
     meta = main.get("meta", {})
     fetch_time = meta.get("fetch_time", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     is_after_close = int(fetch_time[11:13]) >= 15 if len(fetch_time) >= 13 else False
@@ -869,6 +870,10 @@ def generate_dashboard(main, extra):
     limit_down = breadth.get("limit_down", 0)
     total_stocks = breadth.get("total", 0)
     up_ratio = up / (up + down + flat) * 100 if (up + down + flat) > 0 else 0
+    lb_max = lianban.get("max_height", 0) if isinstance(lianban, dict) else 0
+    lb_count = lianban.get("total_count", 0) if isinstance(lianban, dict) else 0
+    lianban_max = f"{lb_max}板" if lb_max else "数据待补录"
+    lianban_count = f"{lb_count}只" if lb_count else "—"
 
     # 放量倍数计算
     vol_data = {}
@@ -962,22 +967,39 @@ def generate_dashboard(main, extra):
 
 ## 二、市场情绪数据
 
-| 指标 | 数值 | 指标 | 数值 |
-|------|------|------|------|
-| 两市成交额 | {total_amt:,.0f}亿{vol_label} | 涨停家数 | {limit_up if limit_up else '数据待补录'} |
-| 上涨家数 | {up if up else '数据待补录'} | 跌停家数 | {limit_down if limit_down else '数据待补录'} |
-| 下跌家数 | {down if down else '数据待补录'} | 炸板家数 | 数据待补录 |
-| 平盘家数 | {flat if flat else '数据待补录'} | 炸板率 | 数据待补录 |
-| 连板最高高度 | 数据待补录 | 昨日连板晋级率 | 数据待补录 |
-| 上涨占比 | {up_ratio:.1f}% | 连板股总数 | 数据待补录 |
+| 指标 | 数值 |
+|------|------|
+| 两市成交额 | {total_amt:,.0f}亿{vol_label} |
+| 上涨家数 | {up if up else '数据待补录'} |
+| 下跌家数 | {down if down else '数据待补录'} |
+| 平盘家数 | {flat if flat else '数据待补录'} |
+| 连板最高高度 | {lianban_max} |
+| 上涨占比 | {up_ratio:.1f}% |
+
+> 涨停{limit_up if limit_up else '—'}只 / 跌停{limit_down if limit_down else '—'}只 / 连板股总数{lianban_count}。
 
 ### 连板梯队
+"""
 
-| 高度 | 个股 | 板块 |
-|------|------|------|
-| 数据待补录 | 数据待补录 | 数据待补录 |
+    # 连板梯队
+    pool = lianban.get("pool", []) if isinstance(lianban, dict) else []
+    if pool:
+        from collections import OrderedDict
+        tiers = OrderedDict()
+        for p in sorted(pool, key=lambda x: -x.get("lbc", 1)):
+            tiers.setdefault(p.get("lbc", 1), []).append(f"{p.get('name','')}({p.get('industry','')})")
+        report += "\n| 高度 | 个股（板块） |\n|------|------------|\n"
+        for h, names in tiers.items():
+            if h < 2:
+                continue
+            report += f"| {h}板 | {'、'.join(names[:12])} |\n"
+        if not any(h >= 2 for h in tiers):
+            report += "| 2板+ | 无 |\n"
+    else:
+        report += "\n| 高度 | 个股（板块） |\n|------|------------|\n| 数据待补录 | 数据待补录 |\n"
 
-> {'上涨' + str(up) + '家 vs 下跌' + str(down) + '家，涨停' + str(limit_up) + '只、跌停' + str(limit_down) + '只。' if up or down else '市场涨跌家数数据待补录。'}{etf_word}，成交量{'为全天量' if is_after_close else '为盘中半日量'}。
+    report += f"""
+> 上涨{up}家 vs 下跌{down}家（平盘{flat}家），涨停{limit_up if limit_up else '—'}只、跌停{limit_down if limit_down else '—'}只，最高{max(lianban.get('max_height', 0) or 0, 0)}连板。{etf_word}，成交量{'为全天量' if is_after_close else '为盘中半日量'}。
 
 ---
 

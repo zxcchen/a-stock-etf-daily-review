@@ -35,10 +35,19 @@ def em_get(url, params=None, headers=None, timeout=15, **kwargs):
     wait = EM_MIN_INTERVAL - (time.time() - _em_last_call[0])
     if wait > 0:
         time.sleep(wait + random.uniform(0.1, 0.3))
-    try:
-        return EM_SESSION.get(url, params=params, headers=headers, timeout=timeout, **kwargs)
-    finally:
-        _em_last_call[0] = time.time()
+    # push2 主域名被风控断连时，自动回退 push2delay 延迟行情域名（2026-08-13验证可用）
+    alt_url = url.replace("push2.eastmoney.com", "push2delay.eastmoney.com")
+    last_err = None
+    for u in [url, alt_url]:
+        try:
+            r = EM_SESSION.get(u, params=params, headers=headers, timeout=timeout, **kwargs)
+            if r.status_code == 200:
+                return r
+            last_err = f"HTTP {r.status_code}"
+        except Exception as e:
+            last_err = e
+            time.sleep(random.uniform(0.5, 1.5))
+    raise last_err if last_err else Exception("em_get failed")
 
 
 # ============================================================

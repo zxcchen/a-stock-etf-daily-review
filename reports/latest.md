@@ -20,22 +20,27 @@
 
 ## 二、市场情绪数据
 
-| 指标 | 数值 | 指标 | 数值 |
-|------|------|------|------|
-| 两市成交额 | 25,509亿 | 涨停家数 | 数据待补录 |
-| 上涨家数 | 数据待补录 | 跌停家数 | 数据待补录 |
-| 下跌家数 | 数据待补录 | 炸板家数 | 数据待补录 |
-| 平盘家数 | 数据待补录 | 炸板率 | 数据待补录 |
-| 连板最高高度 | 数据待补录 | 昨日连板晋级率 | 数据待补录 |
-| 上涨占比 | 0.0% | 连板股总数 | 数据待补录 |
+| 指标 | 数值 |
+|------|------|
+| 两市成交额 | 25,509亿 |
+| 上涨家数 | 1142 |
+| 下跌家数 | 4317 |
+| 平盘家数 | 90 |
+| 连板最高高度 | 5板 |
+| 上涨占比 | 20.6% |
+
+> 涨停62只 / 跌停4只 / 连板股总数59只。
 
 ### 连板梯队
 
-| 高度 | 个股 | 板块 |
-|------|------|------|
-| 数据待补录 | 数据待补录 | 数据待补录 |
+| 高度 | 个股（板块） |
+|------|------------|
+| 5板 | 秦安股份(汽车零部) |
+| 4板 | 北京文化(影视院线)、皇氏集团(饮料乳品)、蓝盾光电(通用设备)、同力天启(专用设备)、京投发展(房地产开)、一鸣食品(饮料乳品) |
+| 3板 | 城地香江(IT服务Ⅱ)、亚泰集团(综合Ⅱ) |
+| 2板 | 坤泰股份(汽车零部)、金 螳 螂(装修装饰)、澳洋健康(医疗服务)、兆日科技(计算机设)、中鼎股份(汽车零部)、华西股份(化学纤维)、惠天热电(电力)、风语筑(数字媒体)、誉衡药业(化学制药)、江河集团(装修装饰)、天洋新材(塑料)、德龙汇能(燃气Ⅱ) |
 
-> 市场涨跌家数数据待补录。ETF全面下跌，科创新材领跌，成交量为全天量。
+> 上涨1142家 vs 下跌4317家（平盘90家），涨停62只、跌停4只，最高5连板。ETF全面下跌，科创新材领跌，成交量为全天量。
 
 ---
 
@@ -73,7 +78,7 @@
 
 ## 五、资金流向
 
-> 数据时间：2026-08-13 15:07:43
+> 数据时间：2026-08-13 16:06:49
 
 ### 5.1 大盘资金流总览
 
@@ -114,21 +119,31 @@
 
 | 排名 | 行业 | 涨跌幅 | 主力净流入(亿) | 超大单(亿) | 主力净占比% |
 |------|------|--------|--------------|-----------|------------|
-| 1 | 医药生物 | <span style="color:red">+1.85%</span> | — | — | — |
-| 2 | 电力 | <span style="color:red">+1.32%</span> | — | — | — |
-| 3 | 公用事业 | <span style="color:red">+0.95%</span> | — | — | — |
-| 4 | 银行Ⅱ | <span style="color:red">+0.42%</span> | — | — | — |
-| 5 | 医疗服务 | <span style="color:red">+1.68%</span> | — | — | — |
+| 1 | 医药生物 | <span style="color:red">+1.51%</span> | <span style="color:red">+45.24</span> | <span style="color:red">+28.62</span> | 2.13 |
+| 2 | 电力 | <span style="color:red">+0.39%</span> | <span style="color:red">+36.10</span> | <span style="color:red">+37.05</span> | 6.29 |
+| 3 | 公用事业 | <span style="color:red">+0.19%</span> | <span style="color:red">+35.39</span> | <span style="color:red">+37.45</span> | 5.76 |
+| 4 | 银行Ⅱ | <span style="color:red">+0.29%</span> | <span style="color:red">+18.85</span> | <span style="color:red">+15.46</span> | 7.98 |
+| 5 | 医疗服务 | <span style="color:red">+3.90%</span> | <span style="color:red">+15.99</span> | <span style="color:red">+10.97</span> | 2.72 |
+| 6 | 中药Ⅱ | <span style="color:red">+1.66%</span> | <span style="color:red">+11.81</span> | <span style="color:red">+7.39</span> | 5.63 |
+| 7 | 计算机设备 | <span style="color:green">-0.77%</span> | <span style="color:red">+8.06</span> | <span style="color:red">+8.44</span> | 1.78 |
+| 8 | 生物制品 | <span style="color:red">+2.14%</span> | <span style="color:red">+7.64</span> | <span style="color:red">+3.20</span> | 3.17 |
+| 9 | 证券Ⅱ | <span style="color:red">+0.29%</span> | <span style="color:red">+6.84</span> | <span style="color:red">+4.60</span> | 2.21 |
+| 10 | 通信 | <span style="color:green">-0.33%</span> | <span style="color:red">+6.11</span> | <span style="color:red">+7.02</span> | 0.28 |
 
 **主力净流出TOP10：**
 
 | 排名 | 行业 | 涨跌幅 | 主力净流出(亿) | 超大单(亿) | 主力净占比% |
 |------|------|--------|--------------|-----------|------------|
-| 1 | 电子 | <span style="color:green">-2.15%</span> | — | — | — |
-| 2 | 有色金属 | <span style="color:green">-2.88%</span> | — | — | — |
-| 3 | 半导体 | <span style="color:green">-2.45%</span> | — | — | — |
-| 4 | 元件 | <span style="color:green">-2.12%</span> | — | — | — |
-| 5 | 小金属 | <span style="color:green">-2.55%</span> | — | — | — |
+| 1 | 电子 | <span style="color:green">-1.60%</span> | <span style="color:green">-170.20</span> | <span style="color:green">-101.27</span> | -2.40 |
+| 2 | 有色金属 | <span style="color:green">-2.82%</span> | <span style="color:green">-167.65</span> | <span style="color:green">-95.25</span> | -10.58 |
+| 3 | 半导体 | <span style="color:green">-1.96%</span> | <span style="color:green">-98.00</span> | <span style="color:green">-71.37</span> | -2.72 |
+| 4 | 元件 | <span style="color:green">-1.85%</span> | <span style="color:green">-45.85</span> | <span style="color:green">-28.45</span> | -3.01 |
+| 5 | 小金属 | <span style="color:green">-2.70%</span> | <span style="color:green">-43.83</span> | <span style="color:green">-29.65</span> | -9.87 |
+| 6 | 基础化工 | <span style="color:green">-1.65%</span> | <span style="color:green">-41.79</span> | <span style="color:green">-21.57</span> | -3.46 |
+| 7 | 贵金属 | <span style="color:green">-5.50%</span> | <span style="color:green">-34.37</span> | <span style="color:green">-21.70</span> | -12.40 |
+| 8 | 机械设备 | <span style="color:green">-1.58%</span> | <span style="color:green">-28.92</span> | <span style="color:green">-11.16</span> | -1.57 |
+| 9 | 电力设备 | <span style="color:green">-1.21%</span> | <span style="color:green">-28.09</span> | <span style="color:green">-6.65</span> | -1.53 |
+| 10 | 建筑材料 | <span style="color:green">-1.88%</span> | <span style="color:green">-21.94</span> | <span style="color:green">-11.66</span> | -6.61 |
 
 ### 5.5 指数量能观察
 
@@ -220,9 +235,9 @@
 |---------|---------|------|
 | 科创50单日跌幅>5% | 1.11% | ✗ |
 | 半导体ETF跌幅>5% | 1.84% | ✗ |
-| 下跌家数>3500 | 待补录 | ✗ |
+| 下跌家数>3500 | 4317 | ✓ |
 | 两市成交额>2万亿 | 25,509亿 | ✓ |
-| 跌停家数>50 | 待补录 | ✗ |
+| 跌停家数>50 | 4 | ✗ |
 
 ---
 
@@ -230,18 +245,18 @@
 
 | 条件 | 代号 | 阈值 | 今日数值 | 是否触发 |
 |------|------|------|---------|---------|
-| 下跌家数 | A | > 3500家 | 待补录家 | ✗ |
+| 下跌家数 | A | > 3500家 | 4317家 | ✓ |
 | ETF放量倍数 | B | ≥ 2只ETF ≥ 1.5x | 0只≥1.5x | ✗ |
 | 两市成交额 | C | > 2万亿 | 25,509亿 | ✓ |
-| 跌停家数 | D | > 50家 | 待补录家 | ✗ |
+| 跌停家数 | D | > 50家 | 4家 | ✗ |
 
 ---
 
 ## 十三、【V3.0】信号等级评级
 
-**当前星级：⭐（1/4星）**
+**当前星级：⭐⭐（2/4星）**
 
-- A条件（下跌家数>3500）：✗ 未触发（或数据待补）
+- A条件（下跌家数>3500）：✓ 触发
 - B条件（≥2只ETF放量≥1.5x）：✗ 未触发
 - C条件（两市成交>2万亿）：✓ 触发
 - D条件（跌停>50家）：✗ 未触发（或数据待补）

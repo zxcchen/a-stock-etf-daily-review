@@ -370,55 +370,69 @@ def ths_hot_reason(date_str=None):
 # ============================================================
 
 def get_market_breadth():
-    """获取市场涨跌家数 - 通过东财全市场列表（使用urllib绕过代理）"""
+    """获取市场涨跌家数 - 东财全市场列表（多域名回退 + 分页拉全量）"""
     import ssl
-    base_url = "https://push2.eastmoney.com/api/qt/clist/get"
-    headers = {"User-Agent": UA}
+    headers = {"User-Agent": UA, "Referer": "https://data.eastmoney.com/"}
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+
+    # 主域名 push2 被风控时回退 push2delay（延迟行情域名，2026-08-13验证可用）
+    domains = [
+        "https://push2.eastmoney.com",
+        "https://push2delay.eastmoney.com",
+    ]
+    fs = "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23"
+
+    def em_get(params, retries=3):
+        for dom in domains:
+            for attempt in range(retries):
+                try:
+                    req = urllib.request.Request(f"{dom}/api/qt/clist/get?{params}", headers=headers)
+                    resp = urllib.request.urlopen(req, timeout=20, context=ctx)
+                    return json.loads(resp.read().decode("utf-8"))
+                except Exception as e:
+                    print(f"    [WARN] breadth {dom.split('//')[1][:24]} attempt{attempt+1}: {str(e)[:50]}")
+                    time.sleep(1.5 + attempt * 2)
+        return None
 
     try:
-        # 获取总数
-        params1 = "pn=1&pz=1&po=1&np=1&fltt=2&invt=2&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23&fields=f2,f3,f4,f12,f14"
-        url1 = f"{base_url}?{params1}"
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        req1 = urllib.request.Request(url1, headers=headers)
-        resp1 = urllib.request.urlopen(req1, timeout=15, context=ctx)
-        d = json.loads(resp1.read().decode("utf-8"))
-        total = d.get("data", {}).get("total", 0)
+        d = em_get(f"pn=1&pz=1&po=1&np=1&fltt=2&invt=2&fs={fs}&fields=f2,f3,f4,f12,f14")
+        total = d.get("data", {}).get("total", 0) if d else 0
+        if not total:
+            return {"total": 0, "up": 0, "down": 0, "flat": 0, "limit_up": 0, "limit_down": 0}
 
-        # 拉取所有股票涨跌统计
-        up = down = flat = 0
-        limit_up = limit_down = 0
-        params2 = "pn=1&pz=5000&po=1&np=1&fltt=2&invt=2&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23&fields=f2,f3,f4,f6,f8,f12,f14"
-        url2 = f"{base_url}?{params2}"
-        req2 = urllib.request.Request(url2, headers=headers)
-        resp2 = urllib.request.urlopen(req2, timeout=15, context=ctx)
-        d2 = json.loads(resp2.read().decode("utf-8"))
-        items = d2.get("data", {}).get("diff", [])
-        for item in items:
-            pct_raw = item.get("f3", 0)
-            try:
-                pct = float(pct_raw) if pct_raw else 0
-            except (ValueError, TypeError):
-                pct = 0
-            if pct > 0:
-                up += 1
-            elif pct < 0:
-                down += 1
-            else:
-                flat += 1
-            code = str(item.get("f12", ""))
-            if code.startswith(("300", "688")):
-                if pct >= 19.5:
-                    limit_up += 1
-                elif pct <= -19.5:
-                    limit_down += 1
-            else:
-                if pct >= 9.9:
-                    limit_up += 1
-                elif pct <= -9.9:
-                    limit_down += 1
+        # 分页拉全量（push2 每页上限100条）
+        up = down = flat = limit_up = limit_down = 0
+        pages = (total + 99) // 100
+        for pn in range(1, pages + 1):
+            d2 = em_get(f"pn={pn}&pz=100&po=1&np=1&fltt=2&invt=2&fs={fs}&fields=f2,f3,f4,f6,f8,f12,f14")
+            if not d2 or not d2.get("data") or not d2["data"].get("diff"):
+                print(f"    [WARN] 第{pn}页失败")
+                continue
+            for item in d2["data"]["diff"]:
+                try:
+                    pct = float(item.get("f3", 0)) if item.get("f3") else 0
+                except (ValueError, TypeError):
+                    pct = 0
+                if pct > 0:
+                    up += 1
+                elif pct < 0:
+                    down += 1
+                else:
+                    flat += 1
+                code = str(item.get("f12", ""))
+                if code.startswith(("300", "688")):
+                    if pct >= 19.5:
+                        limit_up += 1
+                    elif pct <= -19.5:
+                        limit_down += 1
+                else:
+                    if pct >= 9.9:
+                        limit_up += 1
+                    elif pct <= -9.9:
+                        limit_down += 1
+            time.sleep(0.2)
 
         return {
             "total": total,
@@ -431,6 +445,45 @@ def get_market_breadth():
     except Exception as e:
         print(f"[WARN] market breadth: {e}")
         return {"total": 0, "up": 0, "down": 0, "flat": 0, "limit_up": 0, "limit_down": 0}
+
+
+def get_lianban():
+    """获取涨停板池/连板数据 - 东财涨停板池 getTopicZTPool"""
+    import ssl
+    headers = {"User-Agent": UA, "Referer": "https://quote.eastmoney.com/"}
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    today = date.today().strftime("%Y%m%d")
+
+    url = ("https://push2ex.eastmoney.com/getTopicZTPool?"
+           "ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt"
+           f"&Pageindex=0&pagesize=300&sort=fbt:asc&date={today}")
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        resp = urllib.request.urlopen(req, timeout=15, context=ctx)
+        d = json.loads(resp.read().decode("utf-8"))
+        pool = d.get("data", {}).get("pool", []) if d else []
+        lianban = []
+        for p in pool:
+            lianban.append({
+                "code": p.get("c", ""),
+                "name": p.get("n", ""),
+                "lbc": int(p.get("lbc", 1) or 1),
+                "industry": p.get("hybk", ""),
+                "zt_count": p.get("zttj", ""),
+                "days": p.get("days", 0),
+                "first_time": p.get("fbt", ""),
+            })
+        lianban.sort(key=lambda x: -x["lbc"])
+        return {
+            "max_height": lianban[0]["lbc"] if lianban else 0,
+            "total_count": len(lianban),
+            "pool": lianban,
+        }
+    except Exception as e:
+        print(f"[WARN] lianban pool: {e}")
+        return {"max_height": 0, "total_count": 0, "pool": []}
 
 
 # ============================================================
@@ -510,6 +563,12 @@ def main():
     output["market_breadth"] = breadth
     print(f"  上涨={breadth['up']} 下跌={breadth['down']} 平盘={breadth['flat']}")
     print(f"  涨停={breadth['limit_up']} 跌停={breadth['limit_down']}")
+
+    # --- 6.5 涨停板池/连板 ---
+    print("[6.5/8] 拉取涨停板池/连板数据...")
+    lianban = get_lianban()
+    output["lianban"] = lianban
+    print(f"  连板最高={lianban['max_height']}板 连板股={lianban['total_count']}只")
 
     # --- 7. 行业排名 ---
     print("[7/8] 拉取行业板块排名...")
