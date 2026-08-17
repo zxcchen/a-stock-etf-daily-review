@@ -11,16 +11,21 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 from fetch_data import get_klines, calc_indicators
 
 STOCKS = [
+    # ⚠️ 2026-08-14 用户全部清仓，个股追踪列表已清空（000920/603290/000063/002803）
     # 600160 巨化股份 已于2026-08-12清仓，停止追踪
-    ("000920", "沃顿科技", 0, "环保/膜材料"),
-    ("603290", "斯达半导", 1, "半导体/IGBT"),
-    ("000063", "中兴通讯", 0, "通信设备/5G"),
-    ("002803", "吉宏股份", 0, "跨境电商"),
+    # 如需恢复追踪，在此添加元组 (代码, 名称, 市场, 行业)
 ]
 
 def main():
     output = {}
     today_str = date.today().strftime("%Y%m%d")
+
+    # 2026-08-14 用户全部清仓，个股追踪列表已清空：脚本直接退出，不采集
+    if not STOCKS:
+        output["trading_day"] = False
+        output["note"] = "个股追踪列表已清空（2026-08-14用户全部清仓），不再采集个股数据"
+        print(json.dumps(output, ensure_ascii=False, indent=2))
+        return
 
     # Step 1: 确认交易日 - 查首只追踪股近3根日线
     check_code = STOCKS[0][0]

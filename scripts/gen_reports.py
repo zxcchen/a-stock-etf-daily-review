@@ -18,16 +18,20 @@ ETF_FULL_NAMES = {
     "588160": "科创新材ETF", "515050": "5GETF", "588460": "科创增强ETF",
 }
 
-# ETF实际持仓（来自东财账户截图，2026-08-12更新）
-# 说明：510300/588000/159915/512480/588160 于8/10清仓；当前仅持有515050和588460
+# ETF实际持仓（来自东财账户截图，2026-08-13更新）
+# 说明：全部ETF已于8/10、8/14分批清仓。8/14用户判定反弹结束，全仓转国债/逆回购
+# 8/14最后清仓记录：515050=9400股成本1.023；588460=5300股成本2.0835（用户规则：破成本线即走，均已触发/主动清仓）
+# break_price 保留作为"若重新进场"的参考位
+# 个股追踪开关：2026-08-14 用户全部清仓 → False（不再生成个股追踪数据/报告）；ETF追踪保留
+TRACK_STOCKS = False
 ETF_HOLDINGS = {
     "510300": {"shares": 0, "cost": 4.721, "break_price": 4.591},
     "588000": {"shares": 0, "cost": 1.806, "break_price": 1.635},
     "159915": {"shares": 0, "cost": 3.566, "break_price": 3.300},
     "512480": {"shares": 0, "cost": 1.057, "break_price": 0.919},
     "588160": {"shares": 0, "cost": 1.102, "break_price": 0.951},
-    "515050": {"shares": 9500, "cost": 1.044, "break_price": 0.887},
-    "588460": {"shares": 4700, "cost": 2.124, "break_price": 1.880},
+    "515050": {"shares": 0, "cost": 1.023, "break_price": 0.887},
+    "588460": {"shares": 0, "cost": 2.0835, "break_price": 1.880},
 }
 
 def load_data():
@@ -482,6 +486,8 @@ def gen_fund_flow_section(main):
     5.6 资金面观察要点（AI研判 + 手动补录区）
     """
     ff = main.get("fund_flow") or {}
+    fetch_time = (main.get("meta") or {}).get("fetch_time") or ""
+    is_after_close = int(fetch_time[11:13]) >= 15 if len(fetch_time) >= 13 else False
     lines = []
     lines.append("## 五、资金流向")
 
@@ -532,7 +538,7 @@ def gen_fund_flow_section(main):
         else:
             lines.append("| 北向资金 | — | 数据待补录 |")
         if total_amt:
-            lines.append(f"| 两市总成交额 | **{total_amt:.0f}亿** | 上证+深成（盘中） |")
+            lines.append(f"| 两市总成交额 | **{total_amt:.0f}亿** | 上证+深成（{'收盘' if is_after_close else '盘中'}） |")
     else:
         lines.append("\n| 资金类型 | 净流入(亿) | 说明 |")
         lines.append("|---------|-----------|------|")
@@ -716,6 +722,8 @@ def gen_fund_flow_analysis_section(main):
     - 资金面综合结论
     """
     ff = main.get("fund_flow") or {}
+    fetch_time = (main.get("meta") or {}).get("fetch_time") or ""
+    is_after_close = int(fetch_time[11:13]) >= 15 if len(fetch_time) >= 13 else False
     market = ff.get("market") or {}
     nb = ff.get("northbound") or {}
     in_top = (ff.get("industry_flow") or {}).get("in_top") or []
@@ -788,11 +796,11 @@ def gen_fund_flow_analysis_section(main):
         max_r = max(ratios)
         min_r = min(ratios)
         if max_r >= 1.5:
-            lines.append(f"- 全市场**放量**（量比{min_r:.1f}~{max_r:.1f}倍），成交额{total_amt:.0f}亿（盘中）。放量上涨真实性强于缩量上涨。")
+            lines.append(f"- 全市场**放量**（量比{min_r:.1f}~{max_r:.1f}倍），成交额{total_amt:.0f}亿（{'收盘' if is_after_close else '盘中'}）。放量上涨真实性强于缩量上涨。")
         elif max_r >= 1.2:
-            lines.append(f"- 温和放量（量比{min_r:.1f}~{max_r:.1f}倍），成交额{total_amt:.0f}亿（盘中）。")
+            lines.append(f"- 温和放量（量比{min_r:.1f}~{max_r:.1f}倍），成交额{total_amt:.0f}亿（{'收盘' if is_after_close else '盘中'}）。")
         else:
-            lines.append(f"- 量能不足（量比{min_r:.1f}~{max_r:.1f}倍），成交额{total_amt:.0f}亿（盘中）。**缩量上涨本质是资金不足**，追高需谨慎。")
+            lines.append(f"- 量能不足（量比{min_r:.1f}~{max_r:.1f}倍），成交额{total_amt:.0f}亿（{'收盘' if is_after_close else '盘中'}）。**缩量上涨本质是资金不足**，追高需谨慎。")
     hgt = nb.get("hgt_yi")
     sgt = nb.get("sgt_yi")
     nb_total = nb.get("total_yi")
@@ -861,6 +869,12 @@ def generate_dashboard(main, extra):
     sh_amt = idx["000001"]["amount_wan"] / 10000  # 万→亿
     sz_amt = idx["399001"]["amount_wan"] / 10000
     total_amt = sh_amt + sz_amt
+
+    # 量比（fund_flow.volume 腾讯量比，用于总结表资金强弱判断）
+    _vol = (main.get("fund_flow") or {}).get("volume") or {}
+    _ratios5 = [v.get("ratio_5d") for v in _vol.values() if v.get("ratio_5d") is not None]
+    max_ratio_5d = max(_ratios5) if _ratios5 else 0
+    min_ratio_5d = min(_ratios5) if _ratios5 else 0
 
     # 涨跌家数
     up = breadth.get("up", 0)
@@ -945,7 +959,7 @@ def generate_dashboard(main, extra):
         down_names = "、".join(ETF_SHORT_NAMES[c] for c in down_etfs)
         etf_word = f"ETF涨跌分化（{up_names}涨，{down_names}跌）"
 
-    report = f"""# A股每日复盘 V3.0 — ETF异动择时模型
+    report = f"""# A股每日复盘 V4.1 — ETF异动择时模型
 
 **日期：{datetime.now().strftime('%Y年%m月%d日')}| {session_label}（{fetch_time[-8:]}）| 数据源：mootdx + 腾讯财经 + 东财 + 同花顺**
 
@@ -1003,7 +1017,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 三、【V3.0】ETF放量倍数量化表
+## 三、ETF放量倍数量化表
 
 | ETF | 今日成交额（亿） | 昨日成交额（亿） | 近5日均值（亿） | 放量倍数 |
 |-----|----------------|----------------|---------------|---------|
@@ -1072,12 +1086,21 @@ def generate_dashboard(main, extra):
         top_str = "、".join(f"{ind['name']}（{'+' if ind['change_pct'] > 0 else ''}{ind['change_pct']:.2f}%）" for ind in top_ind)
         bottom_str = "、".join(f"{ind['name']}（{ind['change_pct']:.2f}%）" for ind in bottom_ind)
     else:
-        # 用ETF数据代替
-        top_str = "、".join(f"{ETF_SHORT_NAMES[c]}ETF（{'+' if chg > 0 else ''}{chg:.2f}%）" for c, chg in sorted(etf_changes, key=lambda x: x[1], reverse=True))
-        bottom_str = top_str
+        # 用ETF数据代替（按涨跌分组，避免涨幅/跌幅方向重复）
+        up_etfs = sorted(((c, chg) for c, chg in etf_changes if chg > 0), key=lambda x: x[1], reverse=True)
+        down_etfs = sorted(((c, chg) for c, chg in etf_changes if chg <= 0), key=lambda x: x[1])
+        if up_etfs:
+            top_str = "、".join(f"{ETF_SHORT_NAMES[c]}ETF（{'+'}{chg:.2f}%）" for c, chg in up_etfs)
+        else:
+            top_str = "无（ETF全线下跌）"
+        if down_etfs:
+            bottom_str = "、".join(f"{ETF_SHORT_NAMES[c]}ETF（{chg:.2f}%）" for c, chg in down_etfs)
+        else:
+            bottom_str = "无（ETF全线飘红）"
 
     # 动态判断市场风格
-    tech_up = idx['000688']['change_pct'] > 0 and etf['512480']['change_pct'] > 0
+    # 成长科技：创业板/科创50走强 且 半导体或5G通信ETF上涨（2026-08-14修正：加入创业板>0.5%与5G通信，避免科创50平盘误判）
+    tech_up = (idx['399006']['change_pct'] > 0.5 or idx['000688']['change_pct'] > 0) and (etf['512480']['change_pct'] > 0 or etf['515050']['change_pct'] > 1.0)
     big_value_up = idx['000300']['change_pct'] > 0
     if tech_up:
         style_main = "成长科技"
@@ -1118,7 +1141,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 八、【V3.0】融资融券数据
+## 八、融资融券数据
 
 | 指标 | 数值 |
 |------|------|
@@ -1152,7 +1175,7 @@ def generate_dashboard(main, extra):
 
 {etf_change_str}。
 
-**B条件状态：** 盘中放量倍数均低于1.0x（半日量），需观察尾盘是否放量。当前B条件未触发。
+**B条件状态：** {'收盘确认：放量倍数均低于1.5x，B条件未触发。' if is_after_close else '盘中放量倍数均低于1.0x（半日量），需观察尾盘是否放量。当前B条件未触发。'}
 
 ---
 
@@ -1160,15 +1183,15 @@ def generate_dashboard(main, extra):
 
 | 风险指标 | 今日状态 | 触发 |
 |---------|---------|------|
-| 科创50单日跌幅>5% | {abs(idx['000688']['change_pct']):.2f}% | {"✓" if abs(idx['000688']['change_pct']) > 5 else "✗"} |
-| 半导体ETF跌幅>5% | {abs(etf['512480']['change_pct']):.2f}% | {"✓" if abs(etf['512480']['change_pct']) > 5 else "✗"} |
+| 科创50单日跌幅>5% | {idx['000688']['change_pct']:.2f}% | {"✓" if idx['000688']['change_pct'] < -5 else "✗"} |
+| 半导体ETF跌幅>5% | {etf['512480']['change_pct']:.2f}% | {"✓" if etf['512480']['change_pct'] < -5 else "✗"} |
 | 下跌家数>3500 | {down if down else "待补录"} | {"✓" if down and down > 3500 else "✗"} |
 | 两市成交额>2万亿 | {total_amt:,.0f}亿 | {"✓" if total_amt > 20000 else "✗"} |
 | 跌停家数>50 | {limit_down if limit_down else "待补录"} | {"✓" if limit_down and limit_down > 50 else "✗"} |
 
 ---
 
-## 十二、【V3.0】信号阈值检测表
+## 十二、信号阈值检测表
 
 | 条件 | 代号 | 阈值 | 今日数值 | 是否触发 |
 |------|------|------|---------|---------|
@@ -1179,7 +1202,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 十三、【V3.0】信号等级评级
+## 十三、信号等级评级
 
 **当前星级：{"⭐" * star}（{star}/4星）**
 
@@ -1192,7 +1215,7 @@ def generate_dashboard(main, extra):
 
 ---
 
-## 十四、【V3.0】跨市场参考数据
+## 十四、跨市场参考数据
 
 | 指标 | 数值 | 涨跌 |
 |------|------|------|
@@ -1212,12 +1235,12 @@ def generate_dashboard(main, extra):
 | 维度 | 状态 |
 |------|------|
 | 市场情绪 | {style_desc} |
-| 资金强弱 | {'放量' if total_amt > 15000 else '缩量'}（盘中{total_amt:,.0f}亿） |
+| 资金强弱 | {'放量' if max_ratio_5d >= 1.5 else '温和放量' if max_ratio_5d >= 1.2 else '缩量/平量'}（{total_amt:,.0f}亿，量比{min_ratio_5d:.1f}~{max_ratio_5d:.1f}x，{'收盘' if is_after_close else '盘中'}） |
 | ETF状态 | {etf_word} |
 | 市场风格 | {style_main} |
 | 是否极端 | {'是' if abs(worst_idx[1]) > 5 or abs(min(c for _, c in etf_changes)) > 5 else '否'} |
-| 是否ETF异动 | 否（放量倍数均<1.0x{vol_label}） |
-| 是否值得跟踪 | 是（关注收盘后B条件是否触发） |
+| 是否ETF异动 | 否（放量倍数均<1.5x{vol_label}） |
+| 是否值得跟踪 | {'否（B条件未触发，等待重新进场信号）' if is_after_close else '是（关注收盘后B条件是否触发）'} |
 | 外部环境 | {style_desc} |
 
 ---
@@ -1359,7 +1382,7 @@ def generate_analysis(main, extra):
 
 ## 三、K线形态综合分析
 
-> ⚠️ **大盘处于年线下方，任何反弹结构都需警惕K线形态信号。** 以下为7只ETF + 4只追踪个股的最新K线形态检测。
+> ⚠️ **大盘处于年线下方，任何反弹结构都需警惕K线形态信号。** 以下为7只ETF的最新K线形态检测（个股追踪已于2026-08-14停止）。
 
 ### ETF K线形态 + 分时走势汇总
 
@@ -1389,39 +1412,13 @@ def generate_analysis(main, extra):
         signal = pats[0][1][:30] + "..." if pats and len(pats[0][1]) > 30 else (pats[0][1] if pats else "—")
         report += f"| {code} {ETF_SHORT_NAMES.get(code, '')} | {pat_names} | {dir_str} | {intraday_str} | {vol_str} | {combined_str} | {signal} |\n"
 
-    report += f"""
-### 个股 K线形态 + 分时走势汇总
+    # ⚠️ 2026-08-14 个股追踪已停止（用户全部清仓），不再生成个股K线形态表
 
-| 个股 | 今日形态 | 方向 | 分时走势 | 量能 | 综合信号 | 关键信号 |
-|-----|---------|------|---------|------|---------|---------|
-"""
-    for code in ["000920", "603290", "000063", "002803"]:
-        kl = stock_klines.get(code, [])
-        pats, overall = detect_kline_patterns(kl)
-        intraday = analyze_intraday_pattern(kl)
-        if pats:
-            pat_names = ", ".join(p[0] for p in pats)
-            dir_str = overall
-        else:
-            pat_names = "无特殊形态"
-            dir_str = "中性"
-        intraday_str = intraday["intraday_pattern"] if intraday else "—"
-        vol_str = intraday["vol_desc"] if intraday else "—"
-        combined_str = intraday["combined_signal"] if intraday else "—"
-        signal = pats[0][1][:30] + "..." if pats and len(pats[0][1]) > 30 else (pats[0][1] if pats else "—")
-        report += f"| {code} {stock_names_local.get(code, '')} | {pat_names} | {dir_str} | {intraday_str} | {vol_str} | {combined_str} | {signal} |\n"
-
-    # Count bullish/bearish patterns
+    # Count bullish/bearish patterns (仅ETF，个股追踪已停止)
     all_bullish = 0
     all_bearish = 0
     for code in ETFS:
         kl = etf_klines.get(code, [])
-        pats, _ = detect_kline_patterns(kl)
-        for _, _, d in pats:
-            if d in ("看多", "偏多"): all_bullish += 1
-            elif d in ("看空", "偏空"): all_bearish += 1
-    for code in ["000920", "603290", "000063", "002803"]:
-        kl = stock_klines.get(code, [])
         pats, _ = detect_kline_patterns(kl)
         for _, _, d in pats:
             if d in ("看多", "偏多"): all_bullish += 1
@@ -1477,28 +1474,29 @@ def generate_analysis(main, extra):
 
 ## 六、仓位状态建议
 
-**总资产：514,503元**（三账户合计：东财389,725 + 国金61,088 + 广发63,689）
-- ETF持仓市值：约{sum(etf[code]["price"] * ETF_HOLDINGS[code]["shares"] for code in ETFS):,.0f}元（515050+588460，东财账户）
-- 个股持仓市值：约109,071元（4只追踪，分散在广发/国金账户）
-- 可用现金：约46,536元 + 逆回购339,000元（可随时释放）
-- ETF总浮盈亏：{sum(calc_pnl(code)[1] for code in ETFS):+,.0f}元
+**总资产：约513,513元**（三账户合计：东财360,072 + 国金60,591 + 广发92,850，2026-08-13截图；8/14开盘已全部清仓）
+- **ETF持仓：已清仓**（515050/588460于8/14开盘卖出，全仓离场）
+- **个股持仓：已清仓**（000920/000063/002803/603290于8/14开盘卖出）
+- **当前状态：100%现金/国债逆回购**（GC001/GC003滚动持有，等待重新进场信号）
+- 8/14清仓总浮盈亏：{sum(calc_pnl(code)[1] for code in ETFS):+,.0f}元（ETF部分，按8/13收盘价估算）
 
-### ETF仓位建议（趋势破位止损策略）
+### ETF仓位建议（8/14起：空仓观望）
 
-| ETF | 持仓/成本 | 最新价 | 浮盈亏 | 8/5启动阳线低位 | 建议 |
+| ETF | 8/14清仓价 | 成本 | 清仓盈亏 | 若重新进场参考位 | 建议 |
 |-----|---------|--------|--------|----------------|------|
 """
     for code in ETFS:
-        report += f"| {code} | {ETF_HOLDINGS[code]['shares']}股/{ETF_HOLDINGS[code]['cost']:.3f} | {etf[code]['price']:.3f} | {calc_pnl(code)[0]:+.2f}% | {ETF_HOLDINGS[code]['break_price']:.3f} | {'持有' if etf[code]['price'] > ETF_HOLDINGS[code]['break_price'] else '关注止损'} |\n"
+        report += f"| {code} | {etf[code]['price']:.3f} | {ETF_HOLDINGS[code]['cost']:.3f} | {calc_pnl(code)[0]:+.2f}% | {ETF_HOLDINGS[code]['break_price']:.3f} | 空仓观望 |\n"
     report += f"""
-> 止损规则：跌破8/5启动阳线低位即走，不设固定百分比。
+> 清仓决策（2026-08-14用户执行）：用户判定此轮反弹结束（科创50高开低走破MA20、主力资金连续3日净流出），全仓转国债逆回购。
+> 重新进场条件：上证放量重新站上年线3971上方，或缩量回踩3862企稳后出现反转K线。
 
 ### 闲置资金操作建议
 
-约2万元可用资金暂不动，等待更清晰信号。原因：
-1. {'B条件未触发（放量倍数均<1.5x），ABCD模型无买入信号' if b_count == 0 else f'B条件触发{b_count}只，关注C条件确认'}
-2. ETF持仓{'全部站上8/5启动阳线低位，趋势修复中' if all(etf[c]['price'] > ETF_HOLDINGS[c]['break_price'] for c in ETFS) else '部分仍在启动阳线低位下方，需观察'}
-3. 个股方向根据技术指标灵活操作，不急于加仓
+**当前100%资金在国债逆回购（GC001/GC003滚动持有）**，年化约2%：
+1. 空仓不焦虑，逆回购每天有利息（51万×2%≈28元/天）
+2. ABCD模型无买入信号，等大盘重新走强再进场
+3. 原持仓（515050/588460/4只个股）进入观察名单，反弹不追、破位不碰
 
 ---
 
@@ -1509,26 +1507,41 @@ def generate_analysis(main, extra):
 
 ### 2. 核心判断
 - **趋势判断：** {trend_summary}
-- **ETF策略：** 趋势破位止损，跌破8/5启动阳线低位即走
-- **个股策略：** 死扛等反转，依赖技术指标判断反转信号
-- **操作策略：** ETF执行纪律止损，个股死扛等反弹，现金不动
+- **当前状态：** 8/14已全部清仓（用户判定反弹结束），100%资金在国债逆回购
+- **个股策略：** 已清仓；原4只标的转入观察名单，等待重新进场信号
+- **操作策略：** 空仓观望，逆回购滚动持有；大盘重新站上年线3971前不进场
 
 ### 3. 关注点
-- 收盘后确认B条件是否触发
-- 7只ETF是否站稳8/5启动阳线低位上方
-- 个股技术指标变化（MACD/KDJ金叉/死叉）
+- 上证能否守住3862（MA20）——跌破则二次探底确认，反弹前不加仓
+- 大盘重新站上年线3971 = 重新进场信号
+- 原持仓（515050/588460/000920/000063/002803/603290）进入观察名单，跟踪技术指标变化
 
 ---
 
 **报告生成时间：** {fetch_time}
 **策略框架：** ETF异动择时模型 + 趋势跟踪 + ABCD四条件
-**仓位管理：** 总资产51.5万，ETF约2.0万（趋势破位止损）+ 个股约10.9万（死扛等反转）+ 可用约4.7万 + 逆回购33.9万
+**仓位管理：** 总资产约51.4万，**8/14已全部清仓**（ETF+个股），100%资金在国债逆回购（GC001/GC003滚动持有）；重新进场信号：上证放量站上年线3971，或缩量回踩3862企稳后出现反转K线
 """
     return report
 
 
 def generate_stock_tracking(main, extra):
     """生成个股追踪报告"""
+    # ⚠️ 2026-08-14 用户全部清仓，个股追踪已停止（ETF追踪保留在今日看板/复盘分析中）
+    if not TRACK_STOCKS:
+        report = f"""# 个股追踪报告 — {datetime.now().strftime('%Y年%m月%d日')}
+
+> ⚠️ **个股追踪已停止**（2026-08-14 用户全部清仓）
+
+原追踪标的（000920沃顿 / 603290斯达 / 000063中兴 / 002803吉宏）已于 2026-08-14 开盘全部清仓，
+用户判定此轮反弹结束，全仓转入国债逆回购。个股追踪自动化已取消。
+
+**当前追踪范围：仅 ETF**（今日看板 + 复盘分析，每日 15:00 自动化保留）。
+
+---
+"""
+        return report
+
     stock_klines = main.get("stock_klines", {})
     stock_indicators = main.get("stock_indicators", {})
     stock_quotes = main.get("stock_quotes", {})
@@ -1552,7 +1565,8 @@ def generate_stock_tracking(main, extra):
 > 数据时间：{fetch_time} | {session_label}
 > 数据源：mootdx K线 + 手动计算技术指标
 > 追踪标的：000920 / 603290 / 000063 / 002803
-> 注：600160 巨化股份已于2026-08-12清仓，停止追踪
+> 注1：600160 巨化股份已于2026-08-12清仓，停止追踪
+> 注2：⚠️ 2026-08-14 用户已全部清仓（判定反弹结束），以下标的仅作观察，不构成持仓
 
 ---
 

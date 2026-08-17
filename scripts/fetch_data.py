@@ -305,19 +305,30 @@ def eastmoney_global_news(page_size=20):
 
 
 def industry_comparison(top_n=20):
-    """全行业涨跌幅排名（使用urllib绕过代理）"""
+    """全行业涨跌幅排名（使用urllib绕过代理；push2被风控时回退push2delay）"""
     import ssl
-    base_url = "https://push2.eastmoney.com/api/qt/clist/get"
+    domains = [
+        "https://push2.eastmoney.com",
+        "https://push2delay.eastmoney.com",
+    ]
     params = "pn=1&pz=100&po=1&np=1&fltt=2&invt=2&fs=m:90+t:2&fields=f2,f3,f4,f12,f13,f14,f104,f105,f128,f136,f140,f141"
-    url = f"{base_url}?{params}"
     headers = {"User-Agent": UA}
     try:
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
-        req = urllib.request.Request(url, headers=headers)
-        resp = urllib.request.urlopen(req, timeout=15, context=ctx)
-        d = json.loads(resp.read().decode("utf-8"))
+        d = None
+        for dom in domains:
+            try:
+                req = urllib.request.Request(f"{dom}/api/qt/clist/get?{params}", headers=headers)
+                resp = urllib.request.urlopen(req, timeout=15, context=ctx)
+                d = json.loads(resp.read().decode("utf-8"))
+                if d:
+                    break
+            except Exception as e:
+                print(f"[WARN] industry {dom.split('//')[1][:24]}: {str(e)[:50]}")
+        if not d:
+            return {"top": [], "bottom": [], "total": 0}
         items = d.get("data", {}).get("diff", [])
         if not items:
             return {"top": [], "bottom": [], "total": 0}
@@ -385,12 +396,18 @@ def get_market_breadth():
     fs = "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23"
 
     def em_get(params, retries=3):
-        for dom in domains:
+        # 一旦主域名失败由 delay 域成功后，交换顺序，后续分页不再重复等待（2026-08-14优化）
+        for dom in list(domains):
             for attempt in range(retries):
                 try:
                     req = urllib.request.Request(f"{dom}/api/qt/clist/get?{params}", headers=headers)
                     resp = urllib.request.urlopen(req, timeout=20, context=ctx)
-                    return json.loads(resp.read().decode("utf-8"))
+                    data = json.loads(resp.read().decode("utf-8"))
+                    if data is not None:
+                        # 若成功的是 delay 域，把它的优先级提到最前
+                        if domains[0] != dom:
+                            domains.reverse()
+                        return data
                 except Exception as e:
                     print(f"    [WARN] breadth {dom.split('//')[1][:24]} attempt{attempt+1}: {str(e)[:50]}")
                     time.sleep(1.5 + attempt * 2)
