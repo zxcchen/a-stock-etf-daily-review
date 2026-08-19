@@ -1028,8 +1028,12 @@ def generate_dashboard(main, extra):
         ratio_str = f"{v.get('ratio', 0):.2f}x" if v.get('ratio') else "—"
         report += f"| {code} | {v.get('today', 0):.2f} | {v.get('yesterday', 0):.2f} | {v.get('avg5', 0):.2f} | {ratio_str} |\n"
 
+    if is_after_close:
+        b_summary = f"B条件（≥2只ETF≥1.5x）{'✓ 触发' if b_count >= 2 else '✗ 未触发'}，{b_count}只ETF放量≥1.5x。" if b_count > 0 else "B条件（≥2只ETF≥1.5x）✗ 未触发，7只ETF放量倍数均低于1.5x。"
+    else:
+        b_summary = '今日为盘中数据（未收盘），成交额为半日量。放量倍数偏低属正常。B条件（≥2只ETF≥1.5x）暂未触发。'
     report += f"""
-> {'B条件（≥2只ETF≥1.5x）暂未触发，7只ETF放量倍数均低于1.5x。' if is_after_close else '今日为盘中数据（未收盘），成交额为半日量。放量倍数偏低属正常。B条件（≥2只ETF≥1.5x）暂未触发。'}
+> {b_summary}
 """
 
     report += f"""
@@ -1175,7 +1179,7 @@ def generate_dashboard(main, extra):
 
 {etf_change_str}。
 
-**B条件状态：** {'收盘确认：放量倍数均低于1.5x，B条件未触发。' if is_after_close else '盘中放量倍数均低于1.0x（半日量），需观察尾盘是否放量。当前B条件未触发。'}
+**B条件状态：** {'收盘确认：' + ('B条件✓ 触发，' + str(b_count) + '只ETF放量≥1.5x。' if b_count >= 2 else 'B条件✗ 未触发，放量倍数均低于1.5x。') if is_after_close else '盘中放量倍数均低于1.0x（半日量），需观察尾盘是否放量。当前B条件未触发。'}
 
 ---
 
@@ -1239,8 +1243,8 @@ def generate_dashboard(main, extra):
 | ETF状态 | {etf_word} |
 | 市场风格 | {style_main} |
 | 是否极端 | {'是' if abs(worst_idx[1]) > 5 or abs(min(c for _, c in etf_changes)) > 5 else '否'} |
-| 是否ETF异动 | 否（放量倍数均<1.5x{vol_label}） |
-| 是否值得跟踪 | {'否（B条件未触发，等待重新进场信号）' if is_after_close else '是（关注收盘后B条件是否触发）'} |
+| 是否ETF异动 | {'是（' + str(b_count) + '只ETF放量≥1.5x）' if b_count >= 2 else '否（放量倍数均<1.5x' + vol_label + '）'} |
+| 是否值得跟踪 | {'是（B条件触发，' + str(b_count) + '只ETF放量≥1.5x，关注拐点）' if b_count >= 2 and is_after_close else '否（B条件未触发，等待重新进场信号）' if is_after_close else '是（关注收盘后B条件是否触发）'} |
 | 外部环境 | {style_desc} |
 
 ---
@@ -1461,7 +1465,7 @@ def generate_analysis(main, extra):
     report += f"""
 **B条件状态：** {b_count}只ETF ≥ 1.5x → {"✓ 触发" if b_count >= 2 else "✗ 未触发"}
 
-> {"收盘确认：B条件未触发，7只ETF放量倍数均低于1.5x。" if is_after_close else "⚠️ 盘中半日量，放量倍数偏低属正常。需收盘后最终确认。如果下午继续放量（特别是科技ETF恐慌性抛售），B条件可能在尾盘触发。"}
+> {"收盘确认：B条件" + ("✓ 触发，" + str(b_count) + "只ETF放量≥1.5x。" if b_count >= 2 else "✗ 未触发，7只ETF放量倍数均低于1.5x。") if is_after_close else "⚠️ 盘中半日量，放量倍数偏低属正常。需收盘后最终确认。如果下午继续放量（特别是科技ETF恐慌性抛售），B条件可能在尾盘触发。"}
 
 ---
 
