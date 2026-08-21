@@ -1,6 +1,6 @@
 # A股每日复盘 V4.1 — ETF异动择时模型
 
-**日期：2026年08月21日| 盘中快照（11:44:27）| 数据源：mootdx + 腾讯财经 + 东财 + 同花顺**
+**日期：2026年08月21日| 收盘（15:03:04）| 数据源：mootdx + 腾讯财经 + 东财 + 同花顺**
 
 ---
 
@@ -8,13 +8,13 @@
 
 | 指数 | 最新点位 | 涨跌幅 | 成交额（亿） |
 |------|---------|--------|-------------|
-| 上证指数 | 3,903.81 | 0.00% | 5,907 |
-| 深证成指 | 14,061.45 | <span style="color:red">+0.63%</span> | 6,627 |
-| 创业板指 | 3,537.98 | <span style="color:red">+1.21%</span> | 3,304 |
-| 沪深300 | 4,616.83 | <span style="color:red">+0.52%</span> | 3,242 |
-| 科创50 | 1,654.19 | <span style="color:red">+0.07%</span> | 499 |
+| 上证指数 | 3,905.20 | <span style="color:red">+0.04%</span> | 8,834 |
+| 深证成指 | 14,094.17 | <span style="color:red">+0.87%</span> | 9,958 |
+| 创业板指 | 3,545.58 | <span style="color:red">+1.43%</span> | 4,913 |
+| 沪深300 | 4,618.90 | <span style="color:red">+0.57%</span> | 5,055 |
+| 科创50 | 1,653.56 | <span style="color:red">+0.04%</span> | 776 |
 
-> 多数指数上涨，创业板涨1.21%领涨，上证涨0.00%最强。两市成交额约12,534亿。ETF全面上涨，5G通信领涨。
+> 三大指数集体上涨，创业板涨1.43%领涨，上证涨0.04%最强。两市成交额约18,793亿。ETF全面上涨，5G通信领涨。
 
 ---
 
@@ -22,23 +22,23 @@
 
 | 指标 | 数值 |
 |------|------|
-| 两市成交额 | 12,534亿（盘中半日量） |
-| 上涨家数 | 1723 |
-| 下跌家数 | 3336 |
-| 平盘家数 | 493 |
+| 两市成交额 | 18,793亿 |
+| 上涨家数 | 2407 |
+| 下跌家数 | 2627 |
+| 平盘家数 | 518 |
 | 连板最高高度 | 3板 |
-| 上涨占比 | 31.0% |
+| 上涨占比 | 43.4% |
 
-> 涨停48只 / 跌停12只 / 连板股总数45只。
+> 涨停58只 / 跌停19只 / 连板股总数54只。
 
 ### 连板梯队
 
 | 高度 | 个股（板块） |
 |------|------------|
 | 3板 | 汉森制药(中药Ⅱ) |
-| 2板 | 深中华A(饰品)、双鹭药业(化学制药)、键凯科技(化学制药)、中 关 村(化学制药)、贝瑞基因(医疗服务)、哈森股份(服装家纺)、科森科技(消费电子)、近岸蛋白(生物制品)、康希诺(生物制品)、宇环数控(通用设备) |
+| 2板 | 深中华A(饰品)、双鹭药业(化学制药)、键凯科技(化学制药)、中 关 村(化学制药)、贝瑞基因(医疗服务)、哈森股份(服装家纺)、科森科技(消费电子)、近岸蛋白(生物制品)、宇环数控(通用设备)、通鼎互联(通信设备) |
 
-> 上涨1723家 vs 下跌3336家（平盘493家），涨停48只、跌停12只，最高3连板。ETF全面上涨，5G通信领涨，成交量为盘中半日量。
+> 上涨2407家 vs 下跌2627家（平盘518家），涨停58只、跌停19只，最高3连板。ETF全面上涨，5G通信领涨，成交量为全天量。
 
 ---
 
@@ -46,15 +46,15 @@
 
 | ETF | 今日成交额（亿） | 昨日成交额（亿） | 近5日均值（亿） | 放量倍数 |
 |-----|----------------|----------------|---------------|---------|
-| 510300 | 20.95 | 34.92 | 42.01 | 0.50x |
-| 159915 | 40.33 | 55.03 | 60.76 | 0.66x |
-| 588000 | 30.54 | 65.14 | 74.02 | 0.41x |
-| 512480 | 7.43 | 14.97 | 16.63 | 0.45x |
-| 588160 | 1.94 | 2.89 | 2.86 | 0.68x |
-| 515050 | 7.17 | 9.30 | 11.26 | 0.64x |
-| 588460 | 0.23 | 0.66 | 0.67 | 0.34x |
+| 510300 | 34.00 | 34.92 | 42.01 | 0.81x |
+| 159915 | 58.21 | 55.03 | 60.76 | 0.96x |
+| 588000 | 46.52 | 65.14 | 74.02 | 0.63x |
+| 512480 | 11.04 | 14.97 | 16.63 | 0.66x |
+| 588160 | 2.74 | 2.89 | 2.86 | 0.96x |
+| 515050 | 9.78 | 9.30 | 11.26 | 0.87x |
+| 588460 | 0.40 | 0.66 | 0.67 | 0.60x |
 
-> 今日为盘中数据（未收盘），成交额为半日量。放量倍数偏低属正常。B条件（≥2只ETF≥1.5x）暂未触发。
+> B条件（≥2只ETF≥1.5x）✗ 未触发，7只ETF放量倍数均低于1.5x。
 
 
 ---
@@ -63,43 +63,43 @@
 
 | 行业ETF | 名称 | 最新价 | 涨跌幅 | 成交额（亿） | 换手率 |
 |---------|------|--------|--------|-------------|--------|
-| 512400 | 有色金属ETF南方 | 1.929 | <span style="color:red">+2.39%</span> | 7.59 | 3.01% |
-| 515220 | 煤炭ETF国泰 | 1.283 | <span style="color:red">+1.18%</span> | 4.25 | 3.01% |
-| 159611 | 电力ETF广发 | 1.022 | <span style="color:green">-0.68%</span> | 1.36 | 1.39% |
-| 515880 | 通信ETF国泰 | 0.677 | <span style="color:red">+1.96%</span> | 22.61 | 5.37% |
-| 512010 | 医药ETF易方达 | 0.390 | <span style="color:green">-2.50%</span> | 4.91 | 3.10% |
-| 512880 | 证券ETF国泰 | 1.064 | <span style="color:red">+0.09%</span> | 7.41 | 1.18% |
+| 512400 | 有色金属ETF南方 | 1.946 | <span style="color:red">+3.29%</span> | 14.83 | 5.85% |
+| 515220 | 煤炭ETF国泰 | 1.277 | <span style="color:red">+0.71%</span> | 6.18 | 4.39% |
+| 159611 | 电力ETF广发 | 1.024 | <span style="color:green">-0.49%</span> | 2.60 | 2.67% |
+| 515880 | 通信ETF国泰 | 0.677 | <span style="color:red">+1.96%</span> | 31.48 | 7.47% |
+| 512010 | 医药ETF易方达 | 0.388 | <span style="color:green">-3.00%</span> | 6.83 | 4.31% |
+| 512880 | 证券ETF国泰 | 1.063 | 0.00% | 11.26 | 1.80% |
 
-> 行业ETF分化明显：有色金属ETF南方（+2.39%）、通信ETF国泰（+1.96%）上涨，医药ETF易方达（-2.50%）、电力ETF广发（-0.68%）下跌。
+> 行业ETF分化明显：有色金属ETF南方（+3.29%）、通信ETF国泰（+1.96%）上涨，医药ETF易方达（-3.00%）、电力ETF广发（-0.49%）下跌。
 
 ---
 
 ## 五、资金流向
 
-> 数据时间：2026-08-21 11:44:34
+> 数据时间：2026-08-21 15:03:14
 
 ### 5.1 大盘资金流总览
 
 | 资金类型 | 净流入(亿) | 说明 |
 |---------|-----------|------|
-| 主力资金 | <span style="color:red">+74.80</span> | 超大单+大单合计，机构/游资方向 |
-| ├ 超大单 | <span style="color:red">+118.13</span> | 单笔≥100万，主力大资金 |
-| └ 大单 | <span style="color:green">-43.33</span> | 单笔20-100万，中大户 |
-| 中单 | <span style="color:green">-124.88</span> | 单笔4-20万 |
-| 小单(散户) | <span style="color:red">+50.09</span> | 单笔&lt;4万 |
+| 主力资金 | <span style="color:red">+167.16</span> | 超大单+大单合计，机构/游资方向 |
+| ├ 超大单 | <span style="color:red">+175.51</span> | 单笔≥100万，主力大资金 |
+| └ 大单 | <span style="color:green">-8.35</span> | 单笔20-100万，中大户 |
+| 中单 | <span style="color:green">-159.05</span> | 单笔4-20万 |
+| 小单(散户) | <span style="color:green">-8.10</span> | 单笔&lt;4万 |
 | 北向资金 | — | 沪股通<span style="color:green">-9.28</span>亿（深股通数据异常未计入） |
-| 两市总成交额 | **12534亿** | 上证+深成（盘中） |
+| 两市总成交额 | **18793亿** | 上证+深成（收盘） |
 
 ### 5.2 指数资金流明细
 
 | 指数 | 涨跌幅 | 主力净流入(亿) | 超大单(亿) | 大单(亿) | 中单(亿) | 小单(亿) | 主力净占比% |
 |------|--------|--------------|-----------|---------|---------|---------|------------|
-| 上证指数 | 0.00% | <span style="color:green">-4.66</span> | <span style="color:red">+36.67</span> | <span style="color:green">-41.33</span> | <span style="color:green">-30.48</span> | <span style="color:red">+35.15</span> | -0.08 |
-| 深证成指 | <span style="color:red">+0.63%</span> | <span style="color:red">+79.46</span> | <span style="color:red">+81.46</span> | <span style="color:green">-2.00</span> | <span style="color:green">-94.40</span> | <span style="color:red">+14.94</span> | 1.20 |
-| 创业板指 | <span style="color:red">+1.21%</span> | <span style="color:red">+27.12</span> | <span style="color:red">+35.32</span> | <span style="color:green">-8.20</span> | <span style="color:green">-60.93</span> | <span style="color:red">+33.81</span> | 0.82 |
-| 沪深300 | <span style="color:red">+0.52%</span> | <span style="color:red">+90.11</span> | <span style="color:red">+77.43</span> | <span style="color:red">+12.68</span> | <span style="color:green">-76.26</span> | <span style="color:green">-13.85</span> | 2.78 |
-| 科创50 | <span style="color:red">+0.07%</span> | <span style="color:green">-4.80</span> | <span style="color:red">+6.73</span> | <span style="color:green">-11.52</span> | <span style="color:red">+3.10</span> | <span style="color:red">+1.70</span> | -0.96 |
-| 上证50 | <span style="color:red">+0.18%</span> | <span style="color:red">+3.64</span> | <span style="color:red">+10.47</span> | <span style="color:green">-6.83</span> | <span style="color:green">-5.81</span> | <span style="color:red">+2.17</span> | 0.42 |
+| 上证指数 | <span style="color:red">+0.04%</span> | <span style="color:red">+23.58</span> | <span style="color:red">+57.97</span> | <span style="color:green">-34.39</span> | <span style="color:green">-35.89</span> | <span style="color:red">+12.32</span> | 0.27 |
+| 深证成指 | <span style="color:red">+0.87%</span> | <span style="color:red">+143.58</span> | <span style="color:red">+117.54</span> | <span style="color:red">+26.04</span> | <span style="color:green">-123.16</span> | <span style="color:green">-20.42</span> | 1.44 |
+| 创业板指 | <span style="color:red">+1.43%</span> | <span style="color:red">+45.12</span> | <span style="color:red">+45.00</span> | <span style="color:red">+0.11</span> | <span style="color:green">-80.06</span> | <span style="color:red">+34.95</span> | 0.91 |
+| 沪深300 | <span style="color:red">+0.57%</span> | <span style="color:red">+130.83</span> | <span style="color:red">+100.99</span> | <span style="color:red">+29.84</span> | <span style="color:green">-93.02</span> | <span style="color:green">-37.81</span> | 2.59 |
+| 科创50 | <span style="color:red">+0.04%</span> | <span style="color:green">-7.68</span> | <span style="color:red">+6.16</span> | <span style="color:green">-13.84</span> | <span style="color:red">+6.42</span> | <span style="color:red">+1.25</span> | -0.99 |
+| 上证50 | <span style="color:red">+0.07%</span> | <span style="color:red">+6.42</span> | <span style="color:red">+16.00</span> | <span style="color:green">-9.58</span> | <span style="color:green">-6.65</span> | <span style="color:red">+0.22</span> | 0.47 |
 
 ### 5.3 北向资金
 
@@ -125,50 +125,50 @@
 
 | 排名 | 行业 | 涨跌幅 | 主力净流入(亿) | 超大单(亿) | 主力净占比% |
 |------|------|--------|--------------|-----------|------------|
-| 1 | 通信设备 | <span style="color:red">+1.24%</span> | <span style="color:red">+71.36</span> | <span style="color:red">+60.48</span> | 6.20 |
-| 2 | 通信 | <span style="color:red">+0.58%</span> | <span style="color:red">+65.57</span> | <span style="color:red">+57.02</span> | 5.38 |
-| 3 | 电子 | <span style="color:red">+0.41%</span> | <span style="color:red">+57.08</span> | <span style="color:red">+54.01</span> | 1.76 |
-| 4 | 有色金属 | <span style="color:red">+1.92%</span> | <span style="color:red">+56.71</span> | <span style="color:red">+40.01</span> | 5.92 |
-| 5 | 元件 | <span style="color:red">+0.85%</span> | <span style="color:red">+26.79</span> | <span style="color:red">+12.96</span> | 4.14 |
-| 6 | 贵金属 | <span style="color:red">+4.29%</span> | <span style="color:red">+19.69</span> | <span style="color:red">+10.70</span> | 7.54 |
-| 7 | 电力设备 | <span style="color:red">+0.38%</span> | <span style="color:red">+17.91</span> | <span style="color:red">+10.41</span> | 1.96 |
-| 8 | 电池 | <span style="color:red">+1.28%</span> | <span style="color:red">+15.62</span> | <span style="color:red">+5.63</span> | 4.11 |
-| 9 | 消费电子 | <span style="color:red">+0.67%</span> | <span style="color:red">+12.03</span> | <span style="color:red">+10.98</span> | 3.29 |
-| 10 | 能源金属 | <span style="color:red">+4.39%</span> | <span style="color:red">+11.81</span> | <span style="color:red">+6.74</span> | 8.96 |
+| 1 | 有色金属 | <span style="color:red">+2.59%</span> | <span style="color:red">+88.29</span> | <span style="color:red">+59.87</span> | 6.09 |
+| 2 | 电子 | <span style="color:red">+0.73%</span> | <span style="color:red">+85.53</span> | <span style="color:red">+66.74</span> | 1.75 |
+| 3 | 通信设备 | <span style="color:red">+1.34%</span> | <span style="color:red">+85.32</span> | <span style="color:red">+76.34</span> | 5.17 |
+| 4 | 通信 | <span style="color:red">+0.78%</span> | <span style="color:red">+78.13</span> | <span style="color:red">+72.06</span> | 4.45 |
+| 5 | 元件 | <span style="color:red">+1.51%</span> | <span style="color:red">+44.90</span> | <span style="color:red">+19.51</span> | 4.58 |
+| 6 | 贵金属 | <span style="color:red">+5.99%</span> | <span style="color:red">+34.23</span> | <span style="color:red">+18.74</span> | 8.95 |
+| 7 | 电力设备 | <span style="color:red">+0.65%</span> | <span style="color:red">+20.39</span> | <span style="color:red">+14.52</span> | 1.50 |
+| 8 | 消费电子 | <span style="color:red">+1.16%</span> | <span style="color:red">+19.88</span> | <span style="color:red">+15.49</span> | 3.58 |
+| 9 | 基础化工 | <span style="color:red">+0.32%</span> | <span style="color:red">+16.97</span> | <span style="color:red">+14.18</span> | 1.72 |
+| 10 | 电池 | <span style="color:red">+1.25%</span> | <span style="color:red">+16.00</span> | <span style="color:red">+7.41</span> | 2.93 |
 
 **主力净流出TOP10：**
 
 | 排名 | 行业 | 涨跌幅 | 主力净流出(亿) | 超大单(亿) | 主力净占比% |
 |------|------|--------|--------------|-----------|------------|
-| 1 | 医药生物 | <span style="color:green">-3.02%</span> | <span style="color:green">-65.97</span> | <span style="color:green">-29.67</span> | -4.58 |
-| 2 | 化学制药 | <span style="color:green">-3.57%</span> | <span style="color:green">-27.85</span> | <span style="color:green">-12.57</span> | -5.54 |
-| 3 | 医疗服务 | <span style="color:green">-3.89%</span> | <span style="color:green">-17.11</span> | <span style="color:green">-8.23</span> | -5.14 |
-| 4 | 计算机 | <span style="color:green">-0.55%</span> | <span style="color:green">-14.10</span> | <span style="color:green">-6.33</span> | -2.71 |
-| 5 | 传媒 | <span style="color:green">-1.28%</span> | <span style="color:green">-12.58</span> | <span style="color:green">-6.93</span> | -7.79 |
-| 6 | 食品饮料 | <span style="color:green">-1.66%</span> | <span style="color:green">-10.80</span> | <span style="color:green">-6.61</span> | -6.20 |
-| 7 | 生物制品 | <span style="color:green">-2.74%</span> | <span style="color:green">-10.17</span> | <span style="color:green">-5.72</span> | -3.48 |
-| 8 | 建筑材料 | <span style="color:green">-0.58%</span> | <span style="color:green">-8.90</span> | <span style="color:green">-3.54</span> | -5.72 |
-| 9 | 银行Ⅱ | <span style="color:green">-0.42%</span> | <span style="color:green">-8.77</span> | <span style="color:green">-3.89</span> | -6.16 |
-| 10 | 玻璃玻纤 | <span style="color:red">+0.12%</span> | <span style="color:green">-8.40</span> | <span style="color:green">-3.28</span> | -7.11 |
+| 1 | 医药生物 | <span style="color:green">-3.14%</span> | <span style="color:green">-91.11</span> | <span style="color:green">-39.33</span> | -4.65 |
+| 2 | 化学制药 | <span style="color:green">-3.72%</span> | <span style="color:green">-34.65</span> | <span style="color:green">-14.05</span> | -5.10 |
+| 3 | 医疗服务 | <span style="color:green">-4.02%</span> | <span style="color:green">-30.82</span> | <span style="color:green">-14.17</span> | -6.68 |
+| 4 | 生物制品 | <span style="color:green">-3.27%</span> | <span style="color:green">-12.43</span> | <span style="color:green">-7.19</span> | -3.29 |
+| 5 | 传媒 | <span style="color:green">-0.59%</span> | <span style="color:green">-12.02</span> | <span style="color:green">-7.76</span> | -4.67 |
+| 6 | 食品饮料 | <span style="color:green">-1.47%</span> | <span style="color:green">-10.30</span> | <span style="color:green">-5.18</span> | -3.85 |
+| 7 | 银行Ⅱ | <span style="color:green">-0.42%</span> | <span style="color:green">-8.49</span> | <span style="color:green">-3.05</span> | -3.70 |
+| 8 | 农林牧渔 | <span style="color:green">-2.83%</span> | <span style="color:green">-8.21</span> | <span style="color:green">-3.94</span> | -3.26 |
+| 9 | 通信服务 | <span style="color:green">-0.51%</span> | <span style="color:green">-7.19</span> | <span style="color:green">-4.28</span> | -6.84 |
+| 10 | 计算机 | <span style="color:red">+0.09%</span> | <span style="color:green">-7.01</span> | <span style="color:green">-5.95</span> | -0.85 |
 
 ### 5.5 指数量能观察
 
 | 指数 | 涨跌幅 | 成交额(亿) | 量比 | 量能状态 |
 |------|--------|-----------|------|---------|
-| 上证指数 | 0.00% | 5906.7 | 1.14 | 平量 |
-| 深证成指 | <span style="color:red">+0.63%</span> | 6626.9 | 1.11 | 平量 |
-| 创业板指 | <span style="color:red">+1.21%</span> | 3303.9 | 1.16 | 平量 |
-| 沪深300 | <span style="color:red">+0.52%</span> | 3242.4 | 1.05 | 平量 |
-| 科创50 | <span style="color:red">+0.07%</span> | 499.5 | 0.87 | 缩量至0.87倍 |
-| 上证50 | <span style="color:red">+0.18%</span> | 861.2 | 1.04 | 平量 |
+| 上证指数 | <span style="color:red">+0.04%</span> | 8834.2 | 0.87 | 缩量至0.87倍 |
+| 深证成指 | <span style="color:red">+0.87%</span> | 9958.4 | 0.84 | 缩量至0.84倍 |
+| 创业板指 | <span style="color:red">+1.43%</span> | 4912.6 | 0.87 | 缩量至0.87倍 |
+| 沪深300 | <span style="color:red">+0.57%</span> | 5055.0 | 0.84 | 缩量至0.84倍 |
+| 科创50 | <span style="color:red">+0.04%</span> | 775.7 | 0.67 | 缩量至0.67倍 |
+| 上证50 | <span style="color:red">+0.07%</span> | 1376.1 | 0.85 | 缩量至0.85倍 |
 
-> **量能结论：** 量能平稳/缩量（量比0.9~1.2倍），资金参与度不足。
+> **量能结论：** 量能平稳/缩量（量比0.7~0.9倍），资金参与度不足。
 
 ### 5.6 资金面观察要点
-- 主力资金净流入**74.8亿**，机构做多意愿明显，其中超大单118.1亿主导
-- 散户（小单）净流入**50.1亿**，与主力形成同向
+- 主力资金净流入**167.2亿**，机构做多意愿明显，其中超大单175.5亿主导
+- 散户（小单）净流出**8.1亿**
 - 沪股通净流出**9.3亿**（深股通数据异常）
-- 主力资金偏好方向：**通信设备、通信、电子**
+- 主力资金偏好方向：**有色金属、电子、通信设备**
 - 主力资金流出方向：**医药生物、化学制药、医疗服务**
 - 量能不足，缩量状态下需警惕上涨动能衰竭
 
@@ -185,8 +185,8 @@
 
 ## 六、今日最强主线
 
-**涨幅方向：** 通信设备（+1.24%）、通信（+0.58%）、航运港口（+0.52%）、其他电子Ⅱ（+0.52%）、塑料（+0.45%）
-**跌幅方向：** 农林牧渔（-3.03%）、医药生物（-3.02%）、食品饮料（-1.66%）、房地产开发（-1.59%）、出版（-1.56%）
+**涨幅方向：** 塑料（+1.54%）、通信设备（+1.34%）、其他电子Ⅱ（+0.79%）、通信（+0.78%）、航运港口（+0.73%）
+**跌幅方向：** 医药生物（-3.14%）、农林牧渔（-2.83%）、食品饮料（-1.47%）、航空机场（-1.05%）、出版（-0.96%）
 
 市场风格：科技方向走强，半导体、科创等成长板块反弹。
 
@@ -219,19 +219,19 @@
 
 | 时间 | 标题 |
 |------|------|
-| 2026-08-21 11:41:17 | 兆龙互连：公司具备高速有源铜缆相关产品开发及供货能力 |
-| 2026-08-21 11:37:00 | 银监法修订草案二审稿：拟强化消费者权益保护与监管职责 |
-| 2026-08-21 11:36:28 | 航天电器：CPU SOCKET相关产品已通过验证 |
-| 2026-08-21 11:36:10 | 半日主力资金丨加仓电子股 抛售医药生物板块 |
-| 2026-08-21 11:30:26 | 创业板指上涨1.21% 贵金属、能源金属领涨 农业股回落 |
+| 2026-08-21 15:00:58 | A股年内第9次不足2万亿成交 |
+| 2026-08-21 15:00:35 | 国内商品期货收盘 主力合约多数上涨 |
+| 2026-08-21 15:00:02 | 沪指震荡整理 创业板指涨1.43% 成交额不足1.9万亿 |
+| 2026-08-21 14:59:21 | 澳大利亚综合PMI录得52.5 |
+| 2026-08-21 14:59:06 | 中国科学家找到水稻“早熟又高产”基因 |
 
 ---
 
 ## 十、ETF异动历史匹配
 
-沪深300ETF（510300）+0.56%、创业板ETF（159915）+1.22%、科创50ETF（588000）+0.11%、半导体ETF（512480）+0.38%、科创新材ETF（588160）+0.46%、5G通信ETF（515050）+2.05%、科创增强ETF（588460）-0.24%。
+沪深300ETF（510300）+0.58%、创业板ETF（159915）+1.37%、科创50ETF（588000）+0.06%、半导体ETF（512480）+0.29%、科创新材ETF（588160）+0.73%、5G通信ETF（515050）+2.64%、科创增强ETF（588460）-0.15%。
 
-**B条件状态：** 盘中放量倍数均低于1.0x（半日量），需观察尾盘是否放量。当前B条件未触发。
+**B条件状态：** 收盘确认：B条件✗ 未触发，放量倍数均低于1.5x。
 
 ---
 
@@ -239,11 +239,11 @@
 
 | 风险指标 | 今日状态 | 触发 |
 |---------|---------|------|
-| 科创50单日跌幅>5% | 0.07% | ✗ |
-| 半导体ETF跌幅>5% | 0.38% | ✗ |
-| 下跌家数>3500 | 3336 | ✗ |
-| 两市成交额>2万亿 | 12,534亿 | ✗ |
-| 跌停家数>50 | 12 | ✗ |
+| 科创50单日跌幅>5% | 0.04% | ✗ |
+| 半导体ETF跌幅>5% | 0.29% | ✗ |
+| 下跌家数>3500 | 2627 | ✗ |
+| 两市成交额>2万亿 | 18,793亿 | ✗ |
+| 跌停家数>50 | 19 | ✗ |
 
 ---
 
@@ -251,10 +251,10 @@
 
 | 条件 | 代号 | 阈值 | 今日数值 | 是否触发 |
 |------|------|------|---------|---------|
-| 下跌家数 | A | > 3500家 | 3336家 | ✗ |
+| 下跌家数 | A | > 3500家 | 2627家 | ✗ |
 | ETF放量倍数 | B | ≥ 2只ETF ≥ 1.5x | 0只≥1.5x | ✗ |
-| 两市成交额 | C | > 2万亿 | 12,534亿 | ✗ |
-| 跌停家数 | D | > 50家 | 12家 | ✗ |
+| 两市成交额 | C | > 2万亿 | 18,793亿 | ✗ |
+| 跌停家数 | D | > 50家 | 19家 | ✗ |
 
 ---
 
@@ -263,11 +263,11 @@
 **当前星级：（0/4星）**
 
 - A条件（下跌家数>3500）：✗ 未触发（或数据待补）
-- B条件（≥2只ETF放量≥1.5x）：✗ 未触发（盘中半日量）
-- C条件（两市成交>2万亿）：✗ 未触发（盘中半日量）
+- B条件（≥2只ETF放量≥1.5x）：✗ 未触发
+- C条件（两市成交>2万亿）：✗ 未触发
 - D条件（跌停>50家）：✗ 未触发（或数据待补）
 
-> 盘中数据不完整，星级评定为参考值。需收盘后最终确认。
+> 
 
 ---
 
@@ -275,11 +275,11 @@
 
 | 指标 | 数值 | 涨跌 |
 |------|------|------|
-| 上证PE(TTM) | 17.87 | — |
-| 深证PE(TTM) | 44.93 | — |
-| 创业板PE(TTM) | 58.45 | — |
-| 沪深300PE(TTM) | 14.15 | — |
-| 科创50PE(TTM) | 167.16 | — |
+| 上证PE(TTM) | 17.86 | — |
+| 深证PE(TTM) | 45.06 | — |
+| 创业板PE(TTM) | 58.60 | — |
+| 沪深300PE(TTM) | 14.14 | — |
+| 科创50PE(TTM) | 166.88 | — |
 | 美元指数 | 数据待补录 | — |
 | 黄金 | 数据待补录 | — |
 | 恒生指数 | 数据待补录 | — |
@@ -291,17 +291,17 @@
 | 维度 | 状态 |
 |------|------|
 | 市场情绪 | 科技方向走强，半导体、科创等成长板块反弹 |
-| 资金强弱 | 缩量/平量（12,534亿，量比0.9~1.2x，盘中） |
+| 资金强弱 | 缩量/平量（18,793亿，量比0.7~0.9x，收盘） |
 | ETF状态 | ETF全面上涨，5G通信领涨 |
 | 市场风格 | 成长科技 |
 | 是否极端 | 否 |
-| 是否ETF异动 | 否（放量倍数均<1.5x（盘中半日量）） |
-| 是否值得跟踪 | 是（关注收盘后B条件是否触发） |
+| 是否ETF异动 | 否（放量倍数均<1.5x） |
+| 是否值得跟踪 | 否（B条件未触发，等待重新进场信号） |
 | 外部环境 | 科技方向走强，半导体、科创等成长板块反弹 |
 
 ---
 
-**报告生成时间：** 2026-08-21 11:44:27
+**报告生成时间：** 2026-08-21 15:03:04
 **模板版本：** V4.1
 **数据来源：** mootdx + 腾讯财经 + 东财 + 同花顺 + 公开市场数据
 **GitHub存档：** reports/20260821.md
